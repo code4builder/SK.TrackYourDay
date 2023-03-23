@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace SK.TrackYourDay.Expenses.Models
 {
@@ -6,9 +7,15 @@ namespace SK.TrackYourDay.Expenses.Models
     {
         [Key]
         public int Id { get; set; }
-        public string Name { get; set; }
+
+        [DisplayName("Expense")]
+        [Required]
+        public string ExpenseName { get; set; }
         public string? Description { get; set; }
+
+        [Required]
         public decimal Amount { get; set; }
+
         public ExpenseCategory Category { get; set; }
         public string Date { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
