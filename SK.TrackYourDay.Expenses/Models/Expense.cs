@@ -16,8 +16,11 @@ namespace SK.TrackYourDay.Expenses.Models
         [Required]
         public decimal Amount { get; set; }
 
-        public ExpenseCategory Category { get; set; }
+        //public ExpenseCategory Category { get; set; }
         public string Date { get; set; }
-        public PaymentMethod PaymentMethod { get; set; }
+        //public PaymentMethod PaymentMethod { get; set; }
+
+        [Required]
+        public int UserId { get; set; }
     }
 }
