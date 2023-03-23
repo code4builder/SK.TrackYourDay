@@ -18,7 +18,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             return View(objList);
         }
 
-        //GET-Create
+        //GET-Create - Creating View
         public IActionResult Create()
         {
             return View();
@@ -37,6 +37,39 @@ namespace SK.TrackYourDay.Expenses.Controllers
             }
 
             return View(expense);
+        }
+
+        // GET-Delete - Creating View
+        public IActionResult Delete(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+
+            var expense = _db.Expenses.FirstOrDefault(x => x.Id == id);
+            if (expense == null)
+            {
+                return NotFound();
+            }
+            return View(expense);
+        }
+
+        // POST-Delete
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeletePost(int? id)
+        {
+            var expense = _db.Expenses.FirstOrDefault(x => x.Id == id);
+
+            if (expense == null)
+            {
+                return NotFound();
+            }
+            _db.Expenses.Remove(expense);
+            _db.SaveChanges();
+
+            return RedirectToAction("Index");
         }
     }
 }
