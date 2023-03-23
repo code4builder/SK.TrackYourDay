@@ -1,7 +1,68 @@
-﻿
+﻿@model IEnumerable<SK.TrackYourDay.Expenses.Models.Expense>
 @{
     ViewData["Title"] = "Index";
 }
 
 <h1>Expenses Tracker</h1>
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">All Expenses List</h2>
+        </div>
+        <div class="col-6 text-right">
+            <a asp-controller="Expenses" asp-action="Create" class="btn btn-primary">Create new expense</a>
+        </div>
+    </div>
+    <br />
 
+    @if(Model.Count() > 0)
+    {
+        <table class="table table-bordered table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th>
+                        Expense Name
+                    </th>
+                    <th>
+                        Description
+                    </th>
+                    <th>
+                        Amount
+                    </th>
+                    <th>
+                        Date
+                    </th>
+                    <th>
+                        Category
+                    </th>
+                    <th>
+                        Payment Method
+                    </th>
+                    <th>
+                        User Id
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var expense in Model)
+                {
+                    <tr>
+                        <td width="20%">@expense.ExpenseName</td>
+                        <td width="20%">@expense.Description</td>
+                        <td width="20%">@expense.Amount</td>
+                        <td width="20%">@expense.Date</td>
+                        <td width="5%"></td>
+                        <td width="5%"></td>
+                        <td width="10%">@expense.UserId</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No expenses created yet</p>
+    }
+
+</div>
