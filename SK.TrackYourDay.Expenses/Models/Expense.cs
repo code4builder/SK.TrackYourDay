@@ -14,6 +14,7 @@ namespace SK.TrackYourDay.Expenses.Models
         public string? Description { get; set; }
 
         [Required]
+        [Range(0, (double)decimal.MaxValue, ErrorMessage = "Amount must be greater than 0!")]
         public decimal Amount { get; set; }
 
         //public ExpenseCategory Category { get; set; }

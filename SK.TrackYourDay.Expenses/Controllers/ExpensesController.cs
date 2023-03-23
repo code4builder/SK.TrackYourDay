@@ -18,9 +18,25 @@ namespace SK.TrackYourDay.Expenses.Controllers
             return View(objList);
         }
 
+        //GET-Create
         public IActionResult Create()
         {
             return View();
+        }
+
+        //POST-Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Expense expense)
+        {
+            if (ModelState.IsValid)
+            {
+                _db.Expenses.Add(expense);
+                _db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+
+            return View(expense);
         }
     }
 }
