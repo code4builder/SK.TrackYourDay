@@ -1,20 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SK.TrackYourDay.Expenses.Data;
+using SK.TrackYourDay.Expenses.Data.Services;
 using SK.TrackYourDay.Expenses.Models;
+using SK.TrackYourDay.Expenses.Models.ViewModels;
 
 namespace SK.TrackYourDay.Expenses.Controllers
 {
     public class ExpensesController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public ExpensesController(ApplicationDbContext dbContext)
+        private ExpensesService _expensesService;
+        public ExpensesController(ExpensesService expensesService)
         {
-            _db = dbContext;
+            _expensesService = expensesService;
         }
 
         public IActionResult Index()
         {
-            IEnumerable<Expense> objList = _db.Expenses;
+            var objList = _expensesService.GetAllExpensesVM();
             return View(objList);
         }
 
@@ -27,12 +29,11 @@ namespace SK.TrackYourDay.Expenses.Controllers
         //POST-Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Expense expense)
+        public IActionResult Create(ExpenseVM expense)
         {
             if (ModelState.IsValid)
             {
-                _db.Expenses.Add(expense);
-                _db.SaveChanges();
+                _expensesService.AddExpense(expense);
                 return RedirectToAction("Index");
             }
 
@@ -42,17 +43,15 @@ namespace SK.TrackYourDay.Expenses.Controllers
         // GET-Delete - Creating View
         public IActionResult Delete(int? id)
         {
-            if (id == null || id == 0)
+            try
+            {
+                var expense = _expensesService.GetExpenseVMById((int)id);
+                return View(expense);
+            }
+            catch (Exception)
             {
                 return NotFound();
             }
-
-            var expense = _db.Expenses.FirstOrDefault(x => x.Id == id);
-            if (expense == null)
-            {
-                return NotFound();
-            }
-            return View(expense);
         }
 
         // POST-Delete
@@ -60,14 +59,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeletePost(int? id)
         {
-            var expense = _db.Expenses.FirstOrDefault(x => x.Id == id);
-
-            if (expense == null)
-            {
-                return NotFound();
-            }
-            _db.Expenses.Remove(expense);
-            _db.SaveChanges();
+            if(id != null)
+                _expensesService.DeleteExpenseById((int)id);
 
             return RedirectToAction("Index");
         }
@@ -80,7 +73,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 return NotFound();
             }
 
-            var expense = _db.Expenses.FirstOrDefault(x => x.Id == id);
+            var expense = _expensesService.GetExpenseVMById((int)id);
             if (expense == null)
             {
                 return NotFound();
@@ -91,12 +84,11 @@ namespace SK.TrackYourDay.Expenses.Controllers
         //POST-Update
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Update(Expense expense)
+        public IActionResult Update(ExpenseVM expense)
         {
             if (ModelState.IsValid)
             {
-                _db.Expenses.Update(expense);
-                _db.SaveChanges();
+                _expensesService.UpdateExpenseById(expense.Id, expense);
                 return RedirectToAction("Index");
             }
 

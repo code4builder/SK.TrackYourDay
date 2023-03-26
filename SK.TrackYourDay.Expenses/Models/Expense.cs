@@ -18,10 +18,25 @@ namespace SK.TrackYourDay.Expenses.Models
         public decimal Amount { get; set; }
 
         //public ExpenseCategory Category { get; set; }
-        public string Date { get; set; }
+
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
+        [DataType(DataType.Date)]
+        public DateTime Date { get; set; }
         //public PaymentMethod PaymentMethod { get; set; }
 
         [Required]
         public int UserId { get; set; }
+
+        public Expense() { }
+
+        public Expense(int id, string expenseName, string? description, decimal amount, DateTime date, int userId)
+        {
+            id = Id;
+            expenseName = ExpenseName;
+            description = Description;
+            amount = Amount;
+            date = Date;
+            userId = UserId;
+        }
     }
 }

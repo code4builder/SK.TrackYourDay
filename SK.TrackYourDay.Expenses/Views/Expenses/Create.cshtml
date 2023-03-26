@@ -1,4 +1,4 @@
-﻿@model SK.TrackYourDay.Expenses.Models.Expense
+﻿@model SK.TrackYourDay.Expenses.Models.ViewModels.ExpenseVM
 @{
     ViewData["Title"] = "Create";
 }
@@ -48,7 +48,7 @@
                         <span asp-validation-for="Amount" class="text-danger"></span>
                     </div>
                     <div class="col-2">
-                        <input asp-for="Date" class="form-control" />
+                        <input asp-for="Date" class="form-control" value="02/02/2022" />
                     </div>
 @*                    <div class="col-1">
                     <input asp-for="Category" class="form-control" />

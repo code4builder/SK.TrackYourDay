@@ -1,7 +1,8 @@
-﻿@model IEnumerable<SK.TrackYourDay.Expenses.Models.Expense>
+﻿@model IEnumerable<SK.TrackYourDay.Expenses.Models.ViewModels.ExpenseVM>
 @{
     ViewData["Title"] = "Index";
 }
+
 
 <h1>Expenses Tracker</h1>
 <div class="container p-3">
@@ -53,7 +54,7 @@
                         <td width="20%">@expense.ExpenseName</td>
                         <td width="20%">@expense.Description</td>
                         <td width="10%">@expense.Amount</td>
-                        <td width="10%">@expense.Date</td>
+                        <td width="10%">@expense.Date.ToString("d")</td>
                         <td width="5%"></td>
                         <td width="5%"></td>
                         <td width="5%">@expense.UserId</td>

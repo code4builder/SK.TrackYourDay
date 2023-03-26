@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SK.TrackYourDay.Expenses.Data;
+using SK.TrackYourDay.Expenses.Data.Services;
 
 namespace SK.TrackYourDay.Expenses
 {
@@ -14,6 +15,9 @@ namespace SK.TrackYourDay.Expenses
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            // Configure the Services
+            builder.Services.AddTransient<ExpensesService>();
 
             var app = builder.Build();
 
