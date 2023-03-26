@@ -14,9 +14,10 @@ namespace SK.TrackYourDay.Expenses.Controllers
             _expensesService = expensesService;
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        public IActionResult Index(string sortBy, string searchString, int pageNumber)
         {
-            var objList = _expensesService.GetAllExpensesVM();
+            var objList = _expensesService.GetAllExpensesVM(sortBy, searchString, pageNumber);
             return View(objList);
         }
 

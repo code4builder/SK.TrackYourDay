@@ -1,6 +1,8 @@
-﻿using SK.TrackYourDay.Expenses.Models;
+﻿using MyBooks.Data.Paging;
+using SK.TrackYourDay.Expenses.Models;
 using SK.TrackYourDay.Expenses.Models.ViewModels;
 using System;
+using System.Security.Policy;
 
 namespace SK.TrackYourDay.Expenses.Data.Services
 {
@@ -13,10 +15,30 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             _context = context;
         }
 
-        public List<Expense> GetAllExpenses() => _context.Expenses.ToList();
-        public IEnumerable<ExpenseVM> GetAllExpensesVM()
+        public IEnumerable<ExpenseVM> GetAllExpensesVM(string sortBy, string searchString, int? pageNumber)
         {
-            var expenses = _context.Expenses.ToList();
+            var expenses = _context.Expenses.OrderByDescending(e => e.Date).ToList();
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "name_desc":
+                        expenses = expenses.OrderByDescending(p => p.ExpenseName).ToList();
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                expenses = expenses.Where(p => p.ExpenseName.Contains(searchString, StringComparison.CurrentCultureIgnoreCase)).ToList();
+            }
+
+            // Paging
+            int pageSize = 5;
+            expenses = PaginatedList<Expense>.Create(expenses.AsQueryable(), pageNumber ?? 1, pageSize);
+
             var expensesVM = new List<ExpenseVM>();
 
             if (expenses.Any())
