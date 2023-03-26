@@ -18,6 +18,8 @@ namespace SK.TrackYourDay.Expenses
 
             // Configure the Services
             builder.Services.AddTransient<ExpensesService>();
+            builder.Services.AddTransient<ExpenseCategoriesService>();
+
 
             var app = builder.Build();
 

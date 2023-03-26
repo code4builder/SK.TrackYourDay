@@ -1,5 +1,7 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SK.TrackYourDay.Expenses.Models
 {
@@ -15,6 +17,7 @@ namespace SK.TrackYourDay.Expenses.Models
 
         [Required]
         [Range(0, (double)decimal.MaxValue, ErrorMessage = "Amount must be greater than 0!")]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
         //public ExpenseCategory Category { get; set; }
