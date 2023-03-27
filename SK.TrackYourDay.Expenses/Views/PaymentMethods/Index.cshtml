@@ -1,6 +1,6 @@
-﻿@model IEnumerable<SK.TrackYourDay.Expenses.Models.ExpenseCategory>
+﻿@model IEnumerable<SK.TrackYourDay.Expenses.Models.PaymentMethod>
 @{
-    ViewData["Title"] = "Index Expense Categories";
+    ViewData["Title"] = "Index Payment Methods";
 }
 
 
@@ -8,10 +8,10 @@
 <div class="container p-3">
     <div class="row pt-4">
         <div class="col-6">
-            <h2 class="text-primary">All Expense Categories List</h2>
+            <h2 class="text-primary">All Payment Methods List</h2>
         </div>
         <div class="col-6 text-right">
-            <a asp-controller="ExpenseCategories" asp-action="Create" class="btn btn-primary">Create a new expense category</a>
+            <a asp-controller="PaymentMethods" asp-action="Create" class="btn btn-primary">Create a new payment method</a>
         </div>
     </div>
     <br />
@@ -22,19 +22,19 @@
             <thead>
                 <tr>
                     <th>
-                        Expense Category Name
+                        Payment Method Name
                     </th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var expenseCategory in Model)
+                @foreach (var paymentMethod in Model)
                 {
                     <tr>
-                        <td width="30%">@expenseCategory.Name</td>
+                        <td width="30%">@paymentMethod.Name</td>
                         <td>
                             <div class="w-100 btn-group" role="group">
-                                <a asp-controller="ExpenseCategories" asp-action="Update" asp-route-Id="@expenseCategory.Id" class="btn btn-primary mx-1">Update</a>
-                                <a asp-controller="ExpenseCategories" asp-action="Delete" asp-route-Id="@expenseCategory.Id" class="btn btn-danger mx-1">Delete</a>
+                                <a asp-controller="PaymentMethods" asp-action="Update" asp-route-Id="@paymentMethod.Id" class="btn btn-primary mx-1">Update</a>
+                                <a asp-controller="PaymentMethods" asp-action="Delete" asp-route-Id="@paymentMethod.Id" class="btn btn-danger mx-1">Delete</a>
                             </div>
                         </td>
                     </tr>
