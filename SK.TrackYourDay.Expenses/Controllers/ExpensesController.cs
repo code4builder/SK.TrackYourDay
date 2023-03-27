@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SK.TrackYourDay.Expenses.Data;
 using SK.TrackYourDay.Expenses.Data.Services;
 using SK.TrackYourDay.Expenses.Models;
@@ -24,6 +25,9 @@ namespace SK.TrackYourDay.Expenses.Controllers
         //GET-Create - Creating View
         public IActionResult Create()
         {
+            var ExpenseCategoriesDropDown = _expensesService.GetExpenseCategoriesDropDown();
+            ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
+
             return View();
         }
 

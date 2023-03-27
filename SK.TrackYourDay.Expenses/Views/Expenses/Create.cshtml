@@ -25,9 +25,9 @@
                     <div class="col-2">
                         <label asp-for="Date"></label>
                     </div>
-@*                    <div class="col-1">
-                        <label asp-for="Category"></label>
-                    </div>*@
+                    <div class="col-1">
+                        <label asp-for="ExpenseCategory"></label>
+                    </div>
 @*                    <div class="col-1">
                         <label asp-for="Payment Method"></label>
                     </div>*@
@@ -50,9 +50,11 @@
                     <div class="col-2">
                         <input asp-for="Date" class="form-control" value="02/02/2022" />
                     </div>
-@*                    <div class="col-1">
-                    <input asp-for="Category" class="form-control" />
-                    </div>*@
+                    <div class="col-1">
+                        <select asp-for="ExpenseCategory" asp-items="@ViewBag.ExpenseCategoriesDropDown" class="form-control" >
+                            <option selected>--Select Category--</option>
+                        </select>
+                    </div>
 @*                    <div class="col-1">
                     <input asp-for="Payment Method" class="form-control" />
                     </div>*@

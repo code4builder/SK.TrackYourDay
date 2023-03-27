@@ -20,11 +20,16 @@ namespace SK.TrackYourDay.Expenses.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
-        //public ExpenseCategory Category { get; set; }
+        [DisplayName("Expense Category")]
+        public int? ExpenseCategoryId { get; set; }
+
+        [ForeignKey("ExpenseCategoryId")]
+        public virtual ExpenseCategory ExpenseCategory { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         [DataType(DataType.Date)]
         public DateTime Date { get; set; }
+
         //public PaymentMethod PaymentMethod { get; set; }
 
         [Required]

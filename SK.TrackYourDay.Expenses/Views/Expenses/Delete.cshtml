@@ -4,7 +4,7 @@
 }
 
 <form method="post" asp-action="DeletePost">
-    <input asp-for="Id" hidden/>
+    <input asp-for="Id" hidden />
     <div class="border p-3">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -26,9 +26,9 @@
                     <div class="col-2">
                         <label asp-for="Date"></label>
                     </div>
-                    @*                    <div class="col-1">
-                    <label asp-for="Category"></label>
-                    </div>*@
+                    <div class="col-1">
+                        <label asp-for="ExpenseCategory"></label>
+                    </div>
                     @*                    <div class="col-1">
                     <label asp-for="Payment Method"></label>
                     </div>*@
@@ -51,9 +51,9 @@
                     <div class="col-2">
                         <input asp-for="Date" disabled class="form-control" />
                     </div>
-                    @*                    <div class="col-1">
-                    <input asp-for="Category" disabled class="form-control" />
-                    </div>*@
+                    <div class="col-1">
+                        <input asp-for="ExpenseCategory" disabled class="form-control" />
+                    </div>
                     @*                    <div class="col-1">
                     <input asp-for="Payment Method" disabled class="form-control" />
                     </div>*@

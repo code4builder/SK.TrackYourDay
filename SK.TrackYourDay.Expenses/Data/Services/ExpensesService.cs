@@ -1,4 +1,5 @@
-﻿using MyBooks.Data.Paging;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using MyBooks.Data.Paging;
 using SK.TrackYourDay.Expenses.Models;
 using SK.TrackYourDay.Expenses.Models.ViewModels;
 using System;
@@ -52,6 +53,7 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             }
             return expensesVM;
         }
+
         public ExpenseVM GetExpenseVMById(int id)
         {
             var expense = _context.Expenses.FirstOrDefault(x => x.Id == id);
@@ -59,11 +61,20 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             return expenseVM;
         }
 
-        public void AddExpense(ExpenseVM expense)
+        public void AddExpense(ExpenseVM expenseVM)
         {
-            var _expense = ConvertVMToExpense(expense);
-            
-            _context.Expenses.Add(_expense);
+            var expense = new Expense()
+            {
+                Id = expenseVM.Id,
+                ExpenseName = expenseVM.ExpenseName,
+                Description = expenseVM.Description,
+                Amount = expenseVM.Amount,
+                ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == Int32.Parse(expenseVM.ExpenseCategory)),
+                Date = expenseVM.Date,
+                UserId = expenseVM.UserId
+            };
+
+            _context.Expenses.Add(expense);
             _context.SaveChanges();
 
             // TODO: add to another related tables
@@ -94,7 +105,7 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             }
         }
 
-        public static ExpenseVM ConvertExpenseToVM(Expense expense)
+        public ExpenseVM ConvertExpenseToVM(Expense expense)
         {
             var expenseVM = new ExpenseVM()
             {
@@ -102,6 +113,7 @@ namespace SK.TrackYourDay.Expenses.Data.Services
                 ExpenseName = expense.ExpenseName,
                 Description = expense.Description,
                 Amount = expense.Amount,
+                ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == expense.ExpenseCategoryId).Name.ToString(),
                 Date = expense.Date,
                 UserId = expense.UserId
             };
@@ -116,10 +128,23 @@ namespace SK.TrackYourDay.Expenses.Data.Services
                 ExpenseName = expenseVM.ExpenseName,
                 Description = expenseVM.Description,
                 Amount = expenseVM.Amount,
+                ExpenseCategory = (ExpenseCategory)Enum.Parse(typeof(ExpenseCategory), expenseVM.ExpenseCategory),
                 Date = expenseVM.Date,
                 UserId = expenseVM.UserId
             };
             return expense;
+        }
+
+        public IEnumerable<SelectListItem> GetExpenseCategoriesDropDown()
+        {
+            IEnumerable<SelectListItem> expenseCategoriesDropDown = _context
+                    .ExpenseCategories.Select(i => new SelectListItem
+            {
+                Text = i.Name,
+                Value = i.Id.ToString()
+            });
+
+            return expenseCategoriesDropDown;
         }
 
         public Expense GetExpenseById(int id) => _context.Expenses.FirstOrDefault(x => x.Id == id);
