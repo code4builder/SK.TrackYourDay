@@ -1,0 +1,49 @@
+﻿@model IEnumerable<SK.TrackYourDay.Expenses.Models.ExpenseCategory>
+@{
+    ViewData["Title"] = "Index Expense Categories";
+}
+
+
+<h1>Expenses Tracker</h1>
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">All Expense Categories List</h2>
+        </div>
+        <div class="col-6 text-right">
+            <a asp-controller="ExpenseCategories" asp-action="Create" class="btn btn-primary">Create a new expense category</a>
+        </div>
+    </div>
+    <br />
+
+    @if (Model.Count() > 0)
+    {
+        <table class="table table-bordered table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th>
+                        Expense Category Name
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var expenseCategory in Model)
+                {
+                    <tr>
+                        <td width="30%">@expenseCategory.Name</td>
+                        <td>
+                            <div class="w-100 btn-group" role="group">
+                                <a asp-controller="ExpenseCategories" asp-action="Update" asp-route-Id="@expenseCategory.Id" class="btn btn-primary mx-1">Update</a>
+                                <a asp-controller="ExpenseCategories" asp-action="Delete" asp-route-Id="@expenseCategory.Id" class="btn btn-danger mx-1">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No expense categories created yet</p>
+    }
+</div>

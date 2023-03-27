@@ -18,13 +18,15 @@ namespace SK.TrackYourDay.Expenses.Models.ViewModels
         [Range(0, (double)decimal.MaxValue, ErrorMessage = "Amount must be greater than 0!")]
         public decimal Amount { get; set; }
 
-        [DisplayName("Expense Category")]
-        public string ExpenseCategory { get; set; }
-
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
-        //public PaymentMethod PaymentMethod { get; set; }
+
+        [DisplayName("Expense Category")]
+        public string ExpenseCategory { get; set; }
+
+        [DisplayName("Payment Method")]
+        public string PaymentMethod { get; set; }
 
         [Required]
         public int UserId { get; set; }
