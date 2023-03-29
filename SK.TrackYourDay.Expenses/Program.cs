@@ -17,6 +17,7 @@ namespace SK.TrackYourDay.Expenses
             builder.Services.AddControllersWithViews();
 
             // Configure the Services
+            builder.Services.AddTransient<AccountService>();
             builder.Services.AddTransient<ExpensesService>();
             builder.Services.AddTransient<ExpenseCategoriesService>();
             builder.Services.AddTransient<PaymentMethodsService>();
