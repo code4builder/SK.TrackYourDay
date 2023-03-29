@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SK.TrackYourDay.Expenses.Data;
 using SK.TrackYourDay.Expenses.Data.Services;
@@ -15,6 +16,8 @@ namespace SK.TrackYourDay.Expenses
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 
             // Configure the Services
             builder.Services.AddTransient<AccountService>();

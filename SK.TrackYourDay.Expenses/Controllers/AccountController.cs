@@ -11,7 +11,12 @@ namespace SK.TrackYourDay.Expenses.Controllers
             _accountService = accountService;
         }
 
-        public IActionResult Index()
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        public IActionResult Register()
         {
             return View();
         }
