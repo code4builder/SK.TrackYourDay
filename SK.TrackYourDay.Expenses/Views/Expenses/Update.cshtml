@@ -1,0 +1,88 @@
+﻿@model SK.TrackYourDay.Expenses.Models.ViewModels.ExpenseVM
+@{
+    ViewData["Title"] = "Update";
+}
+
+<form method="post" asp-action="Update">
+    <input asp-for="Id" hidden />
+    <div class="border p-3">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group row">
+            <h2 class="text-black-50 pl-3">Update Expense</h2>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group row">
+                    <div class="col-2">
+                        <label asp-for="ExpenseName"></label>
+                    </div>
+                    <div class="col-2">
+                        <label asp-for="Description"></label>
+                    </div>
+                    <div class="col-1">
+                        <label asp-for="Amount"></label>
+                    </div>
+                    <div class="col-2">
+                        <label asp-for="Date"></label>
+                    </div>
+                    <div class="col-2">
+                        <label asp-for="ExpenseCategory"></label>
+                    </div>
+                    <div class="col-1">
+                        <label asp-for="PaymentMethod"></label>
+                    </div>
+                    <div class="col-2">
+                        <label asp-for="UserId"></label>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-2">
+                        <input asp-for="ExpenseName" class="form-control" />
+                        <span asp-validation-for="ExpenseName" class="text-danger"></span>
+                    </div>
+                    <div class="col-2">
+                        <input asp-for="Description" class="form-control" />
+                    </div>
+                    <div class="col-1">
+                        <input asp-for="Amount" class="form-control" />
+                        <span asp-validation-for="Amount" class="text-danger"></span>
+                    </div>
+                    <div class="col-2">
+                        <input asp-for="Date" class="form-control" />
+                    </div>
+                    <div class="col-2">
+                        <select asp-for="ExpenseCategory" asp-items="@ViewBag.ExpenseCategoriesDropDown" class="form-control">
+                            <option selected>--Select Category--</option>
+                        </select>
+                    </div>
+                    <div class="col-1">
+                        <select asp-for="PaymentMethod" asp-items="@ViewBag.PaymentMethodsDropDown" class="form-control">
+                            <option selected>--Select Category--</option>
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <input asp-for="UserId" class="form-control" />
+                    </div>
+                </div>
+                <br />
+                <div class="form-group row">
+                    <div class="col-8 offset-2 row">
+                        <div class="col">
+                            <input type="submit" class="btn btn-success w-75" value="Update" />
+                        </div>
+                        <div class="col">
+                            <a asp-action="Index" class="btn btn-danger w-75">Back</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

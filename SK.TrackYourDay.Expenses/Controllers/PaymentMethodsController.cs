@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using SK.TrackYourDay.Expenses.Data;
 using SK.TrackYourDay.Expenses.Data.Services;
 using SK.TrackYourDay.Expenses.Models;
@@ -7,47 +6,39 @@ using SK.TrackYourDay.Expenses.Models.ViewModels;
 
 namespace SK.TrackYourDay.Expenses.Controllers
 {
-    public class ExpensesController : Controller
+    public class PaymentMethodsController : Controller
     {
-        private ExpensesService _expensesService;
         private PaymentMethodsService _paymentMethodsService;
-        public ExpensesController(ExpensesService expensesService, PaymentMethodsService paymentMethodsService)
+        public PaymentMethodsController(PaymentMethodsService paymentMethodsService)
         {
-            _expensesService = expensesService;
             _paymentMethodsService = paymentMethodsService;
         }
 
         [HttpGet]
-        public IActionResult Index(string sortBy, string searchString, int pageNumber)
+        public IActionResult Index()
         {
-            var objList = _expensesService.GetAllExpensesVM(sortBy, searchString, pageNumber);
+            var objList = _paymentMethodsService.GetAllPaymentMethods();
             return View(objList);
         }
 
         //GET-Create - Creating View
         public IActionResult Create()
         {
-            var ExpenseCategoriesDropDown = _expensesService.GetExpenseCategoriesDropDown();
-            ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
-
-            var PaymentMethodsDropDown = _expensesService.GetPaymentMethodsDropDown();
-            ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
-
             return View();
         }
 
         //POST-Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(ExpenseVM expense)
+        public IActionResult Create(PaymentMethod paymentMethod)
         {
             if (ModelState.IsValid)
             {
-                _expensesService.AddExpense(expense);
+                _paymentMethodsService.CreatePaymentMethod(paymentMethod);
                 return RedirectToAction("Index");
             }
 
-            return View(expense);
+            return View(paymentMethod);
         }
 
         // GET-Delete - Creating View
@@ -55,8 +46,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
         {
             try
             {
-                var expense = _expensesService.GetExpenseVMById((int)id);
-                return View(expense);
+                var paymentMethod = _paymentMethodsService.GetPaymentMethodById((int)id);
+                return View(paymentMethod);
             }
             catch (Exception)
             {
@@ -70,7 +61,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
         public IActionResult DeletePost(int? id)
         {
             if(id != null)
-                _expensesService.DeleteExpenseById((int)id);
+                _paymentMethodsService.DeletePaymentMethodById((int)id);
 
             return RedirectToAction("Index");
         }
@@ -83,34 +74,26 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 return NotFound();
             }
 
-            var expense = _expensesService.GetExpenseVMById((int)id);
-            if (expense == null)
+            var paymentMethod = _paymentMethodsService.GetPaymentMethodById((int)id);
+            if (paymentMethod == null)
             {
                 return NotFound();
             }
-
-            var ExpenseCategoriesDropDown = _expensesService.GetExpenseCategoriesDropDown();
-            ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
-
-            var PaymentMethodsDropDown = _expensesService.GetPaymentMethodsDropDown();
-            ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
-
-            return View(expense);
+            return View(paymentMethod);
         }
 
         //POST-Update
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Update(ExpenseVM expense)
+        public IActionResult Update(PaymentMethod paymentMethod)
         {
             if (ModelState.IsValid)
             {
-                _expensesService.UpdateExpenseById(expense.Id, expense);
+                _paymentMethodsService.UpdatePaymentMethodById(paymentMethod.Id, paymentMethod);
                 return RedirectToAction("Index");
             }
 
-            return View(expense);
+            return View(paymentMethod);
         }
-
     }
 }

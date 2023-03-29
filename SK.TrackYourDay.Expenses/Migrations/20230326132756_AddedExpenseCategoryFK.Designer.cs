@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SK.TrackYourDay.Expenses.Data;
 
@@ -11,9 +12,10 @@ using SK.TrackYourDay.Expenses.Data;
 namespace SK.TrackYourDay.Expenses.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230326132756_AddedExpenseCategoryFK")]
+    partial class AddedExpenseCategoryFK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,18 +49,12 @@ namespace SK.TrackYourDay.Expenses.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PaymentMethodId")
-                        .IsRequired()
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ExpenseCategoryId");
-
-                    b.HasIndex("PaymentMethodId");
 
                     b.ToTable("Expenses");
                 });
@@ -80,23 +76,6 @@ namespace SK.TrackYourDay.Expenses.Migrations
                     b.ToTable("ExpenseCategories");
                 });
 
-            modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.PaymentMethod", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PaymentMethods");
-                });
-
             modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.Expense", b =>
                 {
                     b.HasOne("SK.TrackYourDay.Expenses.Models.ExpenseCategory", "ExpenseCategory")
@@ -105,15 +84,7 @@ namespace SK.TrackYourDay.Expenses.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SK.TrackYourDay.Expenses.Models.PaymentMethod", "PaymentMethod")
-                        .WithMany()
-                        .HasForeignKey("PaymentMethodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("ExpenseCategory");
-
-                    b.Navigation("PaymentMethod");
                 });
 #pragma warning restore 612, 618
         }
