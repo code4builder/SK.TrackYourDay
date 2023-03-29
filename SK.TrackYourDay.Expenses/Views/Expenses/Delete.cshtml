@@ -20,18 +20,18 @@
                     <div class="col-2">
                         <label asp-for="Description"></label>
                     </div>
-                    <div class="col-2">
+                    <div class="col-1">
                         <label asp-for="Amount"></label>
                     </div>
                     <div class="col-2">
                         <label asp-for="Date"></label>
                     </div>
-                    <div class="col-1">
+                    <div class="col-2">
                         <label asp-for="ExpenseCategory"></label>
                     </div>
-                    @*                    <div class="col-1">
-                    <label asp-for="Payment Method"></label>
-                    </div>*@
+                    <div class="col-1">
+                        <label asp-for="PaymentMethod"></label>
+                    </div>
                     <div class="col-2">
                         <label asp-for="UserId"></label>
                     </div>
@@ -44,19 +44,19 @@
                     <div class="col-2">
                         <input asp-for="Description" disabled class="form-control" />
                     </div>
-                    <div class="col-2">
+                    <div class="col-1">
                         <input asp-for="Amount" disabled class="form-control" />
                         <span asp-validation-for="Amount" class="text-danger"></span>
                     </div>
                     <div class="col-2">
                         <input asp-for="Date" disabled class="form-control" />
                     </div>
-                    <div class="col-1">
+                    <div class="col-2">
                         <input asp-for="ExpenseCategory" disabled class="form-control" />
                     </div>
-                    @*                    <div class="col-1">
-                    <input asp-for="Payment Method" disabled class="form-control" />
-                    </div>*@
+                    <div class="col-1">
+                        <input asp-for="PaymentMethod" disabled class="form-control" />
+                    </div>
                     <div class="col-2">
                         <input asp-for="UserId" disabled class="form-control" />
                     </div>

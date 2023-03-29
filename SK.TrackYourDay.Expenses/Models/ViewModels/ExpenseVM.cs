@@ -16,6 +16,7 @@ namespace SK.TrackYourDay.Expenses.Models.ViewModels
 
         [Required]
         [Range(0, (double)decimal.MaxValue, ErrorMessage = "Amount must be greater than 0!")]
+        [DisplayFormat(DataFormatString = "{0:0}", ApplyFormatInEditMode = true)]
         public decimal Amount { get; set; }
 
         [DataType(DataType.Date)]

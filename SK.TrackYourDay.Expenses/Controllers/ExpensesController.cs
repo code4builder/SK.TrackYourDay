@@ -10,9 +10,11 @@ namespace SK.TrackYourDay.Expenses.Controllers
     public class ExpensesController : Controller
     {
         private ExpensesService _expensesService;
-        public ExpensesController(ExpensesService expensesService)
+        private PaymentMethodsService _paymentMethodsService;
+        public ExpensesController(ExpensesService expensesService, PaymentMethodsService paymentMethodsService)
         {
             _expensesService = expensesService;
+            _paymentMethodsService = paymentMethodsService;
         }
 
         [HttpGet]
@@ -27,6 +29,9 @@ namespace SK.TrackYourDay.Expenses.Controllers
         {
             var ExpenseCategoriesDropDown = _expensesService.GetExpenseCategoriesDropDown();
             ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
+
+            var PaymentMethodsDropDown = _expensesService.GetPaymentMethodsDropDown();
+            ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
 
             return View();
         }
@@ -83,6 +88,13 @@ namespace SK.TrackYourDay.Expenses.Controllers
             {
                 return NotFound();
             }
+
+            var ExpenseCategoriesDropDown = _expensesService.GetExpenseCategoriesDropDown();
+            ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
+
+            var PaymentMethodsDropDown = _expensesService.GetPaymentMethodsDropDown();
+            ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
+
             return View(expense);
         }
 

@@ -70,6 +70,7 @@ namespace SK.TrackYourDay.Expenses.Data.Services
                 Description = expenseVM.Description,
                 Amount = expenseVM.Amount,
                 ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == Int32.Parse(expenseVM.ExpenseCategory)),
+                PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == Int32.Parse(expenseVM.PaymentMethod)),
                 Date = expenseVM.Date,
                 UserId = expenseVM.UserId
             };
@@ -88,6 +89,8 @@ namespace SK.TrackYourDay.Expenses.Data.Services
                 _expense.ExpenseName = expenseVM.ExpenseName;
                 _expense.Description = expenseVM.Description;
                 _expense.Amount = expenseVM.Amount;
+                _expense.ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == Int32.Parse(expenseVM.ExpenseCategory));
+                _expense.PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == Int32.Parse(expenseVM.PaymentMethod));
                 _expense.Date = expenseVM.Date;
                 _expense.UserId = expenseVM.UserId;
 
@@ -114,6 +117,7 @@ namespace SK.TrackYourDay.Expenses.Data.Services
                 Description = expense.Description,
                 Amount = expense.Amount,
                 ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == expense.ExpenseCategoryId).Name.ToString(),
+                PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == expense.PaymentMethodId).Name.ToString(),
                 Date = expense.Date,
                 UserId = expense.UserId
             };
@@ -129,6 +133,7 @@ namespace SK.TrackYourDay.Expenses.Data.Services
                 Description = expenseVM.Description,
                 Amount = expenseVM.Amount,
                 ExpenseCategory = (ExpenseCategory)Enum.Parse(typeof(ExpenseCategory), expenseVM.ExpenseCategory),
+                PaymentMethod = (PaymentMethod)Enum.Parse(typeof(PaymentMethod), expenseVM.PaymentMethod),
                 Date = expenseVM.Date,
                 UserId = expenseVM.UserId
             };
@@ -145,6 +150,18 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             });
 
             return expenseCategoriesDropDown;
+        }
+
+        public IEnumerable<SelectListItem> GetPaymentMethodsDropDown()
+        {
+            IEnumerable<SelectListItem> paymentMethodsDropDown = _context
+                    .PaymentMethods.Select(i => new SelectListItem
+                    {
+                        Text = i.Name,
+                        Value = i.Id.ToString()
+                    });
+
+            return paymentMethodsDropDown;
         }
 
         public Expense GetExpenseById(int id) => _context.Expenses.FirstOrDefault(x => x.Id == id);

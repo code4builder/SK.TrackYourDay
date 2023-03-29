@@ -12,10 +12,5 @@ namespace SK.TrackYourDay.Expenses.Models
         [Required]
         public string Name { get; set; }
         public PaymentMethod() { }
-
-        //Card,
-        //Cash,
-        //BankTransfer,
-        //Other
     }
 }
