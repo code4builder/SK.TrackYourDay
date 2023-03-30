@@ -4,11 +4,12 @@ using System.ComponentModel;
 
 namespace SK.TrackYourDay.Expenses.Models
 {
-    public class User : IdentityUser
+    public class ApplicationUser : IdentityUser
     {
         public string Name { get; set; }
 
         // Navigation Properties
-        public List<User_User> TeamMates { get; set; }
+        public virtual ICollection<User_Relation> RelationFrom { get; set; }
+        public virtual ICollection<User_Relation> RelationTo { get; set; }
     }
 }

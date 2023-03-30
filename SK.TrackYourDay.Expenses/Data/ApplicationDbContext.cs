@@ -13,19 +13,26 @@ namespace SK.TrackYourDay.Expenses.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User_User>()
-                .HasOne(b => b.User1)
-                .WithMany(ba => ba.TeamMates)
-                .HasForeignKey(bi => bi.User1Id);
+            base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<User_User>()
-                .HasOne(b => b.User2)
-                .WithMany(ba => ba.TeamMates)
-                .HasForeignKey(bi => bi.User2Id);
+            modelBuilder.Entity<User_Relation>()
+                .HasKey(e => new { e.User1Id, e.User2Id });
+
+            modelBuilder.Entity<User_Relation>()
+                .HasOne(e => e.User1)
+                .WithMany(e => e.RelationTo)
+                .HasForeignKey(e => e.User1Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User_Relation>()
+                .HasOne(e => e.User2)
+                .WithMany(e => e.RelationFrom)
+                .HasForeignKey(e => e.User2Id)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
-        public DbSet<User> Users { get; set; }
-        public DbSet<User_User> TeamMates { get; set; }
+        public DbSet<ApplicationUser> Users { get; set; }
+        public DbSet<User_Relation> User_Relations { get; set; }
 
         public DbSet<Expense> Expenses { get; private set; }
         public DbSet<ExpenseCategory> ExpenseCategories { get; private set; }
