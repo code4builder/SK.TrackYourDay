@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SK.TrackYourDay.Expenses.Data;
 using SK.TrackYourDay.Expenses.Data.Services;
+using SK.TrackYourDay.Expenses.Models;
 
 namespace SK.TrackYourDay.Expenses
 {
@@ -16,7 +18,10 @@ namespace SK.TrackYourDay.Expenses
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+
             // Configure the Services
+            builder.Services.AddTransient<AccountService>();
             builder.Services.AddTransient<ExpensesService>();
             builder.Services.AddTransient<ExpenseCategoriesService>();
             builder.Services.AddTransient<PaymentMethodsService>();
@@ -36,6 +41,7 @@ namespace SK.TrackYourDay.Expenses
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(

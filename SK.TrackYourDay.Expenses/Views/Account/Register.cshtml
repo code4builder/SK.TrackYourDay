@@ -1,0 +1,63 @@
+﻿@model SK.TrackYourDay.Expenses.Models.ViewModels.RegisterVM
+
+<h2>Sign Up</h2>
+<form method="post" asp-action="Register" asp-controller="Account">
+    <h4>Create a new account</h4>
+    <hr />
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group row mt-4">
+        <label class="col-md-2" asp-for="FirstName"></label>
+        <div class="col-md-9">
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row mt-4">
+        <label class="col-md-2" asp-for="LastName"></label>
+        <div class="col-md-9">
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row mt-4">
+        <label class="col-md-2" asp-for="Email"></label>
+        <div class="col-md-9">
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row mt-4">
+        <label class="col-md-2" asp-for="Password"></label>
+        <div class="col-md-9">
+            <input asp-for="Password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row mt-4">
+        <label class="col-md-2" asp-for="ConfirmPassword"></label>
+        <div class="col-md-9">
+            <input asp-for="ConfirmPassword" class="form-control" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row mt-4">
+        <label class="col-md-2" asp-for="RoleName"></label>
+        <div class="col-md-9">
+            <select asp-for="RoleName" asp-items="@SK.TrackYourDay.Expenses.Models.ViewModels.RoleVM.GetRolesForDropDown()" class="form-control"> </select>
+            <span asp-validation-for="RoleName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group mt-4">
+        <div class="col-md-10 offset-md-2">
+            <input type="submit" value="Register" class="btn btn-success" />
+        </div>
+    </div>
+    <p class="col-md-10 offset-md-2 mt-3">
+        <a asp-action="Login">Log In</a>
+    </p>
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial"/>
+
+}
