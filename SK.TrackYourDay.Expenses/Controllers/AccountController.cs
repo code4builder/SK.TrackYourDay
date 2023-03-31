@@ -26,7 +26,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 var result = await _accountService.LoginAsync(model);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Expenses");
                 }
                 ModelState.AddModelError("", "Invalid login attempt");
             }
