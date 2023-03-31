@@ -2,7 +2,7 @@
 
 namespace SK.TrackYourDay.Expenses.Models.ViewModels
 {
-    public class UserVM
+    public class RegisterVM
     {
         [Required]
         [Display(Name = "First Name")]

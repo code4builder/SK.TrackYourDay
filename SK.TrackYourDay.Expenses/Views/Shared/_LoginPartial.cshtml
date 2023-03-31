@@ -1,7 +1,12 @@
-﻿@inject Microsoft.AspNetCore.Identity.SignInManager<Microsoft.AspNetCore.Identity.IdentityUser> signInManager
+﻿@inject Microsoft.AspNetCore.Identity.SignInManager<SK.TrackYourDay.Expenses.Models.ApplicationUser> signInManager
 @if(signInManager.IsSignedIn(User))
 {
-
+    <form method="post" id="logoutForm" asp-action="Logout" asp-controller="Account">
+        <ul class="nav navbar-nav">
+            <li class="text-white nav-link">Hello, @User.Identity.Name ! </li>
+            <li><a class="text-white nav-link" href="javascript:document.getElementById('logoutForm').submit()">Log Out</a></li>
+        </ul>
+    </form>
 }
 else
 {

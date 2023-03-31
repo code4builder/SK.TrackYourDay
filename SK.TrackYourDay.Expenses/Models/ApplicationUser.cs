@@ -6,7 +6,8 @@ namespace SK.TrackYourDay.Expenses.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public string Name { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
 
         // Navigation Properties
         public virtual ICollection<User_Relation> RelationFrom { get; set; }

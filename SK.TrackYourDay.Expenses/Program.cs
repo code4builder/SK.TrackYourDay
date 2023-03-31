@@ -41,6 +41,7 @@ namespace SK.TrackYourDay.Expenses
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
