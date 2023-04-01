@@ -34,10 +34,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Register()
+        public IActionResult Register()
         {
-            await _accountService.CreateRolesAsync();
-
             return View();
         }
 
