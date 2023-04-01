@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using MyBooks.Data.Paging;
 using SK.TrackYourDay.Expenses.Models;
 using SK.TrackYourDay.Expenses.Models.ViewModels;
@@ -25,14 +26,17 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             _signInManager = signInManager;
         }
 
-        public IEnumerable<ExpenseVM> GetAllExpensesVM(string userId, string role, string sortBy, string searchString, int? pageNumber)
+        public async Task<IEnumerable<ExpenseVM>> GetAllExpensesVMAsync(string userId, string role, string sortBy, string searchString, int? pageNumber)
         {
             List<Expense> expenses;
 
             if (role == RoleVM.User)
+            {
                 expenses = GetExpensesByUserId(userId).OrderByDescending(e => e.Date).ToList();
+                expenses = await expenses.AsQueryable().ToListAsync();
+            }
             else
-                expenses = _context.Expenses.OrderByDescending(e => e.Date).ToList();
+                expenses = await _context.Expenses.OrderByDescending(e => e.Date).ToListAsync();
 
             if (!string.IsNullOrEmpty(sortBy))
             {
@@ -78,14 +82,14 @@ namespace SK.TrackYourDay.Expenses.Data.Services
                 return new List<Expense>();
         }
 
-        public ExpenseVM GetExpenseVMById(int expenseId, string userId)
+        public async Task<ExpenseVM> GetExpenseVMByIdAsync(int expenseId, string userId)
         {
-            var expense = _context.Expenses.FirstOrDefault(x => x.Id == expenseId);
+            var expense = await _context.Expenses.FirstOrDefaultAsync(x => x.Id == expenseId);
             var expenseVM = ConvertExpenseToVM(expense, userId);
             return expenseVM;
         }
 
-        public void AddExpense(ExpenseVM expenseVM, string userId)
+        public async Task AddExpenseAsync(ExpenseVM expenseVM, string userId)
         {
             var expense = new Expense()
             {
@@ -99,13 +103,13 @@ namespace SK.TrackYourDay.Expenses.Data.Services
                 UserId = userId
             };
 
-            _context.Expenses.Add(expense);
+            await _context.Expenses.AddAsync(expense);
             _context.SaveChanges();
         }
 
-        public Expense UpdateExpenseById(int id, ExpenseVM expenseVM)
+        public async Task<Expense> UpdateExpenseById(int id, ExpenseVM expenseVM)
         {
-            var _expense = _context.Expenses.FirstOrDefault(expense => expense.Id == id);
+            var _expense = await _context.Expenses.FirstOrDefaultAsync(expense => expense.Id == id);
             if (_expense != null)
             {
                 _expense.ExpenseName = expenseVM.ExpenseName;
@@ -119,9 +123,9 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             }
             return _expense;
         }
-        public void DeleteExpenseById(int id)
+        public async Task DeleteExpenseByIdAsync(int id)
         {
-            var _expense = _context.Expenses.FirstOrDefault(x => x.Id == id);
+            var _expense = await _context.Expenses.FirstOrDefaultAsync(x => x.Id == id);
             if (_expense != null)
             {
                 _context.Expenses.Remove(_expense);
