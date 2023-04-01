@@ -29,7 +29,7 @@ namespace SK.TrackYourDay.Expenses.Models.ViewModels
         [DisplayName("Payment Method")]
         public string PaymentMethod { get; set; }
 
-        [Required]
-        public int UserId { get; set; }
+        [DisplayName("Created By")]
+        public string UserName { get; set; } = "Unknown";
     }
 }

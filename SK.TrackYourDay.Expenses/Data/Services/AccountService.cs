@@ -32,7 +32,6 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             {
                 await _roleManager.CreateAsync(new IdentityRole(RoleVM.Admin));
                 await _roleManager.CreateAsync(new IdentityRole(RoleVM.User));
-                await _roleManager.CreateAsync(new IdentityRole(RoleVM.TeamMate));
             }
         }
 

@@ -25,7 +25,7 @@ namespace SK.TrackYourDay.Expenses.Models
         public DateTime Date { get; set; }
 
         [Required]
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         [DisplayName("Expense Category")]
         public int? ExpenseCategoryId { get; set; }

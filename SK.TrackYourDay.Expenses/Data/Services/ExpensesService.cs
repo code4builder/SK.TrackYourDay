@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using MyBooks.Data.Paging;
 using SK.TrackYourDay.Expenses.Models;
 using SK.TrackYourDay.Expenses.Models.ViewModels;
 using System;
+using System.Security.Claims;
 using System.Security.Policy;
 
 namespace SK.TrackYourDay.Expenses.Data.Services
@@ -10,15 +14,30 @@ namespace SK.TrackYourDay.Expenses.Data.Services
     public class ExpensesService
     {
         private ApplicationDbContext _context;
+        UserManager<ApplicationUser> _userManager;
+        SignInManager<ApplicationUser> _signInManager;
 
-        public ExpensesService(ApplicationDbContext context)
+        public ExpensesService(ApplicationDbContext context,
+            UserManager<ApplicationUser> _userManager,
+            SignInManager<ApplicationUser> signInManager)
         {
             _context = context;
+            _userManager = _userManager;
+            _signInManager = signInManager;
         }
 
-        public IEnumerable<ExpenseVM> GetAllExpensesVM(string sortBy, string searchString, int? pageNumber)
+        public async Task<IEnumerable<ExpenseVM>> GetAllExpensesVMAsync(string userId, string role, string sortBy, string searchString, int? pageNumber)
         {
-            var expenses = _context.Expenses.OrderByDescending(e => e.Date).ToList();
+            List<Expense> expenses;
+
+            if (role == RoleVM.User)
+            {
+                expenses = GetExpensesByUserId(userId).OrderByDescending(e => e.Date).ToList();
+                expenses = await expenses.AsQueryable().ToListAsync();
+            }
+            else
+                expenses = await _context.Expenses.OrderByDescending(e => e.Date).ToListAsync();
+
             if (!string.IsNullOrEmpty(sortBy))
             {
                 switch (sortBy)
@@ -46,22 +65,31 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             {
                 foreach (var expense in expenses)
                 {
-                    var expenseVM = ConvertExpenseToVM(expense);
-                    
+
+                    var expenseVM = ConvertExpenseToVM(expense, expense.UserId);
+
                     expensesVM.Add(expenseVM);
                 }
             }
             return expensesVM;
         }
 
-        public ExpenseVM GetExpenseVMById(int id)
+        public List<Expense> GetExpensesByUserId(string userId)
         {
-            var expense = _context.Expenses.FirstOrDefault(x => x.Id == id);
-            var expenseVM = ConvertExpenseToVM(expense);
+            if (_context.Expenses.Any())
+                return _context.Expenses.Where(e => e.UserId == userId).ToList();
+            else
+                return new List<Expense>();
+        }
+
+        public async Task<ExpenseVM> GetExpenseVMByIdAsync(int expenseId, string userId)
+        {
+            var expense = await _context.Expenses.FirstOrDefaultAsync(x => x.Id == expenseId);
+            var expenseVM = ConvertExpenseToVM(expense, userId);
             return expenseVM;
         }
 
-        public void AddExpense(ExpenseVM expenseVM)
+        public async Task AddExpenseAsync(ExpenseVM expenseVM, string userId)
         {
             var expense = new Expense()
             {
@@ -72,18 +100,16 @@ namespace SK.TrackYourDay.Expenses.Data.Services
                 ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == Int32.Parse(expenseVM.ExpenseCategory)),
                 PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == Int32.Parse(expenseVM.PaymentMethod)),
                 Date = expenseVM.Date,
-                UserId = expenseVM.UserId
+                UserId = userId
             };
 
-            _context.Expenses.Add(expense);
+            await _context.Expenses.AddAsync(expense);
             _context.SaveChanges();
-
-            // TODO: add to another related tables
         }
 
-        public Expense UpdateExpenseById(int id, ExpenseVM expenseVM)
+        public async Task<Expense> UpdateExpenseById(int id, ExpenseVM expenseVM)
         {
-            var _expense = _context.Expenses.FirstOrDefault(expense => expense.Id == id);
+            var _expense = await _context.Expenses.FirstOrDefaultAsync(expense => expense.Id == id);
             if (_expense != null)
             {
                 _expense.ExpenseName = expenseVM.ExpenseName;
@@ -92,15 +118,14 @@ namespace SK.TrackYourDay.Expenses.Data.Services
                 _expense.ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == Int32.Parse(expenseVM.ExpenseCategory));
                 _expense.PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == Int32.Parse(expenseVM.PaymentMethod));
                 _expense.Date = expenseVM.Date;
-                _expense.UserId = expenseVM.UserId;
 
                 _context.SaveChanges();
             }
             return _expense;
         }
-        public void DeleteExpenseById(int id)
+        public async Task DeleteExpenseByIdAsync(int id)
         {
-            var _expense = _context.Expenses.FirstOrDefault(x => x.Id == id);
+            var _expense = await _context.Expenses.FirstOrDefaultAsync(x => x.Id == id);
             if (_expense != null)
             {
                 _context.Expenses.Remove(_expense);
@@ -108,7 +133,7 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             }
         }
 
-        public ExpenseVM ConvertExpenseToVM(Expense expense)
+        public ExpenseVM ConvertExpenseToVM(Expense expense, string userId)
         {
             var expenseVM = new ExpenseVM()
             {
@@ -119,35 +144,19 @@ namespace SK.TrackYourDay.Expenses.Data.Services
                 ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == expense.ExpenseCategoryId).Name.ToString(),
                 PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == expense.PaymentMethodId).Name.ToString(),
                 Date = expense.Date,
-                UserId = expense.UserId
+                UserName = GetFullUserName(userId)
             };
             return expenseVM;
-        }
-
-        public static Expense ConvertVMToExpense(ExpenseVM expenseVM)
-        {
-            var expense = new Expense()
-            {
-                Id = expenseVM.Id,
-                ExpenseName = expenseVM.ExpenseName,
-                Description = expenseVM.Description,
-                Amount = expenseVM.Amount,
-                ExpenseCategory = (ExpenseCategory)Enum.Parse(typeof(ExpenseCategory), expenseVM.ExpenseCategory),
-                PaymentMethod = (PaymentMethod)Enum.Parse(typeof(PaymentMethod), expenseVM.PaymentMethod),
-                Date = expenseVM.Date,
-                UserId = expenseVM.UserId
-            };
-            return expense;
         }
 
         public IEnumerable<SelectListItem> GetExpenseCategoriesDropDown()
         {
             IEnumerable<SelectListItem> expenseCategoriesDropDown = _context
                     .ExpenseCategories.Select(i => new SelectListItem
-            {
-                Text = i.Name,
-                Value = i.Id.ToString()
-            });
+                    {
+                        Text = i.Name,
+                        Value = i.Id.ToString()
+                    });
 
             return expenseCategoriesDropDown;
         }
@@ -164,6 +173,12 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             return paymentMethodsDropDown;
         }
 
+        public string GetFullUserName(string userId)
+        {
+            var _user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            return _user.FirstName + " " + _user.LastName;
+        }
+
         public Expense GetExpenseById(int id) => _context.Expenses.FirstOrDefault(x => x.Id == id);
 
         public List<Expense> GetExpensesByDate(DateTime date) => _context.Expenses.Where(x => x.Date == date).ToList();
@@ -172,7 +187,7 @@ namespace SK.TrackYourDay.Expenses.Data.Services
 
         public List<Expense> GetExpensesByYear(DateTime date) => _context.Expenses.Where(x => x.Date.Year == date.Year).ToList();
 
-        public List<Expense> GetExpensesByUserId(int userId) => _context.Expenses.Where(x => x.UserId == userId).ToList();
+        public List<Expense> GetExpensesByUserId(int userId) => _context.Expenses.Where(x => x.UserId.ToString() == userId.ToString()).ToList();
     }
 }
 

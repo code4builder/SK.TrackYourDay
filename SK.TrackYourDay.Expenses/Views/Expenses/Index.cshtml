@@ -40,7 +40,7 @@
                         Payment Method
                     </th>
                     <th>
-                        User Id
+                        Created By
                     </th>
                     <th>
                         Changes
@@ -57,7 +57,7 @@
                         <td width="10%">@expense.Date.ToString("d")</td>
                         <td width="5%">@expense.ExpenseCategory</td>
                         <td width="5%">@expense.PaymentMethod</td>
-                        <td width="5%">@expense.UserId</td>
+                        <td width="5%">@expense.UserName</td>
                         <td width="25%">
                             <div class="w-100 btn-group" role="group">
                                 <a asp-controller="Expenses" asp-action="Update" asp-route-Id="@expense.Id" class="btn btn-primary mx-1">Update</a>

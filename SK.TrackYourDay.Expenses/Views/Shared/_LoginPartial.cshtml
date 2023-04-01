@@ -1,12 +1,29 @@
 ﻿@inject Microsoft.AspNetCore.Identity.SignInManager<SK.TrackYourDay.Expenses.Models.ApplicationUser> signInManager
-@if(signInManager.IsSignedIn(User))
+@if (signInManager.IsSignedIn(User))
 {
-    <form method="post" id="logoutForm" asp-action="Logout" asp-controller="Account">
-        <ul class="nav navbar-nav">
-            <li class="text-white nav-link">Hello, @User.Identity.Name ! </li>
-            <li><a class="text-white nav-link" href="javascript:document.getElementById('logoutForm').submit()">Log Out</a></li>
+    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+        <ul class="navbar-nav flex-grow-1">
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Expenses" asp-action="Index">Expenses</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="ExpenseCategories" asp-action="Index">Expense Categories</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="PaymentMethods" asp-action="Index">Payment Methods</a>
+            </li>
         </ul>
-    </form>
+
+        <form method="post" id="logoutForm" asp-action="Logout" asp-controller="Account">
+            <ul class="nav navbar-nav">
+                <li class="text-white nav-link">Hello, @User.Identity.Name ! </li>
+                <li><a class="text-white nav-link" href="javascript:document.getElementById('logoutForm').submit()">Log Out</a></li>
+            </ul>
+        </form>
+    </div>
 }
 else
 {
