@@ -4,6 +4,7 @@ using SK.TrackYourDay.Expenses.Data;
 using SK.TrackYourDay.Expenses.Data.Services;
 using SK.TrackYourDay.Expenses.DbInitializer;
 using SK.TrackYourDay.Expenses.Models;
+using System;
 
 namespace SK.TrackYourDay.Expenses
 {
@@ -45,13 +46,14 @@ namespace SK.TrackYourDay.Expenses
             app.UseRouting();
 
             // use dbInitializer
-            var dbInitializer = app.Services.GetRequiredService<IDbInitializer>();
-            dbInitializer.Initialize();
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+                dbInitializer.Initialize();
+            }
 
             app.UseAuthentication();
             app.UseAuthorization();
-
-
 
             app.MapControllerRoute(
                 name: "default",
