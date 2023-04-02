@@ -26,15 +26,6 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             return result;
         }
 
-        internal async Task CreateRolesAsync()
-        {
-            if (!_roleManager.RoleExistsAsync(RoleVM.Admin).GetAwaiter().GetResult())
-            {
-                await _roleManager.CreateAsync(new IdentityRole(RoleVM.Admin));
-                await _roleManager.CreateAsync(new IdentityRole(RoleVM.User));
-            }
-        }
-
         internal async Task<IdentityResult> CreateUserAsync(RegisterVM model)
         {
             var user = new ApplicationUser

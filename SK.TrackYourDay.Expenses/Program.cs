@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SK.TrackYourDay.Expenses.Data;
 using SK.TrackYourDay.Expenses.Data.Services;
+using SK.TrackYourDay.Expenses.DbInitializer;
 using SK.TrackYourDay.Expenses.Models;
+using System;
 
 namespace SK.TrackYourDay.Expenses
 {
@@ -25,6 +27,8 @@ namespace SK.TrackYourDay.Expenses
             builder.Services.AddTransient<ExpensesService>();
             builder.Services.AddTransient<ExpenseCategoriesService>();
             builder.Services.AddTransient<PaymentMethodsService>();
+            builder.Services.AddScoped<IDbInitializer, DbInitializer.DbInitializer>();
+            builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();
 
@@ -40,6 +44,13 @@ namespace SK.TrackYourDay.Expenses
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            // use dbInitializer
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+                dbInitializer.Initialize();
+            }
 
             app.UseAuthentication();
             app.UseAuthorization();
