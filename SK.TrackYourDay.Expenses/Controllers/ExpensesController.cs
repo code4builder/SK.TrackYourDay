@@ -14,7 +14,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
         private ExpensesService _expensesService;
         private PaymentMethodsService _paymentMethodsService;
         private readonly string _role;
-        public ExpensesController(ExpensesService expensesService, PaymentMethodsService paymentMethodsService, 
+
+        public ExpensesController(ExpensesService expensesService, PaymentMethodsService paymentMethodsService,
             IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
@@ -24,10 +25,10 @@ namespace SK.TrackYourDay.Expenses.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string sortBy, string searchString, int pageNumber)
+        public async Task<IActionResult> Index(string sortBy, string searchString, int pageNumber, int pageSize)
         {
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var objList = await _expensesService.GetAllExpensesVMAsync(_userId, _role, sortBy, searchString, pageNumber);
+            var objList = await _expensesService.GetAllExpensesVMAsync(_userId, _role, sortBy, searchString, pageNumber, pageSize);
             return View(objList);
         }
 
@@ -63,15 +64,9 @@ namespace SK.TrackYourDay.Expenses.Controllers
         {
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            try
-            {
-                var expense = await _expensesService.GetExpenseVMByIdAsync((int)id, _userId);
-                return View(expense);
-            }
-            catch (Exception)
-            {
-                return NotFound();
-            }
+            var expense = await _expensesService.GetExpenseVMByIdAsync((int)id, _userId);
+            return View(expense);
+
         }
 
         // POST-Delete
@@ -79,7 +74,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePost(int? id)
         {
-            if(id != null)
+            if (id != null)
                 await _expensesService.DeleteExpenseByIdAsync((int)id);
 
             return RedirectToAction("Index");
