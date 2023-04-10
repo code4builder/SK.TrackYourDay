@@ -25,7 +25,16 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             _userManager = userManager;
             _signInManager = signInManager;
         }
-
+        /// <summary>
+        /// Get all expenses as View Models
+        /// </summary>
+        /// <param name="userId">User Id</param>
+        /// <param name="role">Role</param>
+        /// <param name="sortBy"></param>
+        /// <param name="searchString"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns>Returns all expenses VM</returns>
         public async Task<IEnumerable<ExpenseVM>> GetAllExpensesVMAsync(string userId, string role, string sortBy, 
                                                                     string searchString, int? pageNumber, int? pageSize)
         {
@@ -92,17 +101,28 @@ namespace SK.TrackYourDay.Expenses.Data.Services
 
         public async Task AddExpenseAsync(ExpenseVM expenseVM, string userId)
         {
-            var expense = new Expense()
+            Expense expense;
+            try
             {
-                Id = expenseVM.Id,
-                ExpenseName = expenseVM.ExpenseName,
-                Description = expenseVM.Description,
-                Amount = expenseVM.Amount,
-                ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == Int32.Parse(expenseVM.ExpenseCategory)),
-                PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == Int32.Parse(expenseVM.PaymentMethod)),
-                Date = expenseVM.Date,
-                UserId = userId
-            };
+                expense = new Expense()
+                {
+                    Id = expenseVM.Id,
+                    ExpenseName = expenseVM.ExpenseName,
+                    Description = expenseVM.Description,
+                    Amount = expenseVM.Amount,
+                    ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == Int32.Parse(expenseVM.ExpenseCategory)),
+                    PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == Int32.Parse(expenseVM.PaymentMethod)),
+                    Date = expenseVM.Date,
+                    UserId = userId
+                };
+            }
+            catch (Exception)
+            {
+                throw new Exception("This expense can not be created");
+            }
+
+            if (expense.ExpenseCategory == null || expense.PaymentMethod == null)
+                throw new Exception("This expense can not be created");
 
             await _context.Expenses.AddAsync(expense);
             _context.SaveChanges();
@@ -137,8 +157,7 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             }
             catch (Exception)
             {
-
-                throw;
+                throw new Exception("Can not be deleted");
             }
         }
 
@@ -161,8 +180,7 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             }
             catch (Exception)
             {
-
-                throw;
+                throw new Exception("Can not be converted");
             }
         }
 

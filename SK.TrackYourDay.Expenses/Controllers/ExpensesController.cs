@@ -13,7 +13,6 @@ namespace SK.TrackYourDay.Expenses.Controllers
         IHttpContextAccessor _httpContextAccessor;
         private ExpensesService _expensesService;
         private PaymentMethodsService _paymentMethodsService;
-        private readonly string _role;
 
         public ExpensesController(ExpensesService expensesService, PaymentMethodsService paymentMethodsService,
             IHttpContextAccessor httpContextAccessor)
@@ -21,14 +20,16 @@ namespace SK.TrackYourDay.Expenses.Controllers
             _httpContextAccessor = httpContextAccessor;
             _expensesService = expensesService;
             _paymentMethodsService = paymentMethodsService;
-            _role = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Role).Value;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index(string sortBy, string searchString, int pageNumber, int pageSize)
         {
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var _role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
+
             var objList = await _expensesService.GetAllExpensesVMAsync(_userId, _role, sortBy, searchString, pageNumber, pageSize);
+
             return View(objList);
         }
 
@@ -65,8 +66,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             var expense = await _expensesService.GetExpenseVMByIdAsync((int)id, _userId);
-            return View(expense);
 
+            return View(expense);
         }
 
         // POST-Delete
