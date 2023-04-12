@@ -3,23 +3,21 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SK.TrackYourDay.Expenses.Data;
+using SK.TrackYourDay.Infrastructure.DataAccess;
 
 #nullable disable
 
-namespace SK.TrackYourDay.Expenses.Migrations
+namespace SK.TrackYourDay.Infrastructure.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230331152813_ExpenseUserIdToString")]
-    partial class ExpenseUserIdToString
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.15")
+                .HasAnnotation("ProductVersion", "6.0.16")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -228,7 +226,7 @@ namespace SK.TrackYourDay.Expenses.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.Expense", b =>
+            modelBuilder.Entity("SK.TrackYourDay.Domain.Models.Expense", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -253,6 +251,9 @@ namespace SK.TrackYourDay.Expenses.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IrregularPayment")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("PaymentMethodId")
                         .IsRequired()
                         .HasColumnType("int");
@@ -270,7 +271,7 @@ namespace SK.TrackYourDay.Expenses.Migrations
                     b.ToTable("Expenses");
                 });
 
-            modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.ExpenseCategory", b =>
+            modelBuilder.Entity("SK.TrackYourDay.Domain.Models.ExpenseCategory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -287,7 +288,7 @@ namespace SK.TrackYourDay.Expenses.Migrations
                     b.ToTable("ExpenseCategories");
                 });
 
-            modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.PaymentMethod", b =>
+            modelBuilder.Entity("SK.TrackYourDay.Domain.Models.PaymentMethod", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -304,7 +305,7 @@ namespace SK.TrackYourDay.Expenses.Migrations
                     b.ToTable("PaymentMethods");
                 });
 
-            modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.User_Relation", b =>
+            modelBuilder.Entity("SK.TrackYourDay.Domain.Models.User_Relation", b =>
                 {
                     b.Property<string>("User1Id")
                         .HasColumnType("nvarchar(450)");
@@ -322,7 +323,7 @@ namespace SK.TrackYourDay.Expenses.Migrations
                     b.ToTable("User_Relations");
                 });
 
-            modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.ApplicationUser", b =>
+            modelBuilder.Entity("SK.TrackYourDay.Domain.Models.ApplicationUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
@@ -388,15 +389,15 @@ namespace SK.TrackYourDay.Expenses.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.Expense", b =>
+            modelBuilder.Entity("SK.TrackYourDay.Domain.Models.Expense", b =>
                 {
-                    b.HasOne("SK.TrackYourDay.Expenses.Models.ExpenseCategory", "ExpenseCategory")
+                    b.HasOne("SK.TrackYourDay.Domain.Models.ExpenseCategory", "ExpenseCategory")
                         .WithMany()
                         .HasForeignKey("ExpenseCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SK.TrackYourDay.Expenses.Models.PaymentMethod", "PaymentMethod")
+                    b.HasOne("SK.TrackYourDay.Domain.Models.PaymentMethod", "PaymentMethod")
                         .WithMany()
                         .HasForeignKey("PaymentMethodId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -407,15 +408,15 @@ namespace SK.TrackYourDay.Expenses.Migrations
                     b.Navigation("PaymentMethod");
                 });
 
-            modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.User_Relation", b =>
+            modelBuilder.Entity("SK.TrackYourDay.Domain.Models.User_Relation", b =>
                 {
-                    b.HasOne("SK.TrackYourDay.Expenses.Models.ApplicationUser", "User1")
+                    b.HasOne("SK.TrackYourDay.Domain.Models.ApplicationUser", "User1")
                         .WithMany("RelationTo")
                         .HasForeignKey("User1Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SK.TrackYourDay.Expenses.Models.ApplicationUser", "User2")
+                    b.HasOne("SK.TrackYourDay.Domain.Models.ApplicationUser", "User2")
                         .WithMany("RelationFrom")
                         .HasForeignKey("User2Id")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -426,7 +427,7 @@ namespace SK.TrackYourDay.Expenses.Migrations
                     b.Navigation("User2");
                 });
 
-            modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.ApplicationUser", b =>
+            modelBuilder.Entity("SK.TrackYourDay.Domain.Models.ApplicationUser", b =>
                 {
                     b.Navigation("RelationFrom");
 

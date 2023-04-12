@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SK.TrackYourDay.Domain.Models;
-using SK.TrackYourDay.Expenses.Data;
 using SK.TrackYourDay.Expenses.Data.Services;
 using SK.TrackYourDay.Expenses.DbInitializer;
 using SK.TrackYourDay.Expenses.Exceptions;
+using SK.TrackYourDay.Infrastructure.DataAccess;
 using System;
 
 namespace SK.TrackYourDay.Expenses
@@ -16,7 +16,8 @@ namespace SK.TrackYourDay.Expenses
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                           options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                           options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+                           x => x.MigrationsAssembly("SK.TrackYourDay.Infrastructure.DataAccess")));
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();

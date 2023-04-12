@@ -38,7 +38,7 @@ namespace SK.TrackYourDay.Domain.Models
 
         [ForeignKey("PaymentMethodId")]
         public virtual PaymentMethod PaymentMethod { get; set; }
-
+        public bool IrregularPayment { get; set; }
         public Expense() { }
     }
 }

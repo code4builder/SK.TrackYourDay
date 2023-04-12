@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SK.TrackYourDay.Expenses.Data;
+using SK.TrackYourDay.Infrastructure.DataAccess;
 
 #nullable disable
 
-namespace SK.TrackYourDay.Expenses.Migrations
+namespace SK.TrackYourDay.Infrastructure.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20230323191617_UpdateDateTypeExpenses")]

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace SK.TrackYourDay.Expenses.Migrations
+namespace SK.TrackYourDay.Infrastructure.DataAccess.Migrations
 {
     public partial class UpdateDateTypeExpenses : Migration
     {

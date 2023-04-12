@@ -1,4 +1,5 @@
 ﻿using SK.TrackYourDay.Domain.Models;
+using SK.TrackYourDay.Infrastructure.DataAccess;
 
 namespace SK.TrackYourDay.Expenses.Data.Services
 {

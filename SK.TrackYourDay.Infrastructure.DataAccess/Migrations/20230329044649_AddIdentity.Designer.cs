@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SK.TrackYourDay.Expenses.Data;
+using SK.TrackYourDay.Infrastructure.DataAccess;
 
 #nullable disable
 
-namespace SK.TrackYourDay.Expenses.Migrations
+namespace SK.TrackYourDay.Infrastructure.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230331073833_AddedFirstaAndLastNameToUser")]
-    partial class AddedFirstaAndLastNameToUser
+    [Migration("20230329044649_AddIdentity")]
+    partial class AddIdentity
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -88,10 +88,6 @@ namespace SK.TrackYourDay.Expenses.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -143,8 +139,6 @@ namespace SK.TrackYourDay.Expenses.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -303,39 +297,6 @@ namespace SK.TrackYourDay.Expenses.Migrations
                     b.ToTable("PaymentMethods");
                 });
 
-            modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.User_Relation", b =>
-                {
-                    b.Property<string>("User1Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("User2Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("User1Id", "User2Id");
-
-                    b.HasIndex("User2Id");
-
-                    b.ToTable("User_Relations");
-                });
-
-            modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.ApplicationUser", b =>
-                {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasDiscriminator().HasValue("ApplicationUser");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -404,32 +365,6 @@ namespace SK.TrackYourDay.Expenses.Migrations
                     b.Navigation("ExpenseCategory");
 
                     b.Navigation("PaymentMethod");
-                });
-
-            modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.User_Relation", b =>
-                {
-                    b.HasOne("SK.TrackYourDay.Expenses.Models.ApplicationUser", "User1")
-                        .WithMany("RelationTo")
-                        .HasForeignKey("User1Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SK.TrackYourDay.Expenses.Models.ApplicationUser", "User2")
-                        .WithMany("RelationFrom")
-                        .HasForeignKey("User2Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("User1");
-
-                    b.Navigation("User2");
-                });
-
-            modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.ApplicationUser", b =>
-                {
-                    b.Navigation("RelationFrom");
-
-                    b.Navigation("RelationTo");
                 });
 #pragma warning restore 612, 618
         }

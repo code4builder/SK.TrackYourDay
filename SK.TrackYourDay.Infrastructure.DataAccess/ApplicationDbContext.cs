@@ -2,13 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using SK.TrackYourDay.Domain.Models;
 
-namespace SK.TrackYourDay.Expenses.Data
+namespace SK.TrackYourDay.Infrastructure.DataAccess
 {
-    public class ApplicationDbContext : IdentityDbContext 
+    public class ApplicationDbContext : IdentityDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-            
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

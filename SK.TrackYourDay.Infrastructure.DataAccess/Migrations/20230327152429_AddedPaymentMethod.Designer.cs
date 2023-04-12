@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SK.TrackYourDay.Expenses.Data;
+using SK.TrackYourDay.Infrastructure.DataAccess;
 
 #nullable disable
 
-namespace SK.TrackYourDay.Expenses.Migrations
+namespace SK.TrackYourDay.Infrastructure.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230326103023_AddedExpenseCategory")]
-    partial class AddedExpenseCategory
+    [Migration("20230327152429_AddedPaymentMethod")]
+    partial class AddedPaymentMethod
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -41,14 +41,26 @@ namespace SK.TrackYourDay.Expenses.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ExpenseCategoryId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
                     b.Property<string>("ExpenseName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PaymentMethodId")
+                        .IsRequired()
+                        .HasColumnType("int");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ExpenseCategoryId");
+
+                    b.HasIndex("PaymentMethodId");
 
                     b.ToTable("Expenses");
                 });
@@ -68,6 +80,42 @@ namespace SK.TrackYourDay.Expenses.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ExpenseCategories");
+                });
+
+            modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.PaymentMethod", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PaymentMethods");
+                });
+
+            modelBuilder.Entity("SK.TrackYourDay.Expenses.Models.Expense", b =>
+                {
+                    b.HasOne("SK.TrackYourDay.Expenses.Models.ExpenseCategory", "ExpenseCategory")
+                        .WithMany()
+                        .HasForeignKey("ExpenseCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SK.TrackYourDay.Expenses.Models.PaymentMethod", "PaymentMethod")
+                        .WithMany()
+                        .HasForeignKey("PaymentMethodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ExpenseCategory");
+
+                    b.Navigation("PaymentMethod");
                 });
 #pragma warning restore 612, 618
         }
