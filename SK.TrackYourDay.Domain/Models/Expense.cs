@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SK.TrackYourDay.Expenses.Models
+namespace SK.TrackYourDay.Domain.Models
 {
     public class Expense
     {

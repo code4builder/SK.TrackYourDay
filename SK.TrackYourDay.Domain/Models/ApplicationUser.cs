@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel;
 
-namespace SK.TrackYourDay.Expenses.Models
+namespace SK.TrackYourDay.Domain.Models
 {
     public class ApplicationUser : IdentityUser
     {

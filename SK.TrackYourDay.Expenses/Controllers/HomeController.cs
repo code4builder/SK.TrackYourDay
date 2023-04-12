@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SK.TrackYourDay.Expenses.Models;
+using SK.TrackYourDay.Domain.Models;
 using System.Diagnostics;
 
 namespace SK.TrackYourDay.Expenses.Controllers

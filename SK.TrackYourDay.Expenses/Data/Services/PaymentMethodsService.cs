@@ -1,4 +1,4 @@
-﻿using SK.TrackYourDay.Expenses.Models;
+﻿using SK.TrackYourDay.Domain.Models;
 
 namespace SK.TrackYourDay.Expenses.Data.Services
 {

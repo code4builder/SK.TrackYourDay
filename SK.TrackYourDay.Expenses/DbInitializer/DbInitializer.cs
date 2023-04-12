@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SK.TrackYourDay.Expenses.Data;
-using SK.TrackYourDay.Expenses.Models;
+using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Expenses.Models.ViewModels;
 
 namespace SK.TrackYourDay.Expenses.DbInitializer

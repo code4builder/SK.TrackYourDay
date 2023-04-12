@@ -1,4 +1,4 @@
-namespace SK.TrackYourDay.Expenses.Models
+namespace SK.TrackYourDay.Domain.Models
 {
     public class ErrorViewModel
     {

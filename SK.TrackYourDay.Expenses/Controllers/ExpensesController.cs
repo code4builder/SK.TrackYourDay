@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SK.TrackYourDay.Expenses.Data;
 using SK.TrackYourDay.Expenses.Data.Services;
-using SK.TrackYourDay.Expenses.Models;
+using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Expenses.Models.ViewModels;
 using System.Security.Claims;
 
@@ -92,8 +92,6 @@ namespace SK.TrackYourDay.Expenses.Controllers
         // GET-Update - Creating View
         public async Task<IActionResult> Update(int? id)
         {
-            throw new Exception("This is an exception that will be handled by middleware");
-
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             if (id == null || id == 0)

@@ -1,17 +1,16 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace SK.TrackYourDay.Expenses.Models
+namespace SK.TrackYourDay.Domain.Models
 {
-    public class ExpenseCategory
+    public class PaymentMethod
     {
         [Key]
         public int Id { get; set; }
 
-        [DisplayName("Expense Category")]
+        [DisplayName("Payment Method")]
         [Required]
         public string Name { get; set; }
-
-        public ExpenseCategory() {}
+        public PaymentMethod() { }
     }
 }
