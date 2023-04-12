@@ -13,21 +13,23 @@ namespace SK.TrackYourDay.Expenses.Controllers
         IHttpContextAccessor _httpContextAccessor;
         private ExpensesService _expensesService;
         private PaymentMethodsService _paymentMethodsService;
-        private readonly string _role;
-        public ExpensesController(ExpensesService expensesService, PaymentMethodsService paymentMethodsService, 
+
+        public ExpensesController(ExpensesService expensesService, PaymentMethodsService paymentMethodsService,
             IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
             _expensesService = expensesService;
             _paymentMethodsService = paymentMethodsService;
-            _role = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Role).Value;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string sortBy, string searchString, int pageNumber)
+        public async Task<IActionResult> Index(string sortBy, string searchString, int pageNumber, int pageSize)
         {
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var objList = await _expensesService.GetAllExpensesVMAsync(_userId, _role, sortBy, searchString, pageNumber);
+            var _role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
+
+            var objList = await _expensesService.GetAllExpensesVMAsync(_userId, _role, sortBy, searchString, pageNumber, pageSize);
+
             return View(objList);
         }
 
@@ -49,10 +51,18 @@ namespace SK.TrackYourDay.Expenses.Controllers
         public async Task<IActionResult> Create(ExpenseVM expense)
         {
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            if (ModelState.IsValid)
+            try
             {
-                await _expensesService.AddExpenseAsync(expense, _userId);
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    await _expensesService.AddExpenseAsync(expense, _userId);
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (Exception)
+            {
+                throw new Exception();
+                //return BadRequest();
             }
 
             return View(expense);
@@ -63,15 +73,9 @@ namespace SK.TrackYourDay.Expenses.Controllers
         {
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            try
-            {
-                var expense = await _expensesService.GetExpenseVMByIdAsync((int)id, _userId);
-                return View(expense);
-            }
-            catch (Exception)
-            {
-                return NotFound();
-            }
+            var expense = await _expensesService.GetExpenseVMByIdAsync((int)id, _userId);
+
+            return View(expense);
         }
 
         // POST-Delete
@@ -79,7 +83,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePost(int? id)
         {
-            if(id != null)
+            if (id != null)
                 await _expensesService.DeleteExpenseByIdAsync((int)id);
 
             return RedirectToAction("Index");
@@ -88,6 +92,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
         // GET-Update - Creating View
         public async Task<IActionResult> Update(int? id)
         {
+            throw new Exception("This is an exception that will be handled by middleware");
+
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             if (id == null || id == 0)

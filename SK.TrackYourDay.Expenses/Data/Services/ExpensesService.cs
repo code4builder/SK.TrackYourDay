@@ -18,25 +18,35 @@ namespace SK.TrackYourDay.Expenses.Data.Services
         SignInManager<ApplicationUser> _signInManager;
 
         public ExpensesService(ApplicationDbContext context,
-            UserManager<ApplicationUser> _userManager,
+            UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager)
         {
             _context = context;
-            _userManager = _userManager;
+            _userManager = userManager;
             _signInManager = signInManager;
         }
-
-        public async Task<IEnumerable<ExpenseVM>> GetAllExpensesVMAsync(string userId, string role, string sortBy, string searchString, int? pageNumber)
+        /// <summary>
+        /// Get all expenses as View Models
+        /// </summary>
+        /// <param name="userId">User Id</param>
+        /// <param name="role">Role</param>
+        /// <param name="sortBy"></param>
+        /// <param name="searchString"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns>Returns all expenses VM</returns>
+        public async Task<IEnumerable<ExpenseVM>> GetAllExpensesVMAsync(string userId, string role, string sortBy, 
+                                                                    string searchString, int? pageNumber, int? pageSize)
         {
             List<Expense> expenses;
 
             if (role == RoleVM.User)
             {
                 expenses = GetExpensesByUserId(userId).OrderByDescending(e => e.Date).ToList();
-                expenses = await expenses.AsQueryable().ToListAsync();
+                expenses = expenses.ToList();
             }
             else
-                expenses = await _context.Expenses.OrderByDescending(e => e.Date).ToListAsync();
+                expenses =  _context.Expenses.OrderByDescending(e => e.Date).ToList();
 
             if (!string.IsNullOrEmpty(sortBy))
             {
@@ -56,8 +66,8 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             }
 
             // Paging
-            int pageSize = 5;
-            expenses = PaginatedList<Expense>.Create(expenses.AsQueryable(), pageNumber ?? 1, pageSize);
+            int? pageSizeCorr = pageSize == 0 ? 10 : pageSize;
+            expenses = PaginatedList<Expense>.Create(expenses.AsQueryable(), pageNumber ?? 1, pageSizeCorr ?? 10);
 
             var expensesVM = new List<ExpenseVM>();
 
@@ -91,17 +101,28 @@ namespace SK.TrackYourDay.Expenses.Data.Services
 
         public async Task AddExpenseAsync(ExpenseVM expenseVM, string userId)
         {
-            var expense = new Expense()
+            Expense expense;
+            try
             {
-                Id = expenseVM.Id,
-                ExpenseName = expenseVM.ExpenseName,
-                Description = expenseVM.Description,
-                Amount = expenseVM.Amount,
-                ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == Int32.Parse(expenseVM.ExpenseCategory)),
-                PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == Int32.Parse(expenseVM.PaymentMethod)),
-                Date = expenseVM.Date,
-                UserId = userId
-            };
+                expense = new Expense()
+                {
+                    Id = expenseVM.Id,
+                    ExpenseName = expenseVM.ExpenseName,
+                    Description = expenseVM.Description,
+                    Amount = expenseVM.Amount,
+                    ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == Int32.Parse(expenseVM.ExpenseCategory)),
+                    PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == Int32.Parse(expenseVM.PaymentMethod)),
+                    Date = expenseVM.Date,
+                    UserId = userId
+                };
+            }
+            catch (Exception)
+            {
+                throw new Exception("This expense can not be created");
+            }
+
+            if (expense.ExpenseCategory == null || expense.PaymentMethod == null)
+                throw new Exception("This expense can not be created");
 
             await _context.Expenses.AddAsync(expense);
             _context.SaveChanges();
@@ -125,28 +146,42 @@ namespace SK.TrackYourDay.Expenses.Data.Services
         }
         public async Task DeleteExpenseByIdAsync(int id)
         {
-            var _expense = await _context.Expenses.FirstOrDefaultAsync(x => x.Id == id);
-            if (_expense != null)
+            try
             {
-                _context.Expenses.Remove(_expense);
-                _context.SaveChanges();
+                var _expense = await _context.Expenses.FirstOrDefaultAsync(x => x.Id == id);
+                if (_expense != null)
+                {
+                    _context.Expenses.Remove(_expense);
+                    _context.SaveChanges();
+                }
+            }
+            catch (Exception)
+            {
+                throw new Exception("Can not be deleted");
             }
         }
 
         public ExpenseVM ConvertExpenseToVM(Expense expense, string userId)
         {
-            var expenseVM = new ExpenseVM()
+            try
             {
-                Id = expense.Id,
-                ExpenseName = expense.ExpenseName,
-                Description = expense.Description,
-                Amount = expense.Amount,
-                ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == expense.ExpenseCategoryId).Name.ToString(),
-                PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == expense.PaymentMethodId).Name.ToString(),
-                Date = expense.Date,
-                UserName = GetFullUserName(userId)
-            };
-            return expenseVM;
+                var expenseVM = new ExpenseVM()
+                {
+                    Id = expense.Id,
+                    ExpenseName = expense.ExpenseName,
+                    Description = expense.Description,
+                    Amount = expense.Amount,
+                    ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == expense.ExpenseCategoryId).Name.ToString(),
+                    PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == expense.PaymentMethodId).Name.ToString(),
+                    Date = expense.Date,
+                    UserName = GetFullUserName(userId)
+                };
+                return expenseVM;
+            }
+            catch (Exception)
+            {
+                throw new Exception("Can not be converted");
+            }
         }
 
         public IEnumerable<SelectListItem> GetExpenseCategoriesDropDown()
