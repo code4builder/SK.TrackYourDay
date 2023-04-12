@@ -51,10 +51,18 @@ namespace SK.TrackYourDay.Expenses.Controllers
         public async Task<IActionResult> Create(ExpenseVM expense)
         {
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            if (ModelState.IsValid)
+            try
             {
-                await _expensesService.AddExpenseAsync(expense, _userId);
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    await _expensesService.AddExpenseAsync(expense, _userId);
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (Exception)
+            {
+                throw new Exception();
+                //return BadRequest();
             }
 
             return View(expense);
@@ -84,6 +92,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
         // GET-Update - Creating View
         public async Task<IActionResult> Update(int? id)
         {
+            throw new Exception("This is an exception that will be handled by middleware");
+
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             if (id == null || id == 0)
