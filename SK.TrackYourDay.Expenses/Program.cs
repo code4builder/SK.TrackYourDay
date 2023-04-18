@@ -5,6 +5,7 @@ using SK.TrackYourDay.Expenses.Data.Services;
 using SK.TrackYourDay.Expenses.DbInitializer;
 using SK.TrackYourDay.Expenses.Exceptions;
 using SK.TrackYourDay.Infrastructure.DataAccess;
+using SK.TrackYourDay.UseCases.Expenses.Services;
 using System;
 
 namespace SK.TrackYourDay.Expenses
@@ -27,6 +28,7 @@ namespace SK.TrackYourDay.Expenses
             // Configure the Services
             builder.Services.AddTransient<AccountService>();
             builder.Services.AddTransient<ExpensesService>();
+            builder.Services.AddTransient<ExpensesHandler>();
             builder.Services.AddTransient<ExpenseCategoriesService>();
             builder.Services.AddTransient<PaymentMethodsService>();
             builder.Services.AddScoped<IDbInitializer, DbInitializer.DbInitializer>();

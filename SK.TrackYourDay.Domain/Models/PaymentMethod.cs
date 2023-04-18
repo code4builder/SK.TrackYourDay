@@ -8,7 +8,6 @@ namespace SK.TrackYourDay.Domain.Models
         [Key]
         public int Id { get; set; }
 
-        [DisplayName("Payment Method")]
         [Required]
         public string Name { get; set; }
         public PaymentMethod() { }

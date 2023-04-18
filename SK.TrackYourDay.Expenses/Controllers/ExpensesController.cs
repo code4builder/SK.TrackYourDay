@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SK.TrackYourDay.Expenses.Data;
-using SK.TrackYourDay.Expenses.Data.Services;
 using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Expenses.Models.ViewModels;
 using System.Security.Claims;
+using SK.TrackYourDay.UseCases.Expenses.Services;
+using SK.TrackYourDay.Expenses.Data.Services;
 
 namespace SK.TrackYourDay.Expenses.Controllers
 {
@@ -12,13 +13,15 @@ namespace SK.TrackYourDay.Expenses.Controllers
     {
         IHttpContextAccessor _httpContextAccessor;
         private ExpensesService _expensesService;
+        private ExpensesHandler _expensesHandler;
         private PaymentMethodsService _paymentMethodsService;
 
         public ExpensesController(ExpensesService expensesService, PaymentMethodsService paymentMethodsService,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor, ExpensesHandler expensesHandler)
         {
             _httpContextAccessor = httpContextAccessor;
             _expensesService = expensesService;
+            _expensesHandler = expensesHandler;
             _paymentMethodsService = paymentMethodsService;
         }
 
@@ -36,10 +39,10 @@ namespace SK.TrackYourDay.Expenses.Controllers
         //GET-Create - Creating View
         public IActionResult Create()
         {
-            var ExpenseCategoriesDropDown = _expensesService.GetExpenseCategoriesDropDown();
+            var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown();
             ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
 
-            var PaymentMethodsDropDown = _expensesService.GetPaymentMethodsDropDown();
+            var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown();
             ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
 
             return View();
@@ -55,7 +58,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    await _expensesService.AddExpenseAsync(expense, _userId);
+                    var expenseDTO = ExpensesHandler.ConvertExpenseVMToDto(expense);
+                    await _expensesService.AddExpenseAsync(expenseDTO, _userId);
                     return RedirectToAction("Index");
                 }
             }
@@ -69,22 +73,22 @@ namespace SK.TrackYourDay.Expenses.Controllers
         }
 
         // GET-Delete - Creating View
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            var expense = await _expensesService.GetExpenseVMByIdAsync((int)id, _userId);
+            var expense = await _expensesService.GetExpenseVMByIdAsync(id, _userId);
 
             return View(expense);
         }
 
         // POST-Delete
-        [HttpPost]
+        [HttpDelete]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeletePost(int? id)
+        public async Task<IActionResult> DeletePost(int id)
         {
             if (id != null)
-                await _expensesService.DeleteExpenseByIdAsync((int)id);
+                await _expensesService.DeleteExpenseByIdAsync(id);
 
             return RedirectToAction("Index");
         }
@@ -105,23 +109,24 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 return NotFound();
             }
 
-            var ExpenseCategoriesDropDown = _expensesService.GetExpenseCategoriesDropDown();
+            var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown();
             ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
 
-            var PaymentMethodsDropDown = _expensesService.GetPaymentMethodsDropDown();
+            var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown();
             ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
 
             return View(expense);
         }
 
         //POST-Update
-        [HttpPost]
+        [HttpPatch]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(ExpenseVM expense)
         {
             if (ModelState.IsValid)
             {
-                await _expensesService.UpdateExpenseById(expense.Id, expense);
+                var expenseDTO = ExpensesHandler.ConvertExpenseVMToDto(expense);
+                await _expensesService.UpdateExpenseById(expense.Id, expenseDTO);
                 return RedirectToAction("Index");
             }
 

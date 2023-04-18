@@ -1,7 +1,7 @@
 ﻿using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Infrastructure.DataAccess;
 
-namespace SK.TrackYourDay.Expenses.Data.Services
+namespace SK.TrackYourDay.UseCases.Expenses.Services
 {
     public class ExpenseCategoriesService
     {
@@ -15,7 +15,7 @@ namespace SK.TrackYourDay.Expenses.Data.Services
         public List<ExpenseCategory> GetAllExpenseCategories() => _context.ExpenseCategories.ToList();
 
         public ExpenseCategory GetExpenseCategoryById(int id) => _context.ExpenseCategories.FirstOrDefault(x => x.Id == id);
-        
+
         public void CreateExpenseCategory(ExpenseCategory expenseCategory)
         {
             _context.ExpenseCategories.Add(expenseCategory);

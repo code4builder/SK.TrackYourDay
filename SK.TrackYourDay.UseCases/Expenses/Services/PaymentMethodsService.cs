@@ -1,7 +1,7 @@
 ﻿using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Infrastructure.DataAccess;
 
-namespace SK.TrackYourDay.Expenses.Data.Services
+namespace SK.TrackYourDay.UseCases.Expenses.Services
 {
     public class PaymentMethodsService
     {
@@ -15,7 +15,7 @@ namespace SK.TrackYourDay.Expenses.Data.Services
         public List<PaymentMethod> GetAllPaymentMethods() => _context.PaymentMethods.ToList();
 
         public PaymentMethod GetPaymentMethodById(int id) => _context.PaymentMethods.FirstOrDefault(x => x.Id == id);
-        
+
         public void CreatePaymentMethod(PaymentMethod paymentMethod)
         {
             _context.PaymentMethods.Add(paymentMethod);

@@ -8,7 +8,6 @@ namespace SK.TrackYourDay.Domain.Models
         [Key]
         public int Id { get; set; }
 
-        [DisplayName("Expense Category")]
         [Required]
         public string Name { get; set; }
 

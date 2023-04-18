@@ -20,7 +20,6 @@ namespace SK.TrackYourDay.Domain.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
-        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         [DataType(DataType.Date)]
         public DateTime Date { get; set; }
 
