@@ -11,8 +11,9 @@ namespace SK.TrackYourDay.Expenses.Models.ViewModels
 
         [DisplayName("Expense")]
         [Required]
-        public string ExpenseName { get; set; }
-        public string? Description { get; set; }
+        public string ExpenseName { get; set; } = string.Empty;
+
+        public string Description { get; set; } = string.Empty;
 
         [Required]
         [Range(0, (double)decimal.MaxValue, ErrorMessage = "Amount must be greater than 0!")]
@@ -24,10 +25,10 @@ namespace SK.TrackYourDay.Expenses.Models.ViewModels
         public DateTime Date { get; set; }
 
         [DisplayName("Expense Category")]
-        public string ExpenseCategory { get; set; }
+        public string ExpenseCategory { get; set; } = string.Empty;
 
         [DisplayName("Payment Method")]
-        public string PaymentMethod { get; set; }
+        public string PaymentMethod { get; set; } = string.Empty;
 
         [DisplayName("Created By")]
         public string UserName { get; set; } = "Unknown";

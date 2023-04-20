@@ -7,7 +7,6 @@ using SK.TrackYourDay.UseCases.DTOs;
 
 namespace SK.TrackYourDay.Expenses.Data.Services
 {
-
     public class ExpensesHandler
     {
         private ApplicationDbContext _context;
@@ -38,35 +37,6 @@ namespace SK.TrackYourDay.Expenses.Data.Services
                     });
 
             return paymentMethodsDropDown;
-        }
-
-        public static ExpenseDTO ConvertExpenseVMToDto(ExpenseVM expenseVM)
-        {
-            var expense = new ExpenseDTO
-            {
-                Id = expenseVM.Id,
-                ExpenseName = expenseVM.ExpenseName,
-                ExpenseCategory = expenseVM.ExpenseCategory,
-                PaymentMethod = expenseVM.PaymentMethod,
-                Amount = expenseVM.Amount,
-                Date = expenseVM.Date,
-                Description = expenseVM.Description
-            };
-            return expense;
-        }
-        public static ExpenseVM ConvertExpenseDtoToVM(ExpenseDTO expenseDTO)
-        {
-            var expenseVM = new ExpenseVM
-            {
-                Id = expenseDTO.Id,
-                ExpenseName = expenseDTO.ExpenseName,
-                ExpenseCategory = expenseDTO.ExpenseCategory,
-                PaymentMethod = expenseDTO.PaymentMethod,
-                Amount = expenseDTO.Amount,
-                Date = expenseDTO.Date,
-                Description = expenseDTO.Description
-            };
-            return expenseVM;
         }
     }
 }

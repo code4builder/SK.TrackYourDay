@@ -34,6 +34,8 @@ namespace SK.TrackYourDay.Expenses
             builder.Services.AddScoped<IDbInitializer, DbInitializer.DbInitializer>();
             builder.Services.AddHttpContextAccessor();
 
+            builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

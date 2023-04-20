@@ -15,14 +15,14 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
     {
         private ApplicationDbContext _context;
         UserManager<ApplicationUser> _userManager;
-        //SignInManager<ApplicationUser> _signInManager; //Should use only abstractions, concrete implementations should be in API
+
         public ExpensesService(ApplicationDbContext context,
             UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;
-            //_signInManager = signInManager;
         }
+
         /// <summary>
         /// Get all expenses as View Models
         /// </summary>
@@ -32,20 +32,19 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         /// <param name="searchString"></param>
         /// <param name="pageNumber"></param>
         /// <param name="pageSize"></param>
-        /// <returns>Returns all expenses VM</returns>
-        public async Task<IEnumerable<ExpenseDTO>> GetAllExpensesVMAsync(string userId, string role, string sortBy,
+        /// <returns>Returns all expenses DTO</returns>
+        public async Task<IEnumerable<ExpenseDTO>> GetAllExpensesDTOAsync(string userId, string role, string sortBy,
                                                                     string searchString, int? pageNumber, int? pageSize)
         {
             List<Expense> expenses;
 
-            // TODO: implement role filtering
-            //if (role == RoleVM.User)
-            //{
+            if (role == RoleDTO.User)
+            {
                 expenses = GetExpensesByUserId(userId).OrderByDescending(e => e.Date).ToList();
                 expenses = expenses.ToList();
-            //}
-            //else
-                expenses = _context.Expenses.OrderByDescending(e => e.Date).ToList();
+            }
+            else
+            expenses = _context.Expenses.OrderByDescending(e => e.Date).ToList();
 
             if (!string.IsNullOrEmpty(sortBy))
             {
@@ -68,19 +67,19 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             int? pageSizeCorr = pageSize == 0 ? 10 : pageSize;
             expenses = PaginatedList<Expense>.Create(expenses.AsQueryable(), pageNumber ?? 1, pageSizeCorr ?? 10);
 
-            var expensesVM = new List<ExpenseDTO>();
+            var expensesDTO = new List<ExpenseDTO>();
 
             if (expenses.Any())
             {
                 foreach (var expense in expenses)
                 {
+                    var expenseDTO = ConvertExpenseToDTO(expense, expense.UserId);
 
-                    var expenseVM = ConvertExpenseToVM(expense, expense.UserId);
-
-                    expensesVM.Add(expenseVM);
+                    expensesDTO.Add(expenseDTO);
                 }
             }
-            return expensesVM;
+
+            return expensesDTO;
         }
 
         public List<Expense> GetExpensesByUserId(string userId)
@@ -91,27 +90,27 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 return new List<Expense>();
         }
 
-        public async Task<ExpenseDTO> GetExpenseVMByIdAsync(int expenseId, string userId)
+        public async Task<ExpenseDTO> GetExpenseDTOByIdAsync(int expenseId, string userId)
         {
             var expense = await _context.Expenses.FirstOrDefaultAsync(x => x.Id == expenseId);
-            var expenseVM = ConvertExpenseToVM(expense, userId);
-            return expenseVM;
+            var expenseDTO = ConvertExpenseToDTO(expense, userId);
+            return expenseDTO;
         }
 
-        public async Task AddExpenseAsync(ExpenseDTO expenseVM, string userId)
+        public async Task AddExpenseAsync(ExpenseDTO expenseDTO, string userId)
         {
             Expense expense;
             try
             {
                 expense = new Expense()
                 {
-                    Id = expenseVM.Id,
-                    ExpenseName = expenseVM.ExpenseName,
-                    Description = expenseVM.Description,
-                    Amount = expenseVM.Amount,
-                    ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == int.Parse(expenseVM.ExpenseCategory)),
-                    PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == int.Parse(expenseVM.PaymentMethod)),
-                    Date = expenseVM.Date,
+                    Id = expenseDTO.Id,
+                    ExpenseName = expenseDTO.ExpenseName,
+                    Description = expenseDTO.Description,
+                    Amount = expenseDTO.Amount,
+                    ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == int.Parse(expenseDTO.ExpenseCategory)),
+                    PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == int.Parse(expenseDTO.PaymentMethod)),
+                    Date = expenseDTO.Date,
                     UserId = userId
                 };
             }
@@ -127,22 +126,23 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             _context.SaveChanges();
         }
 
-        public async Task<Expense> UpdateExpenseById(int id, ExpenseDTO expenseVM)
+        public async Task<Expense> UpdateExpenseById(int id, ExpenseDTO expenseDTO)
         {
             var _expense = await _context.Expenses.FirstOrDefaultAsync(expense => expense.Id == id);
             if (_expense != null)
             {
-                _expense.ExpenseName = expenseVM.ExpenseName;
-                _expense.Description = expenseVM.Description;
-                _expense.Amount = expenseVM.Amount;
-                _expense.ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == int.Parse(expenseVM.ExpenseCategory));
-                _expense.PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == int.Parse(expenseVM.PaymentMethod));
-                _expense.Date = expenseVM.Date;
+                _expense.ExpenseName = expenseDTO.ExpenseName;
+                _expense.Description = expenseDTO.Description;
+                _expense.Amount = expenseDTO.Amount;
+                _expense.ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == int.Parse(expenseDTO.ExpenseCategory));
+                _expense.PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == int.Parse(expenseDTO.PaymentMethod));
+                _expense.Date = expenseDTO.Date;
 
                 _context.SaveChanges();
             }
             return _expense;
         }
+
         public async Task DeleteExpenseByIdAsync(int id)
         {
             try
@@ -160,11 +160,11 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             }
         }
 
-        public ExpenseDTO ConvertExpenseToVM(Expense expense, string userId)
+        public ExpenseDTO ConvertExpenseToDTO(Expense expense, string userId)
         {
             try
             {
-                var expenseVM = new ExpenseDTO()
+                var expenseDTO = new ExpenseDTO()
                 {
                     Id = expense.Id,
                     ExpenseName = expense.ExpenseName,
@@ -175,14 +175,13 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                     Date = expense.Date,
                     UserName = GetFullUserName(userId)
                 };
-                return expenseVM;
+                return expenseDTO;
             }
             catch (Exception)
             {
                 throw new Exception("Can not be converted");
             }
         }
-
 
         public string GetFullUserName(string userId)
         {

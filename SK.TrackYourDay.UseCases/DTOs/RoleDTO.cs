@@ -8,6 +8,7 @@ namespace SK.TrackYourDay.UseCases.DTOs
 {
     internal class RoleDTO
     {
-        public string Name { get; set; }
+        public static string Admin = "Admin";
+        public static string User = "User";
     }
 }
