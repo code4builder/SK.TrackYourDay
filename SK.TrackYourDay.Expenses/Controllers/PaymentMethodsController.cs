@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SK.TrackYourDay.Expenses.Data;
-using SK.TrackYourDay.Expenses.Data.Services;
-using SK.TrackYourDay.Expenses.Models;
+using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Expenses.Models.ViewModels;
+using SK.TrackYourDay.UseCases.Expenses.Services;
 
 namespace SK.TrackYourDay.Expenses.Controllers
 {

@@ -2,13 +2,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
+using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Expenses.Controllers;
-using SK.TrackYourDay.Expenses.Data;
 using SK.TrackYourDay.Expenses.Data.Services;
-using SK.TrackYourDay.Expenses.Models;
+using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Expenses.Models.ViewModels;
 using System;
 using System.Security.Policy;
+using SK.TrackYourDay.Infrastructure.DataAccess;
 
 namespace SK.TrackYourDay.Expenses.Tests
 {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using SK.TrackYourDay.Expenses.Models;
+using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Expenses.Models.ViewModels;
+using SK.TrackYourDay.Infrastructure.DataAccess;
 
 namespace SK.TrackYourDay.Expenses.Data.Services
 {

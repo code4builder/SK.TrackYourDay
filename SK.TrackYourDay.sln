@@ -5,7 +5,13 @@ VisualStudioVersion = 17.5.33502.453
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SK.TrackYourDay.Expenses", "SK.TrackYourDay.Expenses\SK.TrackYourDay.Expenses.csproj", "{5D8606CF-8972-44E2-9C99-20CC5C14EC95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SK.TrackYourDay.Expenses.Tests", "SK.TrackYourDay.Expenses.Tests\SK.TrackYourDay.Expenses.Tests.csproj", "{8390593E-9589-4F49-8DF3-1597A645CF0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SK.TrackYourDay.Expenses.Tests", "SK.TrackYourDay.Expenses.Tests\SK.TrackYourDay.Expenses.Tests.csproj", "{8390593E-9589-4F49-8DF3-1597A645CF0B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SK.TrackYourDay.Infrastructure.DataAccess", "SK.TrackYourDay.Infrastructure.DataAccess\SK.TrackYourDay.Infrastructure.DataAccess.csproj", "{E533A38E-28DF-48A8-81D6-6F6E63F7F714}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SK.TrackYourDay.Domain", "SK.TrackYourDay.Domain\SK.TrackYourDay.Domain.csproj", "{E6AEA431-C201-436D-B9CC-CF6C5D4D2B25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SK.TrackYourDay.UseCases", "SK.TrackYourDay.UseCases\SK.TrackYourDay.UseCases.csproj", "{65B05450-C275-41BF-9FD5-D131C9409E1A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +27,18 @@ Global
 		{8390593E-9589-4F49-8DF3-1597A645CF0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8390593E-9589-4F49-8DF3-1597A645CF0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8390593E-9589-4F49-8DF3-1597A645CF0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E533A38E-28DF-48A8-81D6-6F6E63F7F714}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E533A38E-28DF-48A8-81D6-6F6E63F7F714}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E533A38E-28DF-48A8-81D6-6F6E63F7F714}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E533A38E-28DF-48A8-81D6-6F6E63F7F714}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6AEA431-C201-436D-B9CC-CF6C5D4D2B25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6AEA431-C201-436D-B9CC-CF6C5D4D2B25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6AEA431-C201-436D-B9CC-CF6C5D4D2B25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6AEA431-C201-436D-B9CC-CF6C5D4D2B25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65B05450-C275-41BF-9FD5-D131C9409E1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65B05450-C275-41BF-9FD5-D131C9409E1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65B05450-C275-41BF-9FD5-D131C9409E1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65B05450-C275-41BF-9FD5-D131C9409E1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

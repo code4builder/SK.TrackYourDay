@@ -1,4 +1,4 @@
-﻿@inject Microsoft.AspNetCore.Identity.SignInManager<SK.TrackYourDay.Expenses.Models.ApplicationUser> signInManager
+﻿@inject Microsoft.AspNetCore.Identity.SignInManager<SK.TrackYourDay.Domain.Models.ApplicationUser> signInManager
 @if (signInManager.IsSignedIn(User))
 {
     <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
