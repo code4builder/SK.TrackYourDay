@@ -6,6 +6,7 @@ namespace SK.TrackYourDay.Domain.Models
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public bool HasUserRelations { get; set; }
 
         // Navigation Properties
         public virtual ICollection<User_Relation> RelationFrom { get; set; }
