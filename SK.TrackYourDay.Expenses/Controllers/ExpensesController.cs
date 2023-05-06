@@ -140,5 +140,26 @@ namespace SK.TrackYourDay.Expenses.Controllers
 
             return View(expenseVM);
         }
+
+        public IActionResult AddFriend()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddFriend(FriendVM friendVM)
+        {
+            if (ModelState.IsValid)
+            {
+                var currentUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                await _expensesService.AddFriendAsync(currentUserId, friendVM.Email);
+
+
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View();
+        }
     }
 }

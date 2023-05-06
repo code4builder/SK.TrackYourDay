@@ -10,7 +10,6 @@ namespace SK.TrackYourDay.Domain.Models
         [Key]
         public int Id { get; set; }
 
-        [DisplayName("Expense")]
         [Required]
         public string ExpenseName { get; set; }
         public string? Description { get; set; }
@@ -26,13 +25,11 @@ namespace SK.TrackYourDay.Domain.Models
         [Required]
         public string UserId { get; set; }
 
-        [DisplayName("Expense Category")]
         public int? ExpenseCategoryId { get; set; }
 
         [ForeignKey("ExpenseCategoryId")]
         public virtual ExpenseCategory ExpenseCategory { get; set; }
 
-        [DisplayName("Payment Method")]
         public int? PaymentMethodId { get; set; }
 
         [ForeignKey("PaymentMethodId")]

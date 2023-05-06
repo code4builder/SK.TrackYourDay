@@ -1,0 +1,30 @@
+﻿@model SK.TrackYourDay.Expenses.Models.ViewModels.FriendVM
+@{
+    ViewData["Title"] = "Add Friend";
+}
+
+<h2>Add Friend</h2>
+<form method="post" asp-action="AddFriend" asp-controller="Expenses">
+    <hr />
+    <h4>Add the email of a person who will see your records and share his/her records with you</h4>
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group row mt-4">
+        <label class="col-md-2" asp-for="Email"></label>
+        <div class="col-md-9">
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+    </div>
+
+    <br />
+    <div class="form-group row">
+        <div class="col-8 offset-2 row">
+            <div class="col">
+                <input type="submit" class="btn btn-info w-75" value="Add Friend" />
+            </div>
+            <div class="col">
+                <a asp-action="Index" class="btn btn-danger w-75">Back</a>
+            </div>
+        </div>
+    </div>
+</form>
