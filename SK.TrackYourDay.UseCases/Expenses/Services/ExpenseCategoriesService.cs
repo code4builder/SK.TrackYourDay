@@ -1,5 +1,6 @@
 ﻿using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Infrastructure.DataAccess;
+using SK.TrackYourDay.UseCases.DTOs;
 
 namespace SK.TrackYourDay.UseCases.Expenses.Services
 {
@@ -12,12 +13,24 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             _context = context;
         }
 
-        public List<ExpenseCategory> GetAllExpenseCategories() => _context.ExpenseCategories.ToList();
+        public async Task<List<ExpenseCategory>> GetAllExpenseCategoriesDTOAsync(string userId)
+        {
+            if (_context.ExpenseCategories.Any()) 
+                return _context.ExpenseCategories.Where(ec => ec.UserId == userId).ToList();
+            else
+               return new List<ExpenseCategory>();
+        }
 
         public ExpenseCategory GetExpenseCategoryById(int id) => _context.ExpenseCategories.FirstOrDefault(x => x.Id == id);
 
-        public void CreateExpenseCategory(ExpenseCategory expenseCategory)
+        public void CreateExpenseCategory(ExpenseCategoryDTO expenseCategoryDTO, string userId)
         {
+            var expenseCategory = new ExpenseCategory()
+            {
+                Name = expenseCategoryDTO.Name,
+                UserId = userId
+            };
+
             _context.ExpenseCategories.Add(expenseCategory);
             _context.SaveChanges();
         }

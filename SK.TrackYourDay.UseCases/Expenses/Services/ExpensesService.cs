@@ -198,6 +198,8 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         public List<Expense> GetExpensesByYear(DateTime date) => _context.Expenses.Where(x => x.Date.Year == date.Year).ToList();
 
         public List<Expense> GetExpensesByUserId(int userId) => _context.Expenses.Where(x => x.UserId.ToString() == userId.ToString()).ToList();
+
+
     }
 }
 
