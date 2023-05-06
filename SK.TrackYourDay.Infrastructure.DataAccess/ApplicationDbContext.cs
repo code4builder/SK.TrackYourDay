@@ -29,6 +29,12 @@ namespace SK.TrackYourDay.Infrastructure.DataAccess
                 .WithMany(e => e.RelationFrom)
                 .HasForeignKey(e => e.User2Id)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ExpenseCategory>()
+                .HasOne<ApplicationUser>(ec => ec.User)
+                .WithMany(u => u.expenseCategories)
+                .HasForeignKey(ec => ec.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         public DbSet<ApplicationUser> Users { get; set; }
