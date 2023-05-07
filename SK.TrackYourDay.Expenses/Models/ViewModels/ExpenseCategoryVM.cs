@@ -9,6 +9,6 @@ namespace SK.TrackYourDay.Expenses.Models.ViewModels
         public string Name { get; set; }
 
         [DisplayName("Created by")]
-        public string User { get; set; }
+        public string User { get; set; } = "Unknown";
     }
 }

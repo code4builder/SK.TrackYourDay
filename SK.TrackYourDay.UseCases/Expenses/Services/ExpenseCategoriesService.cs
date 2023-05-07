@@ -1,4 +1,5 @@
-﻿using SK.TrackYourDay.Domain.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Infrastructure.DataAccess;
 using SK.TrackYourDay.UseCases.DTOs;
 
@@ -13,17 +14,48 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             _context = context;
         }
 
-        public async Task<List<ExpenseCategory>> GetAllExpenseCategoriesDTOAsync(string userId)
+        public async Task<List<ExpenseCategoryDTO>> GetAllExpenseCategoriesDTOAsync(string userId)
         {
-            if (_context.ExpenseCategories.Any()) 
-                return _context.ExpenseCategories.Where(ec => ec.UserId == userId).ToList();
+            if (_context.ExpenseCategories.Any())
+            {
+                var expenseCategories = await GetExpenseCategoriesDTOByUserId(userId);
+                var friendsExpenseCategories = await GetFriendsExpenseCategories(userId);
+                expenseCategories.AddRange(friendsExpenseCategories);
+
+                return expenseCategories.OrderBy(ec => ec.Name).ToList();
+            }
             else
-               return new List<ExpenseCategory>();
+               return new List<ExpenseCategoryDTO>();
         }
 
-        public ExpenseCategory GetExpenseCategoryById(int id) => _context.ExpenseCategories.FirstOrDefault(x => x.Id == id);
+        public async Task<List<ExpenseCategoryDTO>> GetExpenseCategoriesDTOByUserId(string userId)
+        {
+            if (_context.ExpenseCategories.Any())
+            {
+                var expenseCategories = await _context.ExpenseCategories.Where(e => e.UserId == userId).ToListAsync();
 
-        public void CreateExpenseCategory(ExpenseCategoryDTO expenseCategoryDTO, string userId)
+                var expenseCategoriesDTO = new List<ExpenseCategoryDTO>();
+                foreach (var expenseCategory in expenseCategories)
+                {
+                    var expenseCategoryDTO = ConvertExpenseCategoryToDTO(expenseCategory, userId);
+                    expenseCategoriesDTO.Add(expenseCategoryDTO);
+                }
+                return expenseCategoriesDTO;
+            }
+            else
+                return new List<ExpenseCategoryDTO>();
+        }
+
+        public async Task<ExpenseCategory> GetExpenseCategoryByIdAsync(int id) => await _context.ExpenseCategories.FirstOrDefaultAsync(x => x.Id == id);
+
+        public async Task<ExpenseCategoryDTO> GetExpenseCategoryDTOByIdAsync(int id)
+        {
+            var expensecategory = await GetExpenseCategoryByIdAsync(id);
+            var expenseDTO = ConvertExpenseCategoryToDTO(expensecategory, expensecategory.UserId);
+            return expenseDTO;
+        }
+
+        public async Task CreateExpenseCategory(ExpenseCategoryDTO expenseCategoryDTO, string userId)
         {
             var expenseCategory = new ExpenseCategory()
             {
@@ -31,29 +63,62 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 UserId = userId
             };
 
-            _context.ExpenseCategories.Add(expenseCategory);
-            _context.SaveChanges();
+            await _context.ExpenseCategories.AddAsync(expenseCategory);
+            await _context.SaveChangesAsync();
         }
 
-        public void DeleteExpenseCategoryById(int id)
+        public async Task DeleteExpenseCategoryById(int id)
         {
-            var _expenseCategory = GetExpenseCategoryById(id);
+            var _expenseCategory = await GetExpenseCategoryByIdAsync(id);
             if (_expenseCategory != null)
             {
                 _context.ExpenseCategories.Remove(_expenseCategory);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
 
-        public ExpenseCategory UpdateExpenseCategoryById(int id, ExpenseCategory expenseCategory)
+        public async Task<ExpenseCategory> UpdateExpenseCategoryById(int id, ExpenseCategoryDTO expenseCategoryDTO)
         {
-            var _expenseCategory = GetExpenseCategoryById(id);
-            if (expenseCategory != null)
-                _expenseCategory.Name = expenseCategory.Name;
+            var _expenseCategory = await GetExpenseCategoryByIdAsync(id);
+            if (_expenseCategory != null)
+                _expenseCategory.Name = expenseCategoryDTO.Name;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return _expenseCategory;
+        }
+
+        public async Task<List<ExpenseCategoryDTO>> GetFriendsExpenseCategories(string userId)
+        {
+            var expenseService = new ExpensesService(_context);
+            var friends = expenseService.GetFriendsList(userId);
+
+            var friendsExpenseCategoriesDTO = new List<ExpenseCategoryDTO>();
+            foreach (var friend in friends)
+            {
+                var expenseCategoriesDTO = await GetExpenseCategoriesDTOByUserId(friend.Id);
+                friendsExpenseCategoriesDTO.AddRange(expenseCategoriesDTO);
+            }
+            return friendsExpenseCategoriesDTO;
+        }
+
+        public ExpenseCategoryDTO ConvertExpenseCategoryToDTO(ExpenseCategory expenseCategory, string userId)
+        {
+            var expenseService = new ExpensesService(_context);
+            try
+            {
+                var expenseCategoryDTO = new ExpenseCategoryDTO()
+                {
+                    Id = expenseCategory.Id,
+                    Name = expenseCategory.Name,
+                    User = expenseService.GetFullUserName(userId)
+                };
+                return expenseCategoryDTO;
+            }
+            catch (Exception)
+            {
+                throw new Exception("Can not be converted");
+            }
         }
     }
 }

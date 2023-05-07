@@ -20,11 +20,13 @@ namespace SK.TrackYourDay.Expenses.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var objList = _expenseCategoriesService.GetAllExpenseCategoriesDTOAsync(_userId);
-            return View(objList);
+
+            var expenseCategoriesDTO = await _expenseCategoriesService.GetAllExpenseCategoriesDTOAsync(_userId);
+            var expenseCategoriesVM = _mapper.Map<IEnumerable<ExpenseCategoryVM>>(expenseCategoriesDTO);
+            return View(expenseCategoriesVM);
         }
 
         //GET-Create - Creating View
@@ -36,13 +38,14 @@ namespace SK.TrackYourDay.Expenses.Controllers
         //POST-Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(ExpenseCategoryVM expenseCategoryVM)
+        public async Task<IActionResult> Create(ExpenseCategoryVM expenseCategoryVM)
         {
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             if (ModelState.IsValid)
             {
                 var expenseCategoryDTO = _mapper.Map<ExpenseCategoryDTO>(expenseCategoryVM);
-                _expenseCategoriesService.CreateExpenseCategory(expenseCategoryDTO, _userId);
+                await _expenseCategoriesService.CreateExpenseCategory(expenseCategoryDTO, _userId);
                 return RedirectToAction("Index");
             }
 
@@ -50,13 +53,14 @@ namespace SK.TrackYourDay.Expenses.Controllers
         }
 
         // GET-Delete - Creating View
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             try
             {
-                var expenseCategory = _expenseCategoriesService.GetExpenseCategoryById((int)id);
-                return View(expenseCategory);
+                var expenseCategoryDTO = await _expenseCategoriesService.GetExpenseCategoryDTOByIdAsync((int)id);
+                var expenseCategoryVM = _mapper.Map<ExpenseCategoryVM>(expenseCategoryDTO);
+                return View(expenseCategoryVM);
             }
             catch (Exception)
             {
@@ -67,42 +71,48 @@ namespace SK.TrackYourDay.Expenses.Controllers
         // POST-Delete
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeletePost(int? id)
+        public async Task<IActionResult> DeletePost(int? id)
         {
             if(id != null)
-                _expenseCategoriesService.DeleteExpenseCategoryById((int)id);
+                await _expenseCategoriesService.DeleteExpenseCategoryById((int)id);
 
             return RedirectToAction("Index");
         }
 
         // GET-Update - Creating View
-        public IActionResult Update(int? id)
+        public async Task<IActionResult> Update(int? id)
         {
             if (id == null || id == 0)
             {
                 return NotFound();
             }
 
-            var expenseCategory = _expenseCategoriesService.GetExpenseCategoryById((int)id);
-            if (expenseCategory == null)
+            var expenseCategoryDTO = await _expenseCategoriesService.GetExpenseCategoryDTOByIdAsync((int)id);
+            if (expenseCategoryDTO == null)
             {
                 return NotFound();
             }
-            return View(expenseCategory);
+            var expensecategoryVM = _mapper.Map<ExpenseCategoryVM>(expenseCategoryDTO);
+            if (expensecategoryVM == null)
+            {
+                return NotFound();
+            }
+            return View(expensecategoryVM);
         }
 
         //POST-Update
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Update(ExpenseCategory expenseCategory)
+        public async Task<IActionResult> Update(ExpenseCategoryVM expenseCategoryVM)
         {
             if (ModelState.IsValid)
             {
-                _expenseCategoriesService.UpdateExpenseCategoryById(expenseCategory.Id, expenseCategory);
+                var expenseCategoryDTO = _mapper.Map<ExpenseCategoryDTO>(expenseCategoryVM);
+                await _expenseCategoriesService.UpdateExpenseCategoryById(expenseCategoryDTO.Id, expenseCategoryDTO);
                 return RedirectToAction("Index");
             }
 
-            return View(expenseCategory);
+            return View(expenseCategoryVM);
         }
 
     }
