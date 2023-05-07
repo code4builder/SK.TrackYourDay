@@ -224,8 +224,6 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
         public List<Expense> GetExpensesByYear(DateTime date) => _context.Expenses.Where(x => x.Date.Year == date.Year).ToList();
 
-        public List<Expense> GetExpensesByUserId(string userId) => _context.Expenses.Where(x => x.UserId == userId).ToList();
-
         /// <summary>
         /// Checking if expense category was not selected in the form correctly
         /// </summary>
@@ -294,19 +292,24 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
         public async Task<List<ExpenseDTO>> GetFriendsExpenses(string userId)
         {
-            var friends = _context.User_Relations.Include(x => x.User2).Where(x => x.User1Id == userId).Select(x => x.User2);
+            var friends = GetFriendsList(userId);
 
-            var friendsExpenses = new List<ExpenseDTO>();
+            var friendsExpensesDTO = new List<ExpenseDTO>();
             foreach (var friend in friends)
             {
-                var expenses = GetExpensesByUserId(friend.Id);
-                foreach (var expense in expenses)
-                {
-                    var expensesDTO = ConvertExpenseToDTO(expense, friend.Id);
-                    friendsExpenses.Add(expensesDTO);
-                }
+                var expensesDTO = await GetExpensesDTOByUserId(friend.Id);
+                friendsExpensesDTO.AddRange(expensesDTO);
             }
-            return friendsExpenses;
+            return friendsExpensesDTO;
+        }
+
+    public List<ApplicationUser> GetFriendsList(string userId)
+        {
+            var friends = _context.User_Relations.Include(x => x.User2).Where(x => x.User1Id == userId).Select(x => x.User2).ToList();
+            var friendsRightColumn = _context.User_Relations.Include(x => x.User1).Where(x => x.User2Id == userId).Select(x => x.User1).ToList();
+            friends.AddRange(friendsRightColumn);
+
+            return friends;
         }
     }
 }

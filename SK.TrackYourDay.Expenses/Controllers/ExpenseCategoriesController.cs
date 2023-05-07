@@ -20,11 +20,13 @@ namespace SK.TrackYourDay.Expenses.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var objList = _expenseCategoriesService.GetAllExpenseCategoriesDTOAsync(_userId);
-            return View(objList);
+
+            var expenseCategoriesDTO = await _expenseCategoriesService.GetAllExpenseCategoriesDTOAsync(_userId);
+            var expenseCategoriesVM = _mapper.Map<IEnumerable<ExpenseCategoryVM>>(expenseCategoriesDTO);
+            return View(expenseCategoriesVM);
         }
 
         //GET-Create - Creating View
@@ -39,6 +41,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
         public IActionResult Create(ExpenseCategoryVM expenseCategoryVM)
         {
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             if (ModelState.IsValid)
             {
                 var expenseCategoryDTO = _mapper.Map<ExpenseCategoryDTO>(expenseCategoryVM);
