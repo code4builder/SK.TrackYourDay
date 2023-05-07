@@ -4,6 +4,7 @@ using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Expenses.Models.ViewModels;
 using SK.TrackYourDay.Infrastructure.DataAccess;
 using SK.TrackYourDay.UseCases.DTOs;
+using SK.TrackYourDay.UseCases.Expenses.Services;
 
 namespace SK.TrackYourDay.Expenses.Data.Services
 {
@@ -15,10 +16,13 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             _context = context;
         }
 
-        public IEnumerable<SelectListItem> GetExpenseCategoriesDropDown()
+        public IEnumerable<SelectListItem> GetExpenseCategoriesDropDown(string userId)
         {
-            IEnumerable<SelectListItem> expenseCategoriesDropDown = _context
-                    .ExpenseCategories.Select(i => new SelectListItem
+            var expenseCategoriesService = new ExpenseCategoriesService(_context);
+            var expenseCategories = expenseCategoriesService.GetAllExpenseCategoriesDTOAsync(userId).Result;
+
+            IEnumerable<SelectListItem> expenseCategoriesDropDown = expenseCategories
+                .Select(i => new SelectListItem
                     {
                         Text = i.Name,
                         Value = i.Id.ToString()

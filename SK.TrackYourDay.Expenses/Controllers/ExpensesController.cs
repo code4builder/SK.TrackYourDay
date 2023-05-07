@@ -45,7 +45,9 @@ namespace SK.TrackYourDay.Expenses.Controllers
         //GET-Create - Creating View
         public IActionResult Create()
         {
-            var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown();
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown(_userId);
             ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
 
             var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown();
@@ -117,7 +119,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             }
             var expenseVM = _mapper.Map<ExpenseVM>(expenseDTO);
 
-            var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown();
+            var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown(_userId);
             ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
 
             var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown();
@@ -131,10 +133,12 @@ namespace SK.TrackYourDay.Expenses.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(ExpenseVM expenseVM)
         {
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             if (ModelState.IsValid)
             {
                 var expenseDTO = _mapper.Map<ExpenseDTO>(expenseVM);
-                await _expensesService.UpdateExpenseById(expenseVM.Id, expenseDTO);
+                await _expensesService.UpdateExpenseById(expenseVM.Id, expenseDTO, _userId);
                 return RedirectToAction("Index");
             }
 

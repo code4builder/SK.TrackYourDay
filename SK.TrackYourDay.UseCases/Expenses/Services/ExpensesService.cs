@@ -102,8 +102,10 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
         public async Task AddExpenseAsync(ExpenseDTO expenseDTO, string userId)
         {
-            // Checking if category and payment method was selected
-            await CheckIfExpenseCategoryNotSelected(expenseDTO);
+            // Checking if category was selected
+            var hasExpenseCategorySelected = await CheckExpenseCategorySelected(expenseDTO, userId);
+            
+            // Checking if payment method was selected
             await CheckIfPaymentMethodNotSelected(expenseDTO);
 
             Expense expense;
@@ -133,10 +135,12 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Expense> UpdateExpenseById(int id, ExpenseDTO expenseDTO)
+        public async Task<Expense> UpdateExpenseById(int id, ExpenseDTO expenseDTO, string userId)
         {
-            // Checking if category and payment method was selected
-            await CheckIfExpenseCategoryNotSelected(expenseDTO);
+            // Checking if category was selected
+            var hasExpenseCategorySelected = await CheckExpenseCategorySelected(expenseDTO, userId);
+
+            // Checking if payment method was selected
             await CheckIfPaymentMethodNotSelected(expenseDTO);
 
             var _expense = await _context.Expenses.FirstOrDefaultAsync(expense => expense.Id == id);
@@ -228,7 +232,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         /// Checking if expense category was not selected in the form correctly
         /// </summary>
         /// <param name="expenseDTO">Expense</param>
-        public async Task CheckIfExpenseCategoryNotSelected(ExpenseDTO expenseDTO)
+        public async Task<bool> CheckExpenseCategorySelected(ExpenseDTO expenseDTO, string userId)
         {
             if (!int.TryParse(expenseDTO.ExpenseCategory, out int result))
             {
@@ -240,10 +244,15 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 }
                 else
                 {
-                    await _context.ExpenseCategories.AddAsync(new ExpenseCategory() { Name = "Other" });
-                    await _context.SaveChangesAsync();
+                    var expenseCategoryService = new ExpenseCategoriesService(_context);
+                    var otherExpenseCategory = new ExpenseCategoryDTO() { Name = "Other", User = userId };
+                    await expenseCategoryService.CreateExpenseCategory(otherExpenseCategory, userId);
                 }
+
+                return false;
             }
+            else
+                return true;
         }
 
         /// <summary>
@@ -303,7 +312,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             return friendsExpensesDTO;
         }
 
-    public List<ApplicationUser> GetFriendsList(string userId)
+        public List<ApplicationUser> GetFriendsList(string userId)
         {
             var friends = _context.User_Relations.Include(x => x.User2).Where(x => x.User1Id == userId).Select(x => x.User2).ToList();
             var friendsRightColumn = _context.User_Relations.Include(x => x.User1).Where(x => x.User2Id == userId).Select(x => x.User1).ToList();
