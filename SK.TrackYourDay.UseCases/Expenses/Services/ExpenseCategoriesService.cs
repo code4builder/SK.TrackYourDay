@@ -21,7 +21,8 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 var expenseCategories = await GetExpenseCategoriesDTOByUserId(userId);
                 var friendsExpenseCategories = await GetFriendsExpenseCategories(userId);
                 expenseCategories.AddRange(friendsExpenseCategories);
-                return expenseCategories;
+
+                return expenseCategories.OrderBy(ec => ec.Name).ToList();
             }
             else
                return new List<ExpenseCategoryDTO>();
@@ -36,7 +37,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 var expenseCategoriesDTO = new List<ExpenseCategoryDTO>();
                 foreach (var expenseCategory in expenseCategories)
                 {
-                    var expenseCategoryDTO = ConvertExpenseToDTO(expenseCategory, userId);
+                    var expenseCategoryDTO = ConvertExpenseCategoryToDTO(expenseCategory, userId);
                     expenseCategoriesDTO.Add(expenseCategoryDTO);
                 }
                 return expenseCategoriesDTO;
@@ -45,9 +46,16 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 return new List<ExpenseCategoryDTO>();
         }
 
-        public ExpenseCategory GetExpenseCategoryById(int id) => _context.ExpenseCategories.FirstOrDefault(x => x.Id == id);
+        public async Task<ExpenseCategory> GetExpenseCategoryByIdAsync(int id) => await _context.ExpenseCategories.FirstOrDefaultAsync(x => x.Id == id);
 
-        public void CreateExpenseCategory(ExpenseCategoryDTO expenseCategoryDTO, string userId)
+        public async Task<ExpenseCategoryDTO> GetExpenseCategoryDTOByIdAsync(int id)
+        {
+            var expensecategory = await GetExpenseCategoryByIdAsync(id);
+            var expenseDTO = ConvertExpenseCategoryToDTO(expensecategory, expensecategory.UserId);
+            return expenseDTO;
+        }
+
+        public async Task CreateExpenseCategory(ExpenseCategoryDTO expenseCategoryDTO, string userId)
         {
             var expenseCategory = new ExpenseCategory()
             {
@@ -55,27 +63,27 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 UserId = userId
             };
 
-            _context.ExpenseCategories.Add(expenseCategory);
-            _context.SaveChanges();
+            await _context.ExpenseCategories.AddAsync(expenseCategory);
+            await _context.SaveChangesAsync();
         }
 
-        public void DeleteExpenseCategoryById(int id)
+        public async Task DeleteExpenseCategoryById(int id)
         {
-            var _expenseCategory = GetExpenseCategoryById(id);
+            var _expenseCategory = await GetExpenseCategoryByIdAsync(id);
             if (_expenseCategory != null)
             {
                 _context.ExpenseCategories.Remove(_expenseCategory);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
 
-        public ExpenseCategory UpdateExpenseCategoryById(int id, ExpenseCategory expenseCategory)
+        public async Task<ExpenseCategory> UpdateExpenseCategoryById(int id, ExpenseCategoryDTO expenseCategoryDTO)
         {
-            var _expenseCategory = GetExpenseCategoryById(id);
-            if (expenseCategory != null)
-                _expenseCategory.Name = expenseCategory.Name;
+            var _expenseCategory = await GetExpenseCategoryByIdAsync(id);
+            if (_expenseCategory != null)
+                _expenseCategory.Name = expenseCategoryDTO.Name;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return _expenseCategory;
         }
@@ -94,7 +102,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             return friendsExpenseCategoriesDTO;
         }
 
-        public ExpenseCategoryDTO ConvertExpenseToDTO(ExpenseCategory expenseCategory, string userId)
+        public ExpenseCategoryDTO ConvertExpenseCategoryToDTO(ExpenseCategory expenseCategory, string userId)
         {
             var expenseService = new ExpensesService(_context);
             try
