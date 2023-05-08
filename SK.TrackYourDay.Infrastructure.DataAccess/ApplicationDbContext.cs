@@ -35,6 +35,12 @@ namespace SK.TrackYourDay.Infrastructure.DataAccess
                 .WithMany(u => u.expenseCategories)
                 .HasForeignKey(ec => ec.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PaymentMethod>()
+                .HasOne<ApplicationUser>(ec => ec.User)
+                .WithMany(u => u.paymentMethods)
+                .HasForeignKey(ec => ec.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         public DbSet<ApplicationUser> Users { get; set; }
