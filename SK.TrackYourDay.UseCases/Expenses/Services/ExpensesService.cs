@@ -247,6 +247,8 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                     var expenseCategoryService = new ExpenseCategoriesService(_context);
                     var otherExpenseCategory = new ExpenseCategoryDTO() { Name = "Other", User = userId };
                     await expenseCategoryService.CreateExpenseCategoryAsync(otherExpenseCategory, userId);
+                    var category = await _context.ExpenseCategories.FirstOrDefaultAsync(x => x.Name.ToLower() == "other");
+                    expenseDTO.ExpenseCategory = category.Id.ToString();
                 }
 
                 return false;
@@ -274,6 +276,8 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                     var paymentMethodService = new PaymentMethodsService(_context);
                     var otherPaymentMethod = new PaymentMethodDTO() { Name = "Other", User = userId };
                     await paymentMethodService.CreatePaymentMethodAsync(otherPaymentMethod, userId);
+                    var paymentMethod = await _context.PaymentMethods.FirstOrDefaultAsync(x => x.Name.ToLower() == "other");
+                    expenseDTO.PaymentMethod = paymentMethod.Id.ToString();
                 }
 
                 return false;
