@@ -271,8 +271,9 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 }
                 else
                 {
-                    await _context.PaymentMethods.AddAsync(new PaymentMethod() { Name = "Other" });
-                    await _context.SaveChangesAsync();
+                    var paymentMethodService = new PaymentMethodsService(_context);
+                    var otherPaymentMethod = new PaymentMethodDTO() { Name = "Other", User = userId };
+                    await paymentMethodService.CreatePaymentMethodAsync(otherPaymentMethod, userId);
                 }
 
                 return false;

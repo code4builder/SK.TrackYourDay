@@ -55,18 +55,10 @@ namespace SK.TrackYourDay.Expenses.Controllers
         // GET-Delete - Creating View
         public async Task<IActionResult> Delete(int? id)
         {
-            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (id != null)
+                await _paymentMethodsService.DeletePaymentMethodByIdAsync((int)id);
 
-            try
-            {
-                var paymentMethodDTO = await _paymentMethodsService.GetPaymentMethodByIdAsync((int)id);
-                var paymentMethodVM = _mapper.Map<PaymentMethodVM>(paymentMethodDTO);
-                return View(paymentMethodVM);
-            }
-            catch (Exception)
-            {
-                return NotFound();
-            }
+            return RedirectToAction("Index");
         }
 
         // POST-Delete

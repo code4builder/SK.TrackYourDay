@@ -50,7 +50,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown(_userId);
             ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
 
-            var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown();
+            var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown(_userId);
             ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
 
             return View();
@@ -122,7 +122,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown(_userId);
             ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
 
-            var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown();
+            var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown(_userId);
             ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
 
             return View(expenseVM);

@@ -11,15 +11,20 @@ namespace SK.TrackYourDay.Expenses.Data.Services
     public class ExpensesHandler
     {
         private ApplicationDbContext _context;
-        public ExpensesHandler(ApplicationDbContext context)
+        private ExpenseCategoriesService _expenseCategoriesService;
+        private PaymentMethodsService _paymentMethodsService;
+        public ExpensesHandler(ApplicationDbContext context, 
+            ExpenseCategoriesService expenseCategoriesService, 
+            PaymentMethodsService paymentMethodsService)
         {
             _context = context;
+            _expenseCategoriesService = expenseCategoriesService;
+            _paymentMethodsService = paymentMethodsService;
         }
 
         public IEnumerable<SelectListItem> GetExpenseCategoriesDropDown(string userId)
         {
-            var expenseCategoriesService = new ExpenseCategoriesService(_context);
-            var expenseCategories = expenseCategoriesService.GetAllExpenseCategoriesDTOAsync(userId).Result;
+            var expenseCategories = _expenseCategoriesService.GetAllExpenseCategoriesDTOAsync(userId).Result;
 
             IEnumerable<SelectListItem> expenseCategoriesDropDown = expenseCategories
                 .Select(i => new SelectListItem
@@ -31,10 +36,12 @@ namespace SK.TrackYourDay.Expenses.Data.Services
             return expenseCategoriesDropDown;
         }
 
-        public IEnumerable<SelectListItem> GetPaymentMethodsDropDown()
+        public IEnumerable<SelectListItem> GetPaymentMethodsDropDown(string userId)
         {
-            IEnumerable<SelectListItem> paymentMethodsDropDown = _context
-                    .PaymentMethods.Select(i => new SelectListItem
+            var paymentMethods = _paymentMethodsService.GetAllPaymentMethodsDTOAsync(userId).Result;
+
+            IEnumerable<SelectListItem> paymentMethodsDropDown = paymentMethods
+                    .Select(i => new SelectListItem
                     {
                         Text = i.Name,
                         Value = i.Id.ToString()
