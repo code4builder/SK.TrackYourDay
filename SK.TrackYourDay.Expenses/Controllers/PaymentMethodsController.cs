@@ -3,21 +3,27 @@ using SK.TrackYourDay.Expenses.Data;
 using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Expenses.Models.ViewModels;
 using SK.TrackYourDay.UseCases.Expenses.Services;
+using AutoMapper;
+using System.Security.Claims;
 
 namespace SK.TrackYourDay.Expenses.Controllers
 {
     public class PaymentMethodsController : Controller
     {
         private PaymentMethodsService _paymentMethodsService;
-        public PaymentMethodsController(PaymentMethodsService paymentMethodsService)
+        private readonly IMapper _mapper;
+        public PaymentMethodsController(PaymentMethodsService paymentMethodsService, IMapper mapper)
         {
             _paymentMethodsService = paymentMethodsService;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var objList = _paymentMethodsService.GetAllPaymentMethods();
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var objList = await _paymentMethodsService.GetAllPaymentMethodsDTOAsync(_userId);
             return View(objList);
         }
 
@@ -32,6 +38,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(PaymentMethod paymentMethod)
         {
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             if (ModelState.IsValid)
             {
                 _paymentMethodsService.CreatePaymentMethod(paymentMethod);
@@ -44,9 +52,11 @@ namespace SK.TrackYourDay.Expenses.Controllers
         // GET-Delete - Creating View
         public IActionResult Delete(int? id)
         {
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             try
             {
-                var paymentMethod = _paymentMethodsService.GetPaymentMethodById((int)id);
+                var paymentMethod = _paymentMethodsService.GetPaymentMethodByIdAsync((int)id);
                 return View(paymentMethod);
             }
             catch (Exception)
@@ -61,7 +71,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
         public IActionResult DeletePost(int? id)
         {
             if(id != null)
-                _paymentMethodsService.DeletePaymentMethodById((int)id);
+                _paymentMethodsService.DeletePaymentMethodByIdAsync((int)id);
 
             return RedirectToAction("Index");
         }
@@ -74,7 +84,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 return NotFound();
             }
 
-            var paymentMethod = _paymentMethodsService.GetPaymentMethodById((int)id);
+            var paymentMethod = _paymentMethodsService.GetPaymentMethodByIdAsync((int)id);
             if (paymentMethod == null)
             {
                 return NotFound();
@@ -87,9 +97,11 @@ namespace SK.TrackYourDay.Expenses.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Update(PaymentMethod paymentMethod)
         {
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             if (ModelState.IsValid)
             {
-                _paymentMethodsService.UpdatePaymentMethodById(paymentMethod.Id, paymentMethod);
+                _paymentMethodsService.UpdatePaymentMethodByIdAsync(paymentMethod.Id, paymentMethod);
                 return RedirectToAction("Index");
             }
 

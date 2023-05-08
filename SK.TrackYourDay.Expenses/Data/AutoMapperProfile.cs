@@ -15,6 +15,8 @@ namespace SK.TrackYourDay.Expenses.Data
             CreateMap<ExpenseCategoryDTO, ExpenseCategoryVM>();
             CreateMap<ExpenseCategoryVM, ExpenseCategoryDTO>();
 
+            CreateMap<PaymentMethodDTO, PaymentMethodVM>();
+            CreateMap<PaymentMethodVM, PaymentMethodDTO>();
         }
     }
 }
