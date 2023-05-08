@@ -246,7 +246,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 {
                     var expenseCategoryService = new ExpenseCategoriesService(_context);
                     var otherExpenseCategory = new ExpenseCategoryDTO() { Name = "Other", User = userId };
-                    await expenseCategoryService.CreateExpenseCategory(otherExpenseCategory, userId);
+                    await expenseCategoryService.CreateExpenseCategoryAsync(otherExpenseCategory, userId);
                 }
 
                 return false;

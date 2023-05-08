@@ -45,7 +45,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             if (ModelState.IsValid)
             {
                 var expenseCategoryDTO = _mapper.Map<ExpenseCategoryDTO>(expenseCategoryVM);
-                await _expenseCategoriesService.CreateExpenseCategory(expenseCategoryDTO, _userId);
+                await _expenseCategoriesService.CreateExpenseCategoryAsync(expenseCategoryDTO, _userId);
                 return RedirectToAction("Index");
             }
 
@@ -74,7 +74,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
         public async Task<IActionResult> DeletePost(int? id)
         {
             if(id != null)
-                await _expenseCategoriesService.DeleteExpenseCategoryById((int)id);
+                await _expenseCategoriesService.DeleteExpenseCategoryByIdAsync((int)id);
 
             return RedirectToAction("Index");
         }
@@ -108,7 +108,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             if (ModelState.IsValid)
             {
                 var expenseCategoryDTO = _mapper.Map<ExpenseCategoryDTO>(expenseCategoryVM);
-                await _expenseCategoriesService.UpdateExpenseCategoryById(expenseCategoryDTO.Id, expenseCategoryDTO);
+                await _expenseCategoriesService.UpdateExpenseCategoryByIdAsync(expenseCategoryDTO.Id, expenseCategoryDTO);
                 return RedirectToAction("Index");
             }
 

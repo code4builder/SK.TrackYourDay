@@ -19,7 +19,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             if (_context.ExpenseCategories.Any())
             {
                 var expenseCategories = await GetExpenseCategoriesDTOByUserId(userId);
-                var friendsExpenseCategories = await GetFriendsExpenseCategories(userId);
+                var friendsExpenseCategories = await GetFriendsExpenseCategoriesAsync(userId);
                 expenseCategories.AddRange(friendsExpenseCategories);
 
                 return expenseCategories.OrderBy(ec => ec.Name).ToList();
@@ -51,11 +51,11 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         public async Task<ExpenseCategoryDTO> GetExpenseCategoryDTOByIdAsync(int id)
         {
             var expensecategory = await GetExpenseCategoryByIdAsync(id);
-            var expenseDTO = ConvertExpenseCategoryToDTO(expensecategory, expensecategory.UserId);
-            return expenseDTO;
+            var expensecategoryDTO = ConvertExpenseCategoryToDTO(expensecategory, expensecategory.UserId);
+            return expensecategoryDTO;
         }
 
-        public async Task CreateExpenseCategory(ExpenseCategoryDTO expenseCategoryDTO, string userId)
+        public async Task CreateExpenseCategoryAsync(ExpenseCategoryDTO expenseCategoryDTO, string userId)
         {
             var expenseCategory = new ExpenseCategory()
             {
@@ -67,7 +67,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteExpenseCategoryById(int id)
+        public async Task DeleteExpenseCategoryByIdAsync(int id)
         {
             var _expenseCategory = await GetExpenseCategoryByIdAsync(id);
             if (_expenseCategory != null)
@@ -77,7 +77,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             }
         }
 
-        public async Task<ExpenseCategory> UpdateExpenseCategoryById(int id, ExpenseCategoryDTO expenseCategoryDTO)
+        public async Task<ExpenseCategory> UpdateExpenseCategoryByIdAsync(int id, ExpenseCategoryDTO expenseCategoryDTO)
         {
             var _expenseCategory = await GetExpenseCategoryByIdAsync(id);
             if (_expenseCategory != null)
@@ -88,7 +88,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             return _expenseCategory;
         }
 
-        public async Task<List<ExpenseCategoryDTO>> GetFriendsExpenseCategories(string userId)
+        public async Task<List<ExpenseCategoryDTO>> GetFriendsExpenseCategoriesAsync(string userId)
         {
             var expenseService = new ExpensesService(_context);
             var friends = expenseService.GetFriendsList(userId);
