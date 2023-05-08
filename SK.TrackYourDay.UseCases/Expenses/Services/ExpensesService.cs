@@ -104,9 +104,9 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         {
             // Checking if category was selected
             var hasExpenseCategorySelected = await CheckExpenseCategorySelected(expenseDTO, userId);
-            
+
             // Checking if payment method was selected
-            await CheckIfPaymentMethodNotSelected(expenseDTO);
+            var hasPaymentMethodSelected = await CheckPaymentMethodSelected(expenseDTO, userId);
 
             Expense expense;
             try
@@ -141,7 +141,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             var hasExpenseCategorySelected = await CheckExpenseCategorySelected(expenseDTO, userId);
 
             // Checking if payment method was selected
-            await CheckIfPaymentMethodNotSelected(expenseDTO);
+            var hasPaymentMethodSelected = await CheckPaymentMethodSelected(expenseDTO, userId);
 
             var _expense = await _context.Expenses.FirstOrDefaultAsync(expense => expense.Id == id);
             if (_expense != null)
@@ -259,7 +259,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         /// Checking if payment method was not selected in the form correctly
         /// </summary>
         /// <param name="expenseDTO">Expense</param>
-        public async Task CheckIfPaymentMethodNotSelected(ExpenseDTO expenseDTO)
+        public async Task<bool> CheckPaymentMethodSelected(ExpenseDTO expenseDTO, string userId)
         {
             if (!int.TryParse(expenseDTO.PaymentMethod, out int result))
             {
@@ -274,7 +274,12 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                     await _context.PaymentMethods.AddAsync(new PaymentMethod() { Name = "Other" });
                     await _context.SaveChangesAsync();
                 }
+
+                return false;
             }
+
+            else 
+                return true;
         }
 
         public async Task AddFriendAsync(string currentUserId, string friendEmail)
