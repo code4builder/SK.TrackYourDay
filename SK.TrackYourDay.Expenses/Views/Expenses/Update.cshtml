@@ -26,11 +26,14 @@
                     <div class="col-2">
                         <label asp-for="Date"></label>
                     </div>
-                    <div class="col-2">
+                    <div class="col-1">
                         <label asp-for="ExpenseCategory"></label>
                     </div>
                     <div class="col-1">
                         <label asp-for="PaymentMethod"></label>
+                    </div>
+                    <div class="col-1">
+                        <label asp-for="IrregularPayment"></label>
                     </div>
                 </div>
                 <div class="form-group row">
@@ -48,7 +51,7 @@
                     <div class="col-2">
                         <input asp-for="Date" class="form-control" />
                     </div>
-                    <div class="col-2">
+                    <div class="col-1">
                         <select asp-for="ExpenseCategory" asp-items="@ViewBag.ExpenseCategoriesDropDown" class="form-control">
                             <option selected>--Select Category--</option>
                         </select>
@@ -57,6 +60,9 @@
                         <select asp-for="PaymentMethod" asp-items="@ViewBag.PaymentMethodsDropDown" class="form-control">
                             <option selected>--Select Category--</option>
                         </select>
+                    </div>
+                    <div class="col-1">
+                        <input asp-for="IrregularPayment"/>
                     </div>
                 </div>
                 <br />

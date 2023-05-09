@@ -43,6 +43,9 @@
                         Created By
                     </th>
                     <th>
+                        Irregular Payment
+                    </th>
+                    <th>
                         Changes
                     </th>
                 </tr>
@@ -55,9 +58,10 @@
                         <td width="20%">@expense.Description</td>
                         <td width="10%">@expense.Amount</td>
                         <td width="10%">@expense.Date.ToString("d")</td>
-                        <td width="5%">@expense.ExpenseCategory</td>
-                        <td width="5%">@expense.PaymentMethod</td>
-                        <td width="5%">@expense.UserName</td>
+                        <td width="4%">@expense.ExpenseCategory</td>
+                        <td width="4%">@expense.PaymentMethod</td>
+                        <td width="4%">@expense.UserName</td>
+                        <td width="4%"><input asp-for="@expense.IrregularPayment" disabled/></td>
                         <td width="25%">
                             <div class="w-100 btn-group" role="group">
                                 <a asp-controller="Expenses" asp-action="Update" asp-route-Id="@expense.Id" class="btn btn-primary mx-1">Update</a>

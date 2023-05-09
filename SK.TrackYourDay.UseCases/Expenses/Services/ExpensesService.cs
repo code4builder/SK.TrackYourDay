@@ -120,7 +120,8 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                     ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == int.Parse(expenseDTO.ExpenseCategory)),
                     PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == int.Parse(expenseDTO.PaymentMethod)),
                     Date = expenseDTO.Date,
-                    UserId = userId
+                    UserId = userId,
+                    IrregularPayment = expenseDTO.IrregularPayment
                 };
             }
             catch (Exception)
@@ -152,6 +153,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 _expense.ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == int.Parse(expenseDTO.ExpenseCategory));
                 _expense.PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == int.Parse(expenseDTO.PaymentMethod));
                 _expense.Date = expenseDTO.Date;
+                _expense.IrregularPayment = expenseDTO.IrregularPayment;
 
                 await _context.SaveChangesAsync();
             }
@@ -188,7 +190,8 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                     ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == expense.ExpenseCategoryId).Name.ToString(),
                     PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == expense.PaymentMethodId).Name.ToString(),
                     Date = expense.Date,
-                    UserName = GetFullUserName(userId)
+                    UserName = GetFullUserName(userId),
+                    IrregularPayment = expense.IrregularPayment
                 };
                 return expenseDTO;
             }
