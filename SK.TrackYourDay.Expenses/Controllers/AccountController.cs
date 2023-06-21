@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using SK.TrackYourDay.Expenses.Data.Services;
 using SK.TrackYourDay.Expenses.Models.ViewModels;
 
@@ -7,9 +8,12 @@ namespace SK.TrackYourDay.Expenses.Controllers
     public class AccountController : Controller
     {
         private readonly AccountService _accountService;
-        public AccountController(AccountService accountService)
+        private readonly ILogger<AccountController> _logger;
+
+        public AccountController(AccountService accountService, ILogger<AccountController> logger)
         {
             _accountService = accountService;
+            _logger = logger;
         }
 
         public IActionResult Login()
@@ -21,6 +25,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginVM model)
         {
+            _logger.LogInformation("Login triggered");
+
             if (ModelState.IsValid)
             {
                 var result = await _accountService.LoginAsync(model);

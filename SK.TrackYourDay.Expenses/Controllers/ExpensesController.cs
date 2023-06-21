@@ -18,20 +18,24 @@ namespace SK.TrackYourDay.Expenses.Controllers
         private ExpensesHandler _expensesHandler;
         private PaymentMethodsService _paymentMethodsService;
         private readonly IMapper _mapper;
+        private readonly ILogger<AccountController> _logger;
 
         public ExpensesController(ExpensesService expensesService, PaymentMethodsService paymentMethodsService,
-            IHttpContextAccessor httpContextAccessor, ExpensesHandler expensesHandler, IMapper mapper)
+            IHttpContextAccessor httpContextAccessor, ExpensesHandler expensesHandler, IMapper mapper, ILogger<AccountController> logger)
         {
             _httpContextAccessor = httpContextAccessor;
             _expensesService = expensesService;
             _expensesHandler = expensesHandler;
             _paymentMethodsService = paymentMethodsService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index(string sortBy, string searchString, int pageNumber, int pageSize)
         {
+            _logger.LogInformation("GetAll Expenses triggered");
+
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var _role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
 
