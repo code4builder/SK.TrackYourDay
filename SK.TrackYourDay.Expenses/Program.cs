@@ -11,6 +11,7 @@ using SK.TrackYourDay.UseCases.Expenses.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using System;
+using SK.TrackYourDay.Expenses.Middleware;
 
 namespace SK.TrackYourDay.Expenses
 {
@@ -80,6 +81,8 @@ namespace SK.TrackYourDay.Expenses
 
                 app.UseAuthentication();
                 app.UseAuthorization();
+
+                app.UseMiddleware<LogUserNameMiddleware>();
 
                 // Exception Handling
                 app.ConfigureBuildInExceptionHandler();
