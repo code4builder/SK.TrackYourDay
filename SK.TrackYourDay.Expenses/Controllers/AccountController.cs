@@ -32,6 +32,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 var result = await _accountService.LoginAsync(model);
                 if (result.Succeeded)
                 {
+                    _logger.LogInformation("Login succeded");
+
                     return RedirectToAction("Index", "Expenses");
                 }
                 ModelState.AddModelError("", "Invalid login attempt");
@@ -49,12 +51,17 @@ namespace SK.TrackYourDay.Expenses.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterVM model)
         {
+            _logger.LogInformation("Register triggered");
+
             if (ModelState.IsValid)
             {
-               var result = await _accountService.CreateUserAsync(model);
+                var result = await _accountService.CreateUserAsync(model);
 
                 if (result.Succeeded)
+                {
+                    _logger.LogInformation($"User with email {model.Email} was registered successfully");
                     return RedirectToAction("Index", "Home");
+                }
 
                 foreach(var error in result.Errors)
                 {
@@ -68,6 +75,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
+            _logger.LogInformation("Logout triggered");
+
             await _accountService.LogoutAsync();
             return RedirectToAction("Login", "Account");
         }
