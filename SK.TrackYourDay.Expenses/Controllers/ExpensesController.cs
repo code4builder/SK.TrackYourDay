@@ -34,7 +34,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string sortBy, string searchString, int pageNumber, int pageSize)
         {
-            _logger.LogInformation("GetAll Expenses triggered");
+            _logger.LogInformation("GetAllExpenses triggered");
 
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var _role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
@@ -49,6 +49,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
         //GET-Create - Creating View
         public IActionResult Create()
         {
+            _logger.LogInformation("CreateExpense triggered");
+
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown(_userId);
@@ -72,12 +74,13 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 {
                     var expenseDTO = _mapper.Map<ExpenseDTO>(expenseVM);
                     await _expensesService.AddExpenseAsync(expenseDTO, _userId);
+                    _logger.LogInformation($"The new expense {expenseVM.ExpenseName} was created");
                     return RedirectToAction("Index");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception();
+                throw new Exception($"{ex}. Can't create new expense by user: {User.Identity.Name}");
                 //return BadRequest();
             }
 
@@ -87,6 +90,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
         // GET-Delete - Creating View
         public async Task<IActionResult> Delete(int? id)
         {
+            _logger.LogInformation("DeleteExpense triggered");
+
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             var expenseDTO = await _expensesService.GetExpenseDTOByIdAsync((int)id, _userId);
@@ -102,6 +107,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
         {
             if (id != null)
                 await _expensesService.DeleteExpenseByIdAsync(id);
+                _logger.LogInformation($"The expense with {id} was deleted");
 
             return RedirectToAction("Index");
         }
@@ -109,6 +115,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
         // GET-Update - Creating View
         public async Task<IActionResult> Update(int? id)
         {
+            _logger.LogInformation("UpdateExpense triggered");
+
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             if (id == null || id == 0)
@@ -143,6 +151,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
             {
                 var expenseDTO = _mapper.Map<ExpenseDTO>(expenseVM);
                 await _expensesService.UpdateExpenseById(expenseVM.Id, expenseDTO, _userId);
+                _logger.LogInformation($"The expense with {expenseVM.Id} was updated");
+
                 return RedirectToAction("Index");
             }
 
@@ -151,6 +161,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
 
         public IActionResult AddFriend()
         {
+            _logger.LogInformation("AddFriend triggered");
+
             return View();
         }
 
@@ -162,7 +174,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             {
                 var currentUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 await _expensesService.AddFriendAsync(currentUserId, friendVM.Email);
-
+                _logger.LogInformation($"The friend {friendVM.Email} was added");
 
                 return RedirectToAction("Index", "Home");
             }

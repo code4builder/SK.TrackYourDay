@@ -13,15 +13,20 @@ namespace SK.TrackYourDay.Expenses.Controllers
     {
         private PaymentMethodsService _paymentMethodsService;
         private readonly IMapper _mapper;
-        public PaymentMethodsController(PaymentMethodsService paymentMethodsService, IMapper mapper)
+        private readonly ILogger<AccountController> _logger;
+
+        public PaymentMethodsController(PaymentMethodsService paymentMethodsService, IMapper mapper, ILogger<AccountController> logger)
         {
             _paymentMethodsService = paymentMethodsService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+            _logger.LogInformation("GetAllPaymentMethods triggered");
+
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             var paymentMethodsDTO = await _paymentMethodsService.GetAllPaymentMethodsDTOAsync(_userId);
@@ -32,6 +37,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
         //GET-Create - Creating View
         public IActionResult Create()
         {
+            _logger.LogInformation("CreatePaymentMethod triggered");
+
             return View();
         }
 
@@ -46,6 +53,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
             {
                 var paymentMethodDTO = _mapper.Map<PaymentMethodDTO>(paymentMethodVM);
                 await _paymentMethodsService.CreatePaymentMethodAsync(paymentMethodDTO, _userId);
+                _logger.LogInformation($"The new payment method {paymentMethodVM.Name} was created");
+
                 return RedirectToAction("Index");
             }
 
@@ -55,10 +64,25 @@ namespace SK.TrackYourDay.Expenses.Controllers
         // GET-Delete - Creating View
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id != null)
-                await _paymentMethodsService.DeletePaymentMethodByIdAsync((int)id);
+            _logger.LogInformation("DeletePaymentMethod triggered");
 
-            return RedirectToAction("Index");
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+
+            var paymentMethodDTO = await _paymentMethodsService.GetPaymentMethodDTOByIdAsync((int)id);
+            if (paymentMethodDTO == null)
+            {
+                return NotFound();
+            }
+
+            var paymentMethodVM = _mapper.Map<PaymentMethodVM>(paymentMethodDTO);
+            if (paymentMethodVM == null)
+            {
+                return NotFound();
+            }
+            return View(paymentMethodVM);
         }
 
         // POST-Delete
@@ -66,8 +90,11 @@ namespace SK.TrackYourDay.Expenses.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePost(int? id)
         {
-            if(id != null)
+            if (id != null)
+            {
                 await _paymentMethodsService.DeletePaymentMethodByIdAsync((int)id);
+                _logger.LogInformation($"The payment method with {id} was deleted");
+            }
 
             return RedirectToAction("Index");
         }
@@ -75,6 +102,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
         // GET-Update - Creating View
         public async Task<IActionResult> Update(int? id)
         {
+            _logger.LogInformation("UpdatePaymentMethod triggered");
+
             if (id == null || id == 0)
             {
                 return NotFound();
@@ -105,6 +134,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
             {
                 var paymentMethodDTO = _mapper.Map<PaymentMethodDTO>(paymentMethodVM);
                 await _paymentMethodsService.UpdatePaymentMethodByIdAsync(paymentMethodDTO.Id, paymentMethodDTO);
+                _logger.LogInformation($"The payment method with {paymentMethodVM.Name} was updated");
+
                 return RedirectToAction("Index");
             }
 
