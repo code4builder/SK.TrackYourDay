@@ -1,7 +1,7 @@
 # SK.TrackYourDay
 
 ## Project Structure
-![Screenshot1](/../master//Screenshots/project_structure.JPG)
+![Screenshot1](/../master/Screenshots/project_structure.jpg)
 
 ## Technologies and Packages
 Target framework .NET 6.0<br />
