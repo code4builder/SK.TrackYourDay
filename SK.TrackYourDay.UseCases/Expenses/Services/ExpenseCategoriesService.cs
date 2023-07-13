@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Infrastructure.DataAccess;
+using SK.TrackYourDay.UseCases.Abstractions.Expenses.Services;
 using SK.TrackYourDay.UseCases.DTOs;
 
 namespace SK.TrackYourDay.UseCases.Expenses.Services
 {
-    public class ExpenseCategoriesService
+    public class ExpenseCategoriesService : IExpenseCategoriesService
     {
         private ApplicationDbContext _context;
 

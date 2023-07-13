@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Infrastructure.DataAccess;
+using SK.TrackYourDay.UseCases.Abstractions.Expenses.Services;
 using SK.TrackYourDay.UseCases.DTOs;
 using SK.TrackYourDay.UseCases.Expenses.Paging;
 using System;
@@ -12,7 +13,7 @@ using System.Security.Policy;
 
 namespace SK.TrackYourDay.UseCases.Expenses.Services
 {
-    public class ExpensesService
+    public class ExpensesService : IExpensesService
     {
         private ApplicationDbContext _context;
 
