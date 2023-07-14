@@ -14,6 +14,11 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             _context = context;
         }
 
+        /// <summary>
+        /// Get all expense categories for the current user and his friends by UserId
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>The list of <see cref="ExpenseCategoryDTO"/> for current user and his friends</returns>
         public async Task<List<ExpenseCategoryDTO>> GetAllExpenseCategoriesDTOAsync(string userId)
         {
             if (_context.ExpenseCategories.Any())
@@ -28,6 +33,11 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                return new List<ExpenseCategoryDTO>();
         }
 
+        /// <summary>
+        /// Get all expense categories for the current user
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>The list of <see cref="ExpenseCategoryDTO"/> only for current user</returns>
         public async Task<List<ExpenseCategoryDTO>> GetExpenseCategoriesDTOByUserId(string userId)
         {
             if (_context.ExpenseCategories.Any())
@@ -48,6 +58,11 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
         public async Task<ExpenseCategory> GetExpenseCategoryByIdAsync(int id) => await _context.ExpenseCategories.FirstOrDefaultAsync(x => x.Id == id);
 
+        /// <summary>
+        /// Get an ExpenseCategory by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>The retrieved <see cref="ExpenseCategoryDTO"/> by Id</returns>
         public async Task<ExpenseCategoryDTO> GetExpenseCategoryDTOByIdAsync(int id)
         {
             var expensecategory = await GetExpenseCategoryByIdAsync(id);
@@ -55,6 +70,12 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             return expensecategoryDTO;
         }
 
+        /// <summary>
+        /// Create a new ExpenseCategory
+        /// </summary>
+        /// <param name="expenseCategoryDTO"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public async Task CreateExpenseCategoryAsync(ExpenseCategoryDTO expenseCategoryDTO, string userId)
         {
             var expenseCategory = new ExpenseCategory()
@@ -67,6 +88,11 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Delete ExpenseCategory by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task DeleteExpenseCategoryByIdAsync(int id)
         {
             var _expenseCategory = await GetExpenseCategoryByIdAsync(id);
@@ -77,6 +103,12 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             }
         }
 
+        /// <summary>
+        /// Updates ExpenseCategory by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="expenseCategoryDTO"></param>
+        /// <returns>The updated <see cref="ExpenseCategory"/></returns>
         public async Task<ExpenseCategory> UpdateExpenseCategoryByIdAsync(int id, ExpenseCategoryDTO expenseCategoryDTO)
         {
             var _expenseCategory = await GetExpenseCategoryByIdAsync(id);
@@ -88,6 +120,11 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             return _expenseCategory;
         }
 
+        /// <summary>
+        /// Get all expense categories for the current user's friends
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>The list of <see cref="ExpenseCategoryDTO"/> only for current user's friends</returns>
         public async Task<List<ExpenseCategoryDTO>> GetFriendsExpenseCategoriesAsync(string userId)
         {
             var expenseService = new ExpensesService(_context);
@@ -102,6 +139,12 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             return friendsExpenseCategoriesDTO;
         }
 
+        /// <summary>
+        /// Converts <see cref="ExpenseCategory"/> to <see cref="ExpenseCategoryDTO"/>
+        /// </summary>
+        /// <param name="expenseCategory"></param>
+        /// <param name="userId"></param>
+        /// <returns>Converted <see cref="ExpenseCategoryDTO"/></returns>
         public ExpenseCategoryDTO ConvertExpenseCategoryToDTO(ExpenseCategory expenseCategory, string userId)
         {
             var expenseService = new ExpensesService(_context);
