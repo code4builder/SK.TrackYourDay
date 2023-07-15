@@ -1,19 +1,10 @@
 ﻿using FluentAssertions;
-using FluentAssertions.Common;
-using FluentAssertions.Execution;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SK.TrackYourDay.Domain.Models;
-using SK.TrackYourDay.Expenses.Models.ViewModels;
 using SK.TrackYourDay.Infrastructure.DataAccess;
-using SK.TrackYourDay.Infrastructure.DataAccess.Migrations;
 using SK.TrackYourDay.UseCases.DTOs;
 using SK.TrackYourDay.UseCases.Expenses.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SK.TrackYourDay.Expenses.Tests.Services
 {
@@ -140,6 +131,7 @@ namespace SK.TrackYourDay.Expenses.Tests.Services
 
             // Restore _context
             _context.ExpenseCategories.Remove(createdExpenseCategory);
+            await _context.SaveChangesAsync();
         }
 
         [Test, Order(8)]
