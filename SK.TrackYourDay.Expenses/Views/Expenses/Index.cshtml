@@ -16,6 +16,23 @@
     </div>
     <br />
 
+    <div class="accordion" id="accordionExample">
+        <div class="card">
+            <div class="card-header" id="headingOne">
+                <h4 class="mb-0">
+                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                        Expand/Collapse Filters
+                    </button>
+                </h4>
+            </div>
+            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                <div class="card-body">
+                    @Html.Partial("_FilterExpenses", new SK.TrackYourDay.Expenses.Models.ViewModels.FilterVM())
+                </div>
+            </div>
+        </div>
+    </div>
+
     @if (Model.Count() > 0)
     {
         <table class="table table-bordered table-striped" style="width:100%">
@@ -61,7 +78,7 @@
                         <td width="4%">@expense.ExpenseCategory</td>
                         <td width="4%">@expense.PaymentMethod</td>
                         <td width="4%">@expense.UserName</td>
-                        <td width="4%"><input asp-for="@expense.IrregularPayment" disabled/></td>
+                        <td width="4%"><input asp-for="@expense.IrregularPayment" disabled /></td>
                         <td width="25%">
                             <div class="w-100 btn-group" role="group">
                                 <a asp-controller="Expenses" asp-action="Update" asp-route-Id="@expense.Id" class="btn btn-primary mx-1">Update</a>
@@ -75,6 +92,6 @@
     }
     else
     {
-        <p>No expenses created yet</p>
+        <p>No expenses</p>
     }
 </div>
