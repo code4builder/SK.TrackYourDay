@@ -8,6 +8,8 @@ using SK.TrackYourDay.UseCases.Expenses.Services;
 using SK.TrackYourDay.Expenses.Data.Services;
 using AutoMapper;
 using SK.TrackYourDay.UseCases.DTOs;
+using System.Drawing.Printing;
+using System.Globalization;
 
 namespace SK.TrackYourDay.Expenses.Controllers
 {
@@ -18,20 +20,25 @@ namespace SK.TrackYourDay.Expenses.Controllers
         private ExpensesHandler _expensesHandler;
         private PaymentMethodsService _paymentMethodsService;
         private readonly IMapper _mapper;
+        private readonly ILogger<AccountController> _logger;
+        //private FilterVM _filterVM = new FilterVM();
 
         public ExpensesController(ExpensesService expensesService, PaymentMethodsService paymentMethodsService,
-            IHttpContextAccessor httpContextAccessor, ExpensesHandler expensesHandler, IMapper mapper)
+            IHttpContextAccessor httpContextAccessor, ExpensesHandler expensesHandler, IMapper mapper, ILogger<AccountController> logger)
         {
             _httpContextAccessor = httpContextAccessor;
             _expensesService = expensesService;
             _expensesHandler = expensesHandler;
             _paymentMethodsService = paymentMethodsService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index(string sortBy, string searchString, int pageNumber, int pageSize)
         {
+            _logger.LogInformation("GetAllExpenses triggered");
+
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var _role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
 
@@ -39,16 +46,25 @@ namespace SK.TrackYourDay.Expenses.Controllers
 
             var expensesVM = _mapper.Map<IEnumerable<ExpenseVM>>(expensesDTO);
 
+            var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown(_userId);
+            ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
+            var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown(_userId);
+            ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
+
             return View(expensesVM);
         }
 
         //GET-Create - Creating View
         public IActionResult Create()
         {
-            var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown();
+            _logger.LogInformation("CreateExpense triggered");
+
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown(_userId);
             ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
 
-            var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown();
+            var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown(_userId);
             ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
 
             return View();
@@ -66,12 +82,13 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 {
                     var expenseDTO = _mapper.Map<ExpenseDTO>(expenseVM);
                     await _expensesService.AddExpenseAsync(expenseDTO, _userId);
+                    _logger.LogInformation($"The new expense {expenseVM.ExpenseName} was created");
                     return RedirectToAction("Index");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception();
+                throw new Exception($"{ex}. Can't create new expense by user: {User.Identity.Name}");
                 //return BadRequest();
             }
 
@@ -81,6 +98,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
         // GET-Delete - Creating View
         public async Task<IActionResult> Delete(int? id)
         {
+            _logger.LogInformation("DeleteExpense triggered");
+
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             var expenseDTO = await _expensesService.GetExpenseDTOByIdAsync((int)id, _userId);
@@ -96,6 +115,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
         {
             if (id != null)
                 await _expensesService.DeleteExpenseByIdAsync(id);
+            _logger.LogInformation($"The expense with {id} was deleted");
 
             return RedirectToAction("Index");
         }
@@ -103,6 +123,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
         // GET-Update - Creating View
         public async Task<IActionResult> Update(int? id)
         {
+            _logger.LogInformation("UpdateExpense triggered");
+
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             if (id == null || id == 0)
@@ -117,10 +139,10 @@ namespace SK.TrackYourDay.Expenses.Controllers
             }
             var expenseVM = _mapper.Map<ExpenseVM>(expenseDTO);
 
-            var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown();
+            var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown(_userId);
             ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
 
-            var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown();
+            var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown(_userId);
             ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
 
             return View(expenseVM);
@@ -131,10 +153,14 @@ namespace SK.TrackYourDay.Expenses.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(ExpenseVM expenseVM)
         {
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             if (ModelState.IsValid)
             {
                 var expenseDTO = _mapper.Map<ExpenseDTO>(expenseVM);
-                await _expensesService.UpdateExpenseById(expenseVM.Id, expenseDTO);
+                await _expensesService.UpdateExpenseById(expenseVM.Id, expenseDTO, _userId);
+                _logger.LogInformation($"The expense with {expenseVM.Id} was updated");
+
                 return RedirectToAction("Index");
             }
 
@@ -143,6 +169,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
 
         public IActionResult AddFriend()
         {
+            _logger.LogInformation("AddFriend triggered");
+
             return View();
         }
 
@@ -154,12 +182,41 @@ namespace SK.TrackYourDay.Expenses.Controllers
             {
                 var currentUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 await _expensesService.AddFriendAsync(currentUserId, friendVM.Email);
-
+                _logger.LogInformation($"The friend {friendVM.Email} was added");
 
                 return RedirectToAction("Index", "Home");
             }
 
             return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FilterExpenses(FilterVM filterVM)
+        {
+            _logger.LogInformation("FilterExpenses triggered");
+
+            var filteredExpensesVM = new List<ExpenseVM>();
+
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var _role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
+
+            if (ModelState.IsValid)
+            {
+                var filterDTO = _mapper.Map<FilterDTO>(filterVM);
+
+                var filteredExpensesDTO = await _expensesService.FilterExpenses(_userId, _role, filterDTO);
+
+                filteredExpensesVM = _mapper.Map<List<ExpenseVM>>(filteredExpensesDTO);
+
+                _logger.LogInformation("FilterExpenses list received");
+            }
+
+            var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown(_userId);
+            ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
+            var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown(_userId);
+            ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
+
+            return View("Index", filteredExpensesVM);
         }
     }
 }

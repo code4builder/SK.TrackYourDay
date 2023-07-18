@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SK.TrackYourDay.Domain.Models.PaymentMethod>
+﻿@model IEnumerable<SK.TrackYourDay.Expenses.Models.ViewModels.PaymentMethodVM>
 @{
     ViewData["Title"] = "Index Payment Methods";
 }
@@ -24,6 +24,9 @@
                     <th>
                         Payment Method Name
                     </th>
+                    <th>
+                        Created by
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -31,6 +34,7 @@
                 {
                     <tr>
                         <td width="30%">@paymentMethod.Name</td>
+                        <td width="30%">@paymentMethod.User</td>
                         <td>
                             <div class="w-100 btn-group" role="group">
                                 <a asp-controller="PaymentMethods" asp-action="Update" asp-route-Id="@paymentMethod.Id" class="btn btn-primary mx-1">Update</a>

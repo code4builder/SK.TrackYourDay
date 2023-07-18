@@ -11,6 +11,8 @@ namespace SK.TrackYourDay.Domain.Models
         [Required]
         public string Name { get; set; }
 
-        public ExpenseCategory() {}
+        // Navigation Properties
+        public string UserId { get; set; }
+        public ApplicationUser User { get; set; }
     }
 }

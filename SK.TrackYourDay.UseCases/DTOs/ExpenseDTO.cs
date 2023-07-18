@@ -21,5 +21,7 @@ namespace SK.TrackYourDay.UseCases.DTOs
         public string PaymentMethod { get; set; } = string.Empty;
 
         public string UserName { get; set; } = "Unknown";
+
+        public bool IrregularPayment { get; set; }
     }
 }

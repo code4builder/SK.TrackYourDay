@@ -26,7 +26,7 @@
                     <div class="col-2">
                         <label asp-for="Date"></label>
                     </div>
-                    <div class="col-2">
+                    <div class="col-1">
                         <label asp-for="ExpenseCategory"></label>
                     </div>
                     <div class="col-1">
@@ -35,13 +35,16 @@
                     <div class="col-2">
                         <label asp-for="UserName"></label>
                     </div>
+                    <div class="col-1">
+                        <label asp-for="IrregularPayment"></label>
+                    </div>
                 </div>
                 <div class="form-group row">
                     <div class="col-2">
                         <input asp-for="ExpenseName" disabled class="form-control" />
                         <span asp-validation-for="ExpenseName" class="text-danger"></span>
                     </div>
-                    <div class="col-2">
+                    <div class="col-">
                         <input asp-for="Description" disabled class="form-control" />
                     </div>
                     <div class="col-1">
@@ -51,7 +54,7 @@
                     <div class="col-2">
                         <input asp-for="Date" disabled class="form-control" />
                     </div>
-                    <div class="col-2">
+                    <div class="col-1">
                         <input asp-for="ExpenseCategory" disabled class="form-control" />
                     </div>
                     <div class="col-1">
@@ -59,6 +62,9 @@
                     </div>
                     <div class="col-2">
                         <input asp-for="UserName" disabled class="form-control" />
+                    </div>
+                    <div class="col-1">
+                        <input asp-for="IrregularPayment" />
                     </div>
                 </div>
                 <br />

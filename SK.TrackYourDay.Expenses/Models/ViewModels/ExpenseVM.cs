@@ -35,5 +35,8 @@ namespace SK.TrackYourDay.Expenses.Models.ViewModels
 
         [DisplayName("Created By")]
         public string UserName { get; set; } = "Unknown";
+
+        [DisplayName("Irregular payment")]
+        public bool IrregularPayment { get; set; }
     }
 }

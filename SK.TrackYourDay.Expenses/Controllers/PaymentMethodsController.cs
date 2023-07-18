@@ -3,97 +3,143 @@ using SK.TrackYourDay.Expenses.Data;
 using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Expenses.Models.ViewModels;
 using SK.TrackYourDay.UseCases.Expenses.Services;
+using AutoMapper;
+using System.Security.Claims;
+using SK.TrackYourDay.UseCases.DTOs;
 
 namespace SK.TrackYourDay.Expenses.Controllers
 {
     public class PaymentMethodsController : Controller
     {
         private PaymentMethodsService _paymentMethodsService;
-        public PaymentMethodsController(PaymentMethodsService paymentMethodsService)
+        private readonly IMapper _mapper;
+        private readonly ILogger<AccountController> _logger;
+
+        public PaymentMethodsController(PaymentMethodsService paymentMethodsService, IMapper mapper, ILogger<AccountController> logger)
         {
             _paymentMethodsService = paymentMethodsService;
+            _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var objList = _paymentMethodsService.GetAllPaymentMethods();
-            return View(objList);
+            _logger.LogInformation("GetAllPaymentMethods triggered");
+
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var paymentMethodsDTO = await _paymentMethodsService.GetAllPaymentMethodsDTOAsync(_userId);
+            var paymentMethodsVM = _mapper.Map<IEnumerable<PaymentMethodVM>>(paymentMethodsDTO);
+            return View(paymentMethodsVM);
         }
 
         //GET-Create - Creating View
         public IActionResult Create()
         {
+            _logger.LogInformation("CreatePaymentMethod triggered");
+
             return View();
         }
 
         //POST-Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(PaymentMethod paymentMethod)
+        public async Task<IActionResult> Create(PaymentMethodVM paymentMethodVM)
         {
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             if (ModelState.IsValid)
             {
-                _paymentMethodsService.CreatePaymentMethod(paymentMethod);
+                var paymentMethodDTO = _mapper.Map<PaymentMethodDTO>(paymentMethodVM);
+                await _paymentMethodsService.CreatePaymentMethodAsync(paymentMethodDTO, _userId);
+                _logger.LogInformation($"The new payment method {paymentMethodVM.Name} was created");
+
                 return RedirectToAction("Index");
             }
 
-            return View(paymentMethod);
+            return View(paymentMethodVM);
         }
 
         // GET-Delete - Creating View
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
-            try
-            {
-                var paymentMethod = _paymentMethodsService.GetPaymentMethodById((int)id);
-                return View(paymentMethod);
-            }
-            catch (Exception)
-            {
-                return NotFound();
-            }
-        }
+            _logger.LogInformation("DeletePaymentMethod triggered");
 
-        // POST-Delete
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeletePost(int? id)
-        {
-            if(id != null)
-                _paymentMethodsService.DeletePaymentMethodById((int)id);
-
-            return RedirectToAction("Index");
-        }
-
-        // GET-Update - Creating View
-        public IActionResult Update(int? id)
-        {
             if (id == null || id == 0)
             {
                 return NotFound();
             }
 
-            var paymentMethod = _paymentMethodsService.GetPaymentMethodById((int)id);
-            if (paymentMethod == null)
+            var paymentMethodDTO = await _paymentMethodsService.GetPaymentMethodDTOByIdAsync((int)id);
+            if (paymentMethodDTO == null)
             {
                 return NotFound();
             }
-            return View(paymentMethod);
+
+            var paymentMethodVM = _mapper.Map<PaymentMethodVM>(paymentMethodDTO);
+            if (paymentMethodVM == null)
+            {
+                return NotFound();
+            }
+            return View(paymentMethodVM);
+        }
+
+        // POST-Delete
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeletePost(int? id)
+        {
+            if (id != null)
+            {
+                await _paymentMethodsService.DeletePaymentMethodByIdAsync((int)id);
+                _logger.LogInformation($"The payment method with {id} was deleted");
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        // GET-Update - Creating View
+        public async Task<IActionResult> Update(int? id)
+        {
+            _logger.LogInformation("UpdatePaymentMethod triggered");
+
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+
+            var paymentMethodDTO = await _paymentMethodsService.GetPaymentMethodDTOByIdAsync((int)id);
+            if (paymentMethodDTO == null)
+            {
+                return NotFound();
+            }
+
+            var paymentMethodVM = _mapper.Map<PaymentMethodVM>(paymentMethodDTO);
+            if (paymentMethodVM == null)
+            {
+                return NotFound();
+            }
+            return View(paymentMethodVM);
         }
 
         //POST-Update
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Update(PaymentMethod paymentMethod)
+        public async Task<IActionResult> Update(PaymentMethodVM paymentMethodVM)
         {
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             if (ModelState.IsValid)
             {
-                _paymentMethodsService.UpdatePaymentMethodById(paymentMethod.Id, paymentMethod);
+                var paymentMethodDTO = _mapper.Map<PaymentMethodDTO>(paymentMethodVM);
+                await _paymentMethodsService.UpdatePaymentMethodByIdAsync(paymentMethodDTO.Id, paymentMethodDTO);
+                _logger.LogInformation($"The payment method with {paymentMethodVM.Name} was updated");
+
                 return RedirectToAction("Index");
             }
 
-            return View(paymentMethod);
+            return View(paymentMethodVM);
         }
     }
 }

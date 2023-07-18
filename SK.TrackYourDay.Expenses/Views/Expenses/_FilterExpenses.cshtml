@@ -1,0 +1,81 @@
+﻿@model SK.TrackYourDay.Expenses.Models.ViewModels.FilterVM
+
+<form method="get" asp-controller="Expenses" asp-action="FilterExpenses" asp-area="">
+    <div class="form-group row">
+        <div class="form-row">
+            <div class="col">
+                <div class="form-group row margin-b-1">
+                    <label class="col-sm-2 col-form-label" asp-for="ExpenseName">Expense Name</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" asp-for="ExpenseName" />
+                    </div>
+                    <div class="col-sm-2"></div>
+                    <label class="col-sm-2 col-form-label" asp-for="Description">Description</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" asp-for="Description" />
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group row margin-b-1">
+                    <label class="col-sm-2 col-form-label" asp-for="ExpenseCategory">Expense Category</label>
+                    <div class="col-sm-2">
+                        <select asp-for="ExpenseCategory" asp-items="@ViewBag.ExpenseCategoriesDropDown" class="form-control">
+                            <option selected>--Select Category--</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2"></div>
+                    <label class="col-sm-2 col-form-label" asp-for="PaymentMethod">Payment Method</label>
+                    <div class="col-sm-2">
+                        <select asp-for="PaymentMethod" asp-items="@ViewBag.PaymentMethodsDropDown" class="form-control">
+                            <option selected>--Select Category--</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group row margin-b-1">
+                    <label class="col-sm-2 col-form-label" asp-for="DateFrom">Date From</label>
+                    <div class="col-sm-2">
+                        <input type="date" class="form-control" asp-for="DateFrom" />
+                    </div>
+                    <div class="col-sm-2"></div>
+                    <label class="col-sm-2 col-form-label" asp-for="DateTo">Date To</label>
+                    <div class="col-sm-2">
+                        <input type="date" class="form-control" asp-for="DateTo" />
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group row margin-b-1">
+                    <label class="col-sm-2 col-form-label" asp-for="AmountFrom">Amount From</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" asp-for="AmountFrom" />
+                        <span asp-validation-for="AmountFrom" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-2"></div>
+                    <label class="col-sm-2 col-form-label" asp-for="AmountTo">Amount To</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" asp-for="AmountTo" />
+                        <span asp-validation-for="AmountTo" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group row margin-b-1">
+                    <label class="col-sm-2 col-form-label" asp-for="RegularPayment">Regular</label>
+                    <div class="col-sm-2">
+                        <input type="checkbox" class="form-check-input align-bottom" asp-for="RegularPayment" />
+                    </div>
+                    <div class="col-sm-2"></div>
+                    <label class="col-sm-2 col-form-label" asp-for="IrregularPayment">Irregular</label>
+                    <div class="col-sm-2 align-content-center">
+                        <input type="checkbox" class="form-check-input align-bottom" asp-for="IrregularPayment" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Apply Filter</button>
+</form>

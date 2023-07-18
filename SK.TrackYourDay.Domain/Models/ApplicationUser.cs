@@ -11,5 +11,7 @@ namespace SK.TrackYourDay.Domain.Models
         // Navigation Properties
         public virtual ICollection<User_Relation> RelationFrom { get; set; }
         public virtual ICollection<User_Relation> RelationTo { get; set; }
+        public List<ExpenseCategory> expenseCategories { get; set; }
+        public List<PaymentMethod> paymentMethods { get; set; }
     }
 }

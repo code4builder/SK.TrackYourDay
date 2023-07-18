@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SK.TrackYourDay.Infrastructure.DataAccess;
 
@@ -11,9 +12,10 @@ using SK.TrackYourDay.Infrastructure.DataAccess;
 namespace SK.TrackYourDay.Infrastructure.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230504173501_AddExpenseCategoriesListToUsersTableNoCascadeDel")]
+    partial class AddExpenseCategoriesListToUsersTableNoCascadeDel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -306,13 +308,7 @@ namespace SK.TrackYourDay.Infrastructure.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("PaymentMethods");
                 });
@@ -342,9 +338,6 @@ namespace SK.TrackYourDay.Infrastructure.DataAccess.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("HasUserRelations")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -434,17 +427,6 @@ namespace SK.TrackYourDay.Infrastructure.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SK.TrackYourDay.Domain.Models.PaymentMethod", b =>
-                {
-                    b.HasOne("SK.TrackYourDay.Domain.Models.ApplicationUser", "User")
-                        .WithMany("paymentMethods")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("SK.TrackYourDay.Domain.Models.User_Relation", b =>
                 {
                     b.HasOne("SK.TrackYourDay.Domain.Models.ApplicationUser", "User1")
@@ -471,8 +453,6 @@ namespace SK.TrackYourDay.Infrastructure.DataAccess.Migrations
                     b.Navigation("RelationTo");
 
                     b.Navigation("expenseCategories");
-
-                    b.Navigation("paymentMethods");
                 });
 #pragma warning restore 612, 618
         }

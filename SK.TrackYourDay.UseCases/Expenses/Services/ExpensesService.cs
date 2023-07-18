@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Infrastructure.DataAccess;
+using SK.TrackYourDay.UseCases.Abstractions.Expenses.Services;
 using SK.TrackYourDay.UseCases.DTOs;
 using SK.TrackYourDay.UseCases.Expenses.Paging;
 using System;
@@ -12,7 +13,7 @@ using System.Security.Policy;
 
 namespace SK.TrackYourDay.UseCases.Expenses.Services
 {
-    public class ExpensesService
+    public class ExpensesService : IExpensesService
     {
         private ApplicationDbContext _context;
 
@@ -102,9 +103,11 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
         public async Task AddExpenseAsync(ExpenseDTO expenseDTO, string userId)
         {
-            // Checking if category and payment method was selected
-            await CheckIfExpenseCategoryNotSelected(expenseDTO);
-            await CheckIfPaymentMethodNotSelected(expenseDTO);
+            // Checking if category was selected
+            var hasExpenseCategorySelected = await CheckExpenseCategorySelected(expenseDTO, userId);
+
+            // Checking if payment method was selected
+            var hasPaymentMethodSelected = await CheckPaymentMethodSelected(expenseDTO, userId);
 
             Expense expense;
             try
@@ -118,7 +121,8 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                     ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == int.Parse(expenseDTO.ExpenseCategory)),
                     PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == int.Parse(expenseDTO.PaymentMethod)),
                     Date = expenseDTO.Date,
-                    UserId = userId
+                    UserId = userId,
+                    IrregularPayment = expenseDTO.IrregularPayment
                 };
             }
             catch (Exception)
@@ -133,11 +137,13 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Expense> UpdateExpenseById(int id, ExpenseDTO expenseDTO)
+        public async Task<Expense> UpdateExpenseById(int id, ExpenseDTO expenseDTO, string userId)
         {
-            // Checking if category and payment method was selected
-            await CheckIfExpenseCategoryNotSelected(expenseDTO);
-            await CheckIfPaymentMethodNotSelected(expenseDTO);
+            // Checking if category was selected
+            var hasExpenseCategorySelected = await CheckExpenseCategorySelected(expenseDTO, userId);
+
+            // Checking if payment method was selected
+            var hasPaymentMethodSelected = await CheckPaymentMethodSelected(expenseDTO, userId);
 
             var _expense = await _context.Expenses.FirstOrDefaultAsync(expense => expense.Id == id);
             if (_expense != null)
@@ -148,6 +154,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 _expense.ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == int.Parse(expenseDTO.ExpenseCategory));
                 _expense.PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == int.Parse(expenseDTO.PaymentMethod));
                 _expense.Date = expenseDTO.Date;
+                _expense.IrregularPayment = expenseDTO.IrregularPayment;
 
                 await _context.SaveChangesAsync();
             }
@@ -184,7 +191,8 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                     ExpenseCategory = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == expense.ExpenseCategoryId).Name.ToString(),
                     PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == expense.PaymentMethodId).Name.ToString(),
                     Date = expense.Date,
-                    UserName = GetFullUserName(userId)
+                    UserName = GetFullUserName(userId),
+                    IrregularPayment = expense.IrregularPayment
                 };
                 return expenseDTO;
             }
@@ -224,13 +232,11 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
         public List<Expense> GetExpensesByYear(DateTime date) => _context.Expenses.Where(x => x.Date.Year == date.Year).ToList();
 
-        public List<Expense> GetExpensesByUserId(string userId) => _context.Expenses.Where(x => x.UserId == userId).ToList();
-
         /// <summary>
         /// Checking if expense category was not selected in the form correctly
         /// </summary>
         /// <param name="expenseDTO">Expense</param>
-        public async Task CheckIfExpenseCategoryNotSelected(ExpenseDTO expenseDTO)
+        public async Task<bool> CheckExpenseCategorySelected(ExpenseDTO expenseDTO, string userId)
         {
             if (!int.TryParse(expenseDTO.ExpenseCategory, out int result))
             {
@@ -242,17 +248,24 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 }
                 else
                 {
-                    await _context.ExpenseCategories.AddAsync(new ExpenseCategory() { Name = "Other" });
-                    await _context.SaveChangesAsync();
+                    var expenseCategoryService = new ExpenseCategoriesService(_context);
+                    var otherExpenseCategory = new ExpenseCategoryDTO() { Name = "Other", User = userId };
+                    await expenseCategoryService.CreateExpenseCategoryAsync(otherExpenseCategory, userId);
+                    var category = await _context.ExpenseCategories.FirstOrDefaultAsync(x => x.Name.ToLower() == "other");
+                    expenseDTO.ExpenseCategory = category.Id.ToString();
                 }
+
+                return false;
             }
+            else
+                return true;
         }
 
         /// <summary>
         /// Checking if payment method was not selected in the form correctly
         /// </summary>
         /// <param name="expenseDTO">Expense</param>
-        public async Task CheckIfPaymentMethodNotSelected(ExpenseDTO expenseDTO)
+        public async Task<bool> CheckPaymentMethodSelected(ExpenseDTO expenseDTO, string userId)
         {
             if (!int.TryParse(expenseDTO.PaymentMethod, out int result))
             {
@@ -264,10 +277,18 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 }
                 else
                 {
-                    await _context.PaymentMethods.AddAsync(new PaymentMethod() { Name = "Other" });
-                    await _context.SaveChangesAsync();
+                    var paymentMethodService = new PaymentMethodsService(_context);
+                    var otherPaymentMethod = new PaymentMethodDTO() { Name = "Other", User = userId };
+                    await paymentMethodService.CreatePaymentMethodAsync(otherPaymentMethod, userId);
+                    var paymentMethod = await _context.PaymentMethods.FirstOrDefaultAsync(x => x.Name.ToLower() == "other");
+                    expenseDTO.PaymentMethod = paymentMethod.Id.ToString();
                 }
+
+                return false;
             }
+
+            else
+                return true;
         }
 
         public async Task AddFriendAsync(string currentUserId, string friendEmail)
@@ -294,19 +315,59 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
         public async Task<List<ExpenseDTO>> GetFriendsExpenses(string userId)
         {
-            var friends = _context.User_Relations.Include(x => x.User2).Where(x => x.User1Id == userId).Select(x => x.User2);
+            var friends = GetFriendsList(userId);
 
-            var friendsExpenses = new List<ExpenseDTO>();
+            var friendsExpensesDTO = new List<ExpenseDTO>();
             foreach (var friend in friends)
             {
-                var expenses = GetExpensesByUserId(friend.Id);
-                foreach (var expense in expenses)
-                {
-                    var expensesDTO = ConvertExpenseToDTO(expense, friend.Id);
-                    friendsExpenses.Add(expensesDTO);
-                }
+                var expensesDTO = await GetExpensesDTOByUserId(friend.Id);
+                friendsExpensesDTO.AddRange(expensesDTO);
             }
-            return friendsExpenses;
+            return friendsExpensesDTO;
+        }
+
+        public List<ApplicationUser> GetFriendsList(string userId)
+        {
+            var friends = _context.User_Relations.Include(x => x.User2).Where(x => x.User1Id == userId).Select(x => x.User2).ToList();
+            var friendsRightColumn = _context.User_Relations.Include(x => x.User1).Where(x => x.User2Id == userId).Select(x => x.User1).ToList();
+            friends.AddRange(friendsRightColumn);
+
+            return friends;
+        }
+
+        public async Task<List<ExpenseDTO>> FilterExpenses(string userId, string role, FilterDTO filterDTO)
+        {
+            var expenses = await GetAllExpensesDTOAsync(userId, role, null, null, 0, 10);
+
+            var filteredExpenses = expenses.Where(x => x.Date >= filterDTO.DateFrom && x.Date <= filterDTO.DateTo).ToList();
+
+            if (!string.IsNullOrEmpty(filterDTO.ExpenseName))
+                filteredExpenses = filteredExpenses.Where(x => x.ExpenseName.ToLower().Contains(filterDTO.ExpenseName.ToLower())).ToList();
+
+            if (!string.IsNullOrEmpty(filterDTO.Description))
+                filteredExpenses = filteredExpenses.Where(x => x.Description.ToLower().Contains(filterDTO.Description.ToLower())).ToList();
+
+            string requestedPaymentMethodName = _context.PaymentMethods.FirstOrDefault(x => x.Id.ToString() == filterDTO.PaymentMethod)?.Name;
+            if (filterDTO.PaymentMethod != null && requestedPaymentMethodName != null)
+                filteredExpenses = filteredExpenses.Where(x => x.PaymentMethod.ToString() == requestedPaymentMethodName).ToList();
+
+            string requestedExpenseCategoryName = _context.ExpenseCategories.FirstOrDefault(x => x.Id.ToString() == filterDTO.ExpenseCategory)?.Name;
+            if (filterDTO.ExpenseCategory != null && requestedExpenseCategoryName != null)
+                filteredExpenses = filteredExpenses.Where(x => x.ExpenseCategory.ToString() == requestedExpenseCategoryName).ToList();
+
+            if (filterDTO.AmountFrom != 0)
+                filteredExpenses = filteredExpenses.Where(x => x.Amount >= filterDTO.AmountFrom).ToList();
+
+            if (filterDTO.AmountTo != 0)
+                filteredExpenses = filteredExpenses.Where(x => x.Amount <= filterDTO.AmountTo).ToList();
+
+            if (filterDTO.IrregularPayment == false)
+                filteredExpenses = filteredExpenses.Where(x => x.IrregularPayment == false).ToList();
+
+            if (filterDTO.RegularPayment == false)
+                filteredExpenses = filteredExpenses.Where(x => x.IrregularPayment == true).ToList();
+
+            return filteredExpenses;
         }
     }
 }

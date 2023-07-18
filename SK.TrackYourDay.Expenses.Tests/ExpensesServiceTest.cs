@@ -5,11 +5,14 @@ using Microsoft.Extensions.Logging.Abstractions;
 using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Expenses.Controllers;
 using SK.TrackYourDay.Expenses.Data.Services;
-using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Expenses.Models.ViewModels;
 using System;
 using System.Security.Policy;
 using SK.TrackYourDay.Infrastructure.DataAccess;
+using SK.TrackYourDay.UseCases.Expenses.Services;
+using FluentAssertions;
+using FluentAssertions.Execution;
+using SK.TrackYourDay.UseCases.DTOs;
 
 namespace SK.TrackYourDay.Expenses.Tests
 {
@@ -31,97 +34,101 @@ namespace SK.TrackYourDay.Expenses.Tests
 
             SeedDatabase();
 
-            _expensesService = new ExpensesService(_context, null, null);
+            _expensesService = new ExpensesService(_context);
         }
 
         #endregion
 
         [Test, Order(1)]
-        public void GetAllExpensesVMAsync_WithNoSort_NoSearchString_NoPageNumber_RoleAdmin_Test()
+        public void GetAllExpensesDTOAsync_WithNoSort_NoSearchString_NoPageNumber_RoleAdmin_Test()
         {
-            var result = _expensesService.GetAllExpensesVMAsync("UserId1", RoleVM.Admin, "", "", null, null).Result;
-            var expenseNameFirstElement = "Name expense 1";
+            var expenses = _expensesService.GetAllExpensesDTOAsync("UserId1", RoleVM.Admin, "", "", null, null).Result;
+            var expectedExpenseNameFirstElement = "Name expense 1";
 
-            Assert.That(result.Count, Is.EqualTo(6));
-            Assert.That(result.Sum(e => e.Amount), Is.EqualTo(210));
-            Assert.That(result.ElementAt(0).ExpenseName, Is.EqualTo(expenseNameFirstElement));
+            using (new AssertionScope())
+            {
+                expenses.Count().Should().Be(6);
+                expenses.Sum(e => e.Amount).Should().Be(210);
+                expenses.ElementAt(0).ExpenseName.Should().Be(expectedExpenseNameFirstElement);
+            }
         }
 
         [Test, Order(2)]
-        public void GetAllExpensesVMAsync_NoSort_NoSearchString_NoPageNumber_RoleUser_Test()
+        public void GetAllExpensesDTOAsync_NoSort_NoSearchString_NoPageNumber_RoleUser_Test()
         {
-            var result = _expensesService.GetAllExpensesVMAsync("UserId2", RoleVM.User, "", "", null, null).Result;
+            var expenses = _expensesService.GetAllExpensesDTOAsync("UserId2", RoleVM.User, "", "", null, null).Result;
 
-            Assert.That(result.Count, Is.EqualTo(3));
-            Assert.That(result.Sum(e => e.Amount), Is.EqualTo(150));
+            using (new AssertionScope())
+            {
+                expenses.Count().Should().Be(3);
+                expenses.Sum(e => e.Amount).Should().Be(150);
+            }
         }
 
         [Test, Order(3)]
-        public void GetAllExpensesVMAsync_NoSort_NoSearchString_WithPageNumber_RoleAdmin_Test()
+        public void GetAllExpensesDTOAsync_NoSort_NoSearchString_WithPageNumber_RoleAdmin_Test()
         {
-            var result = _expensesService.GetAllExpensesVMAsync("UserId1", RoleVM.Admin, "", "", 1, 5).Result;
+            var expenses = _expensesService.GetAllExpensesDTOAsync("UserId1", RoleVM.Admin, "", "", 1, 5).Result;
 
-            Assert.That(result.Count, Is.EqualTo(5));
-            Assert.That(result.Sum(e => e.Amount), Is.EqualTo(150));
+            using (new AssertionScope())
+            {
+                expenses.Count().Should().Be(5);
+                expenses.Sum(e => e.Amount).Should().Be(150);
+            }
         }
 
         [Test, Order(4)]
-        public void GetAllExpensesVMAsync_NoSort_WithSearchString_NoPageNumber_RoleUser_Test()
+        public void GetAllExpensesDTOAsync_NoSort_WithSearchString_NoPageNumber_RoleUser_Test()
         {
-            var result = _expensesService.GetAllExpensesVMAsync("UserId2", RoleVM.User, "", "Name expense 5", null, null).Result;
-            var expenseName = "Name expense 5";
+            var expenses = _expensesService.GetAllExpensesDTOAsync("UserId2", RoleVM.User, "", "Name expense 5", null, null).Result;
+            var expectedName = "Name expense 5";
 
-            Assert.That(result.Count, Is.EqualTo(1));
-            Assert.That(result.ElementAt(0).ExpenseName, Is.EqualTo(expenseName));
+            using (new AssertionScope())
+            {
+                expenses.Count().Should().Be(1);
+                expenses.ElementAt(0).ExpenseName.Should().Be(expectedName);
+            }
         }
 
         [Test, Order(5)]
-        public void GetAllExpensesVMAsync_WithSort_NoSearchString_NoPageNumber_RoleAdmin_Test()
+        public void GetAllExpensesDTOAsync_WithSort_NoSearchString_NoPageNumber_RoleAdmin_Test()
         {
-            var result = _expensesService.GetAllExpensesVMAsync("UserId1", RoleVM.Admin, "name_desc", "", null, null).Result;
-            var expenseNameFirstElement = "Name expense 6";
+            var expenses = _expensesService.GetAllExpensesDTOAsync("UserId1", RoleVM.Admin, "name_desc", "", null, null).Result;
+            var expectedExpenseNameFirstElement = "Name expense 6";
 
-            Assert.That(result.ElementAt(0).ExpenseName, Is.EqualTo(expenseNameFirstElement));
+            expenses.ElementAt(0).ExpenseName.Should().Be(expectedExpenseNameFirstElement);
         }
 
         [Test, Order(6)]
         public void GetExpensesByUserId_Test()
         {
-            var result = _expensesService.GetExpensesByUserId("UserId2");
+            var expenses = _expensesService.GetExpensesDTOByUserId("UserId2").Result;
 
-            Assert.That(result.Count, Is.EqualTo(3));
+            expenses.Count().Should().Be(3);
         }
 
         [Test, Order(7)]
-        public void GetExpenseVMByIdAsync_Test()
+        public void GetExpenseDTOByIdAsync_Test()
         {
-            var result = _expensesService.GetExpenseVMByIdAsync(5, "UserId2").Result;
-            var expenseVM = new ExpenseVM()
-            {
-                Id = 5,
-                ExpenseName = "Name expense 5",
-                Description = "Description expense 5",
-                Amount = 50,
-                Date = DateTime.Now,
-                ExpenseCategory = "Groceries",
-                PaymentMethod = "Cash",
-                UserName = "John SmithUser"
-            };
+            var expenseDTO = _expensesService.GetExpenseDTOByIdAsync(5, "UserId2").Result;
 
-            Assert.That(result.ExpenseName, Is.EqualTo("Name expense 5"));
-            Assert.That(result.ExpenseCategory, Is.EqualTo("Groceries"));
-            Assert.That(result.PaymentMethod, Is.EqualTo("Cash"));
-            Assert.That(result.UserName, Is.EqualTo("John SmithUser"));
+            using (new AssertionScope())
+            {
+                expenseDTO.ExpenseName.Should().Be("Name expense 5");
+                expenseDTO.ExpenseCategory.Should().Be("Groceries");
+                expenseDTO.PaymentMethod.Should().Be("Cash");
+                expenseDTO.UserName.Should().Be("John SmithUser");
+            }
         }
 
         [Test, Order(8)]
-        public void AddExpenseAsync_Test()
+        public async Task AddExpenseAsync_Test()
         {
-            var expenseVM = new ExpenseVM()
+            var expenseDTO = new ExpenseDTO()
             {
-                Id = 5,
-                ExpenseName = "Name expense 5",
-                Description = "Description expense 5",
+                Id = 7,
+                ExpenseName = "Name expense 7",
+                Description = "Description expense 7",
                 Amount = 50,
                 Date = DateTime.Now,
                 ExpenseCategory = "Groceries",
@@ -129,40 +136,51 @@ namespace SK.TrackYourDay.Expenses.Tests
                 UserName = "John SmithUser"
             };
 
-            var result = _expensesService.AddExpenseAsync(expenseVM, "UserId2");
+            var addingResult = _expensesService.AddExpenseAsync(expenseDTO, "UserId2");
 
-            Assert.That(result, Is.Not.Null);
+            using (new AssertionScope())
+            {
+                addingResult.Should().NotBeNull();
+                addingResult.IsCompleted.Should().BeTrue();
+            }
+
+            // Remove this element from the list
+            await _expensesService.DeleteExpenseByIdAsync(7);
+            _context.Expenses.Count().Should().Be(6);
         }
 
         [Test, Order(9)]
         public void UpdateExpenseById_Test()
         {
-            var expenseVM = new ExpenseVM()
+            var expenseDTO = new ExpenseDTO()
             {
-                Id = 5,
-                ExpenseName = "Name expense 5",
-                Description = "Description expense 5",
+                Id = 4,
+                ExpenseName = "Name expense 4 upd",
+                Description = "Description expense 4",
                 Amount = 50,
                 Date = DateTime.Now,
-                ExpenseCategory = "1",
-                PaymentMethod = "1",
+                ExpenseCategory = "2",
+                PaymentMethod = "2",
                 UserName = "John SmithUser"
             };
 
-            var result = _expensesService.UpdateExpenseById(5, expenseVM).Result;
+            var updateResult = _expensesService.UpdateExpenseById(4, expenseDTO, "UserId2").Result;
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.ExpenseName, Is.EqualTo("Name expense 5"));
-            Assert.That(result.ExpenseCategoryId, Is.EqualTo(1));
-            Assert.That(result.PaymentMethodId, Is.EqualTo(1));
+            using (new AssertionScope())
+            {
+                updateResult.Should().NotBeNull();
+                updateResult.ExpenseName.Should().Be("Name expense 4 upd");
+                updateResult.ExpenseCategoryId.Should().Be(2);
+                updateResult.PaymentMethodId.Should().Be(2);
+            }
         }
 
         [Test, Order(10)]
         public void DeleteExpenseByIdAsync_Test()
         {
-            var result = _expensesService.DeleteExpenseByIdAsync(5);
+            _expensesService.DeleteExpenseByIdAsync(5);
 
-            Assert.That(_context.Expenses.Count, Is.EqualTo(5));
+            _context.Expenses.Count().Should().Be(5);
         }
 
         [Test, Order(11)]
@@ -179,15 +197,15 @@ namespace SK.TrackYourDay.Expenses.Tests
                 PaymentMethodId = 1,
                 UserId = "UserId1"
             };
-            var result = _expensesService.ConvertExpenseToVM(expense, "UserId1");
+            var convertedExpenseDTO = _expensesService.ConvertExpenseToDTO(expense, "UserId1");
 
-            var expenseCategory = "Groceries";
-            var paymentMethod = "Cash";
-            var fullName = "James BondAdmin";
-
-            Assert.That(result.ExpenseCategory, Is.EqualTo(expenseCategory));
-            Assert.That(result.PaymentMethod, Is.EqualTo(paymentMethod));
-            Assert.That(result.UserName, Is.EqualTo(fullName));
+            using (new AssertionScope())
+            {
+                convertedExpenseDTO.Should().NotBeNull();
+                convertedExpenseDTO.ExpenseCategory.Should().Be("Groceries");
+                convertedExpenseDTO.PaymentMethod.Should().Be("Cash");
+                convertedExpenseDTO.UserName.Should().Be("James BondAdmin");
+            }
         }
 
         [OneTimeTearDown]
@@ -273,12 +291,14 @@ namespace SK.TrackYourDay.Expenses.Tests
                 new ExpenseCategory()
                 {
                     Id = 1,
-                    Name = "Groceries"
+                    Name = "Groceries",
+                    UserId = "UserId1"
                 },
                 new ExpenseCategory()
                 {
                     Id = 2,
-                    Name = "Car"
+                    Name = "Car",
+                    UserId = "UserId1"
                 }
             };
 
@@ -287,12 +307,14 @@ namespace SK.TrackYourDay.Expenses.Tests
                 new PaymentMethod()
                 {
                     Id = 1,
-                    Name = "Cash"
+                    Name = "Cash",
+                    UserId = "UserId1"
                 },
                 new PaymentMethod()
                 {
                     Id = 2,
-                    Name = "Credit card"
+                    Name = "Credit card",
+                    UserId = "UserId1"
                 }
             };
 
