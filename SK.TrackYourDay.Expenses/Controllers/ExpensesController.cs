@@ -8,6 +8,8 @@ using SK.TrackYourDay.UseCases.Expenses.Services;
 using SK.TrackYourDay.Expenses.Data.Services;
 using AutoMapper;
 using SK.TrackYourDay.UseCases.DTOs;
+using System.Drawing.Printing;
+using System.Globalization;
 
 namespace SK.TrackYourDay.Expenses.Controllers
 {
@@ -19,6 +21,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
         private PaymentMethodsService _paymentMethodsService;
         private readonly IMapper _mapper;
         private readonly ILogger<AccountController> _logger;
+        //private FilterVM _filterVM = new FilterVM();
 
         public ExpensesController(ExpensesService expensesService, PaymentMethodsService paymentMethodsService,
             IHttpContextAccessor httpContextAccessor, ExpensesHandler expensesHandler, IMapper mapper, ILogger<AccountController> logger)
@@ -42,6 +45,11 @@ namespace SK.TrackYourDay.Expenses.Controllers
             var expensesDTO = await _expensesService.GetAllExpensesDTOAsync(_userId, _role, sortBy, searchString, pageNumber, pageSize);
 
             var expensesVM = _mapper.Map<IEnumerable<ExpenseVM>>(expensesDTO);
+
+            var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown(_userId);
+            ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
+            var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown(_userId);
+            ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
 
             return View(expensesVM);
         }
@@ -107,7 +115,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
         {
             if (id != null)
                 await _expensesService.DeleteExpenseByIdAsync(id);
-                _logger.LogInformation($"The expense with {id} was deleted");
+            _logger.LogInformation($"The expense with {id} was deleted");
 
             return RedirectToAction("Index");
         }
@@ -180,6 +188,35 @@ namespace SK.TrackYourDay.Expenses.Controllers
             }
 
             return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FilterExpenses(FilterVM filterVM)
+        {
+            _logger.LogInformation("FilterExpenses triggered");
+
+            var filteredExpensesVM = new List<ExpenseVM>();
+
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var _role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
+
+            if (ModelState.IsValid)
+            {
+                var filterDTO = _mapper.Map<FilterDTO>(filterVM);
+
+                var filteredExpensesDTO = await _expensesService.FilterExpenses(_userId, _role, filterDTO);
+
+                filteredExpensesVM = _mapper.Map<List<ExpenseVM>>(filteredExpensesDTO);
+
+                _logger.LogInformation("FilterExpenses list received");
+            }
+
+            var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown(_userId);
+            ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
+            var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown(_userId);
+            ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
+
+            return View("Index", filteredExpensesVM);
         }
     }
 }
