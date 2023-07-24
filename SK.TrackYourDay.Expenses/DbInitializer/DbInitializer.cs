@@ -44,7 +44,7 @@ namespace SK.TrackYourDay.Expenses.DbInitializer
 
             _userManager.CreateAsync(new ApplicationUser
             {
-                UserName = "info@bim-s.it",
+                UserName = "adminSergey",
                 Email = "info@bim-s.it",
                 EmailConfirmed = true,
                 FirstName = "Sergey",
