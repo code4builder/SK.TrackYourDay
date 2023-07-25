@@ -129,7 +129,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         public async Task<List<ExpenseCategoryDTO>> GetFriendsExpenseCategoriesAsync(string userId)
         {
             var expenseService = new ExpensesService(_context);
-            var friends = expenseService.GetFriendsList(userId);
+            var friends = await expenseService.GetFriendsList(userId);
 
             var friendsExpenseCategoriesDTO = new List<ExpenseCategoryDTO>();
             foreach (var friend in friends)

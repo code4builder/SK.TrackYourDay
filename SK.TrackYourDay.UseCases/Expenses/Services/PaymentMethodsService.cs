@@ -92,7 +92,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         public async Task<List<PaymentMethodDTO>> GetFriendsPaymentMethods(string userId)
         {
             var expenseService = new ExpensesService(_context);
-            var friends = expenseService.GetFriendsList(userId);
+            var friends = expenseService.GetFriendsList(userId).Result;
 
             var friendsPaymentMethodsDTO = new List<PaymentMethodDTO>();
             foreach (var friend in friends)
