@@ -29,6 +29,6 @@ namespace SK.TrackYourDay.UseCases.Abstractions.Expenses.Services
         Task<bool> CheckPaymentMethodSelected(ExpenseDTO expenseDTO, string userId);
         Task AddFriendAsync(string currentUserId, string friendEmail);
         Task<List<ExpenseDTO>> GetFriendsExpenses(string userId);
-        List<ApplicationUser> GetFriendsList(string userId);
+        Task<List<ApplicationUser>> GetFriendsList(string userId);
     }
 }
