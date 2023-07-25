@@ -81,7 +81,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         {
             if (_context.Expenses.Any())
             {
-                var expenses = _context.Expenses.Where(e => e.UserId == userId);
+                var expenses = await _context.Expenses.Where(e => e.UserId == userId).ToListAsync();
                 var expensesDTO = new List<ExpenseDTO>();
                 foreach (var expense in expenses)
                 {
@@ -180,6 +180,9 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
         public ExpenseDTO ConvertExpenseToDTO(Expense expense, string userId)
         {
+            var expenseCat = _context.ExpenseCategories.FirstOrDefault(ec => ec.Id == expense.ExpenseCategoryId).Name.ToString();
+            var paymentMet = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == expense.PaymentMethodId).Name.ToString();
+
             try
             {
                 var expenseDTO = new ExpenseDTO()
@@ -315,7 +318,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
         public async Task<List<ExpenseDTO>> GetFriendsExpenses(string userId)
         {
-            var friends = GetFriendsList(userId);
+            var friends = await GetFriendsList(userId);
 
             var friendsExpensesDTO = new List<ExpenseDTO>();
             foreach (var friend in friends)
@@ -326,10 +329,10 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             return friendsExpensesDTO;
         }
 
-        public List<ApplicationUser> GetFriendsList(string userId)
+        public async Task<List<ApplicationUser>> GetFriendsList(string userId)
         {
-            var friends = _context.User_Relations.Include(x => x.User2).Where(x => x.User1Id == userId).Select(x => x.User2).ToList();
-            var friendsRightColumn = _context.User_Relations.Include(x => x.User1).Where(x => x.User2Id == userId).Select(x => x.User1).ToList();
+            var friends = await _context.User_Relations.Include(x => x.User2).Where(x => x.User1Id == userId).Select(x => x.User2).ToListAsync();
+            var friendsRightColumn = await _context.User_Relations.Include(x => x.User1).Where(x => x.User2Id == userId).Select(x => x.User1).ToListAsync();
             friends.AddRange(friendsRightColumn);
 
             return friends;
@@ -339,10 +342,10 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         {
             var expenses = await GetAllExpensesDTOAsync(userId, role, null, null, 0, 10);
 
-            var filteredExpenses = expenses.Where(x => x.Date >= filterDTO.DateFrom && x.Date <= filterDTO.DateTo).ToList();
+            var filteredExpenses = expenses.Where(x => x.Date >= filterDTO.DateFrom && x.Date <= filterDTO.DateTo);
 
             if (!string.IsNullOrEmpty(filterDTO.ExpenseName))
-                filteredExpenses = filteredExpenses.Where(x => x.ExpenseName.ToLower().Contains(filterDTO.ExpenseName.ToLower())).ToList();
+                filteredExpenses = filteredExpenses.Where(x => x.ExpenseName.ToLower().Contains(filterDTO.ExpenseName.ToLower()));
 
             if (!string.IsNullOrEmpty(filterDTO.Description))
                 filteredExpenses = filteredExpenses.Where(x => x.Description.ToLower().Contains(filterDTO.Description.ToLower())).ToList();
@@ -367,7 +370,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             if (filterDTO.RegularPayment == false)
                 filteredExpenses = filteredExpenses.Where(x => x.IrregularPayment == true).ToList();
 
-            return filteredExpenses;
+            return filteredExpenses.ToList();
         }
     }
 }
