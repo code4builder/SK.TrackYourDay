@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SK.TrackYourDay.Domain.Models;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace SK.TrackYourDay.Expenses.Controllers
 {
@@ -15,7 +16,12 @@ namespace SK.TrackYourDay.Expenses.Controllers
 
         public IActionResult Index()
         {
-            return RedirectToAction("Index", "Expenses");
+            var _user = HttpContext.User.Identity.Name;
+
+            if (_user == null)
+                return RedirectToAction("Login", "Account");
+            else 
+                return RedirectToAction("Index", "Expenses");
         }
 
         public IActionResult Privacy()
