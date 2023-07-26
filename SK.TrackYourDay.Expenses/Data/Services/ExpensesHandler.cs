@@ -49,6 +49,18 @@ namespace SK.TrackYourDay.Expenses.Data.Services
 
             return paymentMethodsDropDown;
         }
+
+        public int GetExpenseCategoryIdFromExpenseVM(ExpenseVM expenseVM)
+        {
+            var expenseCategory = _context.ExpenseCategories.FirstOrDefault(x => x.Name == expenseVM.ExpenseCategory);
+            return expenseCategory?.Id ?? 0;
+        }
+
+        public int GetPaymentMethodIdFromExpenseVM(ExpenseVM expenseVM)
+        {
+            var paymentMethod = _context.PaymentMethods.FirstOrDefault(x => x.Name == expenseVM.PaymentMethod);
+            return paymentMethod?.Id ?? 0;
+        }
     }
 }
 
