@@ -13,73 +13,86 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <div class="form-group row">
-                    <div class="col-2">
+                <div class="form-group margin-b-1">
+                    <div class="col-12">
                         <label asp-for="ExpenseName"></label>
                     </div>
-                    <div class="col-2">
-                        <label asp-for="Description"></label>
-                    </div>
-                    <div class="col-1">
-                        <label asp-for="Amount"></label>
-                    </div>
-                    <div class="col-2">
-                        <label asp-for="Date"></label>
-                    </div>
-                    <div class="col-1">
-                        <label asp-for="ExpenseCategory"></label>
-                    </div>
-                    <div class="col-1">
-                        <label asp-for="PaymentMethod"></label>
-                    </div>
-                    <div class="col-2">
-                        <label asp-for="UserName"></label>
-                    </div>
-                    <div class="col-1">
-                        <label asp-for="IrregularPayment"></label>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-2">
+                    <div class="col-12">
                         <input asp-for="ExpenseName" disabled class="form-control" />
                         <span asp-validation-for="ExpenseName" class="text-danger"></span>
                     </div>
-                    <div class="col-">
+                </div>
+                <div class="form-group margin-b-1">
+                    <div class="col-12">
+                        <label asp-for="Description"></label>
+                    </div>
+                    <div class="col-12">
                         <input asp-for="Description" disabled class="form-control" />
                     </div>
-                    <div class="col-1">
+                </div>
+                <div class="form-group margin-b-1">
+                    <div class="col-12">
+                        <label asp-for="Amount"></label>
+                    </div>
+                    <div class="col-12">
                         <input asp-for="Amount" disabled class="form-control" />
                         <span asp-validation-for="Amount" class="text-danger"></span>
                     </div>
-                    <div class="col-2">
+                </div>
+                <div class="form-group margin-b-1">
+                    <div class="col-12">
+                        <label asp-for="Date"></label>
+                    </div>
+                    <div class="col-12">
                         <input asp-for="Date" disabled class="form-control" />
                     </div>
-                    <div class="col-1">
+                </div>
+                <div class="form-group margin-b-1">
+                    <div class="col-2">
+                        <label asp-for="ExpenseCategory"></label>
+                    </div>
+                    <div class="col-12">
                         <input asp-for="ExpenseCategory" disabled class="form-control" />
                     </div>
-                    <div class="col-1">
+                </div>
+                <div class="form-group margin-b-1">
+                    <div class="col-12">
+                        <label asp-for="PaymentMethod"></label>
+                    </div>
+                    <div class="col-12">
                         <input asp-for="PaymentMethod" disabled class="form-control" />
                     </div>
-                    <div class="col-2">
+                </div>
+                <div class="form-group margin-b-1">
+                    <div class="col-12">
+                        <label asp-for="UserName"></label>
+                    </div>
+                    <div class="col-12">
                         <input asp-for="UserName" disabled class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group margin-b-1 row">
+                    <div class="col-3">
+                        <label asp-for="IrregularPayment"></label>
                     </div>
                     <div class="col-1">
                         <input asp-for="IrregularPayment" />
                     </div>
                 </div>
-                <br />
-                <div class="form-group row">
-                    <div class="col-8 offset-2 row">
-                        <div class="col">
-                            <input type="submit" class="btn btn-danger w-75" value="Delete" />
-                        </div>
-                        <div class="col">
-                            <a asp-action="Index" class="btn btn-success w-75">Back</a>
-                        </div>
+            </div>
+            <br />
+            <div class="form-group row">
+                <div class="col-8 offset-2 row">
+                    <div class="col">
+                        <input type="submit" class="btn btn-danger w-75" value="Delete" />
+                    </div>
+                    <div class="col">
+                        <a asp-action="Index" class="btn btn-success w-75">Back</a>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </form>
 

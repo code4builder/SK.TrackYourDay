@@ -15,7 +15,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "Expenses");
         }
 
         public IActionResult Privacy()
