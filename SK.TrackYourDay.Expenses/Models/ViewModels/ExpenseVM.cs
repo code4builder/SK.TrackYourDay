@@ -20,7 +20,6 @@ namespace SK.TrackYourDay.Expenses.Models.ViewModels
         [DisplayFormat(DataFormatString = "{0:0}", ApplyFormatInEditMode = true)]
         public decimal Amount { get; set; }
 
-        [DataType(DataType.Date)]
         [Required(ErrorMessage = "Date is required")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }

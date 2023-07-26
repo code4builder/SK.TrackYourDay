@@ -145,6 +145,9 @@ namespace SK.TrackYourDay.Expenses.Controllers
             var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown(_userId);
             ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
 
+            expenseVM.ExpenseCategory = _expensesHandler.GetExpenseCategoryIdFromExpenseVM(expenseVM).ToString();
+            expenseVM.PaymentMethod = _expensesHandler.GetPaymentMethodIdFromExpenseVM(expenseVM).ToString();
+
             return View(expenseVM);
         }
 
