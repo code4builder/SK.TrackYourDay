@@ -38,31 +38,31 @@
         <table class="table table-bordered table-striped" style="width:100%">
             <thead>
                 <tr>
-                    <th>
+                    <th class="text-center align-middle">
                         Expense Name
                     </th>
-                    <th scope="col" class="d-none d-sm-table-cell">
+                    <th scope="col" class="d-none d-sm-table-cell text-center align-middle">
                         Description
                     </th>
-                    <th>
+                    <th class="text-center align-middle">
                         Amount
                     </th>
-                    <th>
+                    <th class="text-center align-middle">
                         Date
                     </th>
-                    <th scope="col" class="d-none d-sm-table-cell">
+                    <th scope="col" class="d-none d-sm-table-cell text-center align-middle">
                         Category
                     </th>
-                    <th scope="col" class="d-none d-sm-table-cell">
+                    <th scope="col" class="d-none d-sm-table-cell align-middle">
                         Payment Method
                     </th>
-                    <th scope="col" class="d-none d-sm-table-cell">
+                    <th scope="col" class="d-none d-sm-table-cell align-middle">
                         Created By
                     </th>
-                    <th scope="col" class="d-none d-sm-table-cell">
+                    <th scope="col" class="d-none d-sm-table-cell align-middle">
                         Irregular Payment
                     </th>
-                    <th>
+                    <th class="text-center align-middle">
                         Changes
                     </th>
                 </tr>
@@ -71,15 +71,15 @@
                 @foreach (var expense in Model)
                 {
                     <tr>
-                        <td width="20%">@expense.ExpenseName</td>
-                        <td width="20%" scope="col" class="d-none d-sm-table-cell">@expense.Description</td>
-                        <td width="10%">@expense.Amount</td>
-                        <td width="10%">@expense.Date.ToString("dd/MM/yyyy")</td>
-                        <td width="4%" scope="col" class="d-none d-sm-table-cell">@expense.ExpenseCategory</td>
-                        <td width="4%" scope="col" class="d-none d-sm-table-cell">@expense.PaymentMethod</td>
-                        <td width="4%" scope="col" class="d-none d-sm-table-cell">@expense.UserName</td>
-                        <td width="4%" scope="col" class="d-none d-sm-table-cell"><input asp-for="@expense.IrregularPayment" disabled /></td>
-                        <td width="25%">
+                        <td width="20%" class="text-center align-middle">@expense.ExpenseName</td>
+                        <td width="20%" scope="col" class="d-none d-sm-table-cell text-center align-middle">@expense.Description</td>
+                        <td width="10%" class="text-center align-middle">@expense.Amount</td>
+                        <td width="8%" class="text-center align-middle">@expense.Date.ToString("dd/MM/yy")</td>
+                        <td width="4%" scope="col" class="d-none d-sm-table-cell text-center align-middle">@expense.ExpenseCategory</td>
+                        <td width="4%" scope="col" class="d-none d-sm-table-cell text-center align-middle">@expense.PaymentMethod</td>
+                        <td width="4%" scope="col" class="d-none d-sm-table-cell text-center align-middle">@expense.UserName</td>
+                        <td width="4%" scope="col" class="d-none d-sm-table-cell text-center align-middle"><input asp-for="@expense.IrregularPayment" disabled /></td>
+                        <td width="23%">
                             <div class="w-100 btn-group" role="group">
                                 <a asp-controller="Expenses" asp-action="Update" asp-route-Id="@expense.Id" class="btn btn-primary mx-1">Update</a>
                                 <a asp-controller="Expenses" asp-action="Delete" asp-route-Id="@expense.Id" class="btn btn-danger mx-1">Delete</a>

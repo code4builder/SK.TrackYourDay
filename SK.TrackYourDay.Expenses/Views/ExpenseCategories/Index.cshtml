@@ -21,11 +21,14 @@
         <table class="table table-bordered table-striped" style="width:100%">
             <thead>
                 <tr>
-                    <th>
+                    <th class="text-center align-middle">
                         Expense Category Name
                     </th>
-                    <th>
+                    <th class="text-center align-middle">
                         Created by
+                    </th>
+                    <th class="text-center align-middle">
+                        Changes
                     </th>
                 </tr>
             </thead>
@@ -33,8 +36,8 @@
                 @foreach (var expenseCategory in Model)
                 {
                     <tr>
-                        <td width="30%">@expenseCategory.Name</td>
-                        <td width="30%">@expenseCategory.User</td>
+                        <td width="30%" class="text-center align-middle">@expenseCategory.Name</td>
+                        <td width="30%" class="text-center align-middle">@expenseCategory.User</td>
                         <td>
                             <div class="w-100 btn-group" role="group">
                                 <a asp-controller="ExpenseCategories" asp-action="Update" asp-route-Id="@expenseCategory.Id" class="btn btn-primary mx-1">Update</a>
