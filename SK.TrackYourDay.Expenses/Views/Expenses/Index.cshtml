@@ -1,4 +1,5 @@
-﻿@model IEnumerable<SK.TrackYourDay.Expenses.Models.ViewModels.ExpenseVM>
+﻿@using SK.TrackYourDay.Expenses.Data.Paging;
+@model PaginatedList<SK.TrackYourDay.Expenses.Models.ViewModels.ExpenseVM>
 @{
     ViewData["Title"] = "Index";
 }
@@ -94,4 +95,19 @@
     {
         <p>No expenses</p>
     }
+
+    @{
+        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+        var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+    }
+
+    <a asp-action="Index" asp-route-pageNumber="@(Model.PageIndex - 1)" class="btn btn-default @prevDisabled">Previous</a>
+    <!-- Render page number buttons -->
+    @for (int pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+    {
+        string activeClass = pageNumber == Model.PageIndex ? "active" : "";
+        <a asp-action="Index" asp-route-pageNumber="@pageNumber" class="btn btn-default @activeClass">@pageNumber</a>
+    }
+    <a asp-action="Index" asp-route-pageNumber="@(Model.PageIndex + 1)" class="btn btn-default @nextDisabled">Next</a>
+
 </div>

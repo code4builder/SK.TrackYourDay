@@ -1,15 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Infrastructure.DataAccess;
 using SK.TrackYourDay.UseCases.Abstractions.Expenses.Services;
 using SK.TrackYourDay.UseCases.DTOs;
-using SK.TrackYourDay.UseCases.Expenses.Paging;
-using System;
-using System.Security.Claims;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Policy;
 
 namespace SK.TrackYourDay.UseCases.Expenses.Services
 {
@@ -69,10 +62,6 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             }
             else
                 expensesDTO = expensesDTO.OrderByDescending(e => e.Date).ThenBy(e => e.ExpenseName).ToList();
-
-            // Paging
-            int? pageSizeCorr = pageSize == 0 ? 10 : pageSize;
-            expensesDTO = PaginatedList<ExpenseDTO>.Create(expensesDTO.AsQueryable(), pageNumber ?? 1, pageSizeCorr ?? 10);
 
             return expensesDTO;
         }

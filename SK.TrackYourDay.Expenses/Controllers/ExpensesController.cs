@@ -10,6 +10,7 @@ using AutoMapper;
 using SK.TrackYourDay.UseCases.DTOs;
 using System.Drawing.Printing;
 using System.Globalization;
+using SK.TrackYourDay.Expenses.Data.Paging;
 
 namespace SK.TrackYourDay.Expenses.Controllers
 {
@@ -21,7 +22,6 @@ namespace SK.TrackYourDay.Expenses.Controllers
         private PaymentMethodsService _paymentMethodsService;
         private readonly IMapper _mapper;
         private readonly ILogger<AccountController> _logger;
-        //private FilterVM _filterVM = new FilterVM();
 
         public ExpensesController(ExpensesService expensesService, PaymentMethodsService paymentMethodsService,
             IHttpContextAccessor httpContextAccessor, ExpensesHandler expensesHandler, IMapper mapper, ILogger<AccountController> logger)
@@ -35,7 +35,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string sortBy, string searchString, int pageNumber, int pageSize)
+        public async Task<IActionResult> Index(string sortBy, string searchString, int? pageNumber = 1, int pageSize = 10)
         {
             _logger.LogInformation("GetAllExpenses triggered");
 
@@ -51,7 +51,10 @@ namespace SK.TrackYourDay.Expenses.Controllers
             var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown(_userId);
             ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
 
-            return View(expensesVM);
+            // Pagination
+            var paginatedExpensesVM = PaginatedList<ExpenseVM>.Create(expensesVM.AsQueryable(), pageNumber, pageSize);
+
+            return View(paginatedExpensesVM);
         }
 
         //GET-Create - Creating View
@@ -194,7 +197,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> FilterExpenses(FilterVM filterVM)
+        public async Task<IActionResult> FilterExpenses(FilterVM filterVM, int? pageNumber = 1, int pageSize = 5)
         {
             _logger.LogInformation("FilterExpenses triggered");
 
@@ -214,12 +217,14 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 _logger.LogInformation("FilterExpenses list received");
             }
 
+            var paginatedExpensesVM = PaginatedList<ExpenseVM>.Create(filteredExpensesVM.AsQueryable(), pageNumber, pageSize);
+
             var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown(_userId);
             ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
             var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown(_userId);
             ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
 
-            return View("Index", filteredExpensesVM);
+            return View("Index", paginatedExpensesVM);
         }
     }
 }
