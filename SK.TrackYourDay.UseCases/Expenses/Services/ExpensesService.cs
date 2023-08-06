@@ -329,35 +329,22 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
         public async Task<IEnumerable<ExpenseDTO>> FilterExpenses(string userId, string role, FilterDTO filterDTO)
         {
+            string requestedPaymentMethodName = _context.PaymentMethods.FirstOrDefault(x => x.Id.ToString() == filterDTO.PaymentMethod)?.Name;
+            string requestedExpenseCategoryName = _context.ExpenseCategories.FirstOrDefault(x => x.Id.ToString() == filterDTO.ExpenseCategory)?.Name;
+
             var expenses = await GetAllExpensesDTOAsync(userId, role, null, null, 0, 10);
 
-            var filteredExpenses = expenses.Where(x => x.Date >= filterDTO.DateFrom && x.Date <= filterDTO.DateTo);
+            List<ExpenseDTO> filteredExpenses = new List<ExpenseDTO>();
 
-            if (!string.IsNullOrEmpty(filterDTO.ExpenseName))
-                filteredExpenses = filteredExpenses.Where(x => x.ExpenseName.ToLower().Contains(filterDTO.ExpenseName.ToLower()));
-
-            if (!string.IsNullOrEmpty(filterDTO.Description))
-                filteredExpenses = filteredExpenses.Where(x => x.Description.ToLower().Contains(filterDTO.Description.ToLower()));
-
-            string requestedPaymentMethodName = _context.PaymentMethods.FirstOrDefault(x => x.Id.ToString() == filterDTO.PaymentMethod)?.Name;
-            if (filterDTO.PaymentMethod != null && requestedPaymentMethodName != null)
-                filteredExpenses = filteredExpenses.Where(x => x.PaymentMethod.ToString() == requestedPaymentMethodName);
-
-            string requestedExpenseCategoryName = _context.ExpenseCategories.FirstOrDefault(x => x.Id.ToString() == filterDTO.ExpenseCategory)?.Name;
-            if (filterDTO.ExpenseCategory != null && requestedExpenseCategoryName != null)
-                filteredExpenses = filteredExpenses.Where(x => x.ExpenseCategory.ToString() == requestedExpenseCategoryName);
-
-            if (filterDTO.AmountFrom != 0)
-                filteredExpenses = filteredExpenses.Where(x => x.Amount >= filterDTO.AmountFrom);
-
-            if (filterDTO.AmountTo != 0)
-                filteredExpenses = filteredExpenses.Where(x => x.Amount <= filterDTO.AmountTo);
-
-            if (filterDTO.IrregularPayment == false)
-                filteredExpenses = filteredExpenses.Where(x => x.IrregularPayment == false);
-
-            if (filterDTO.RegularPayment == false)
-                filteredExpenses = filteredExpenses.Where(x => x.IrregularPayment == true);
+            if (expenses != null)
+                filteredExpenses = expenses.FilterByDateRange(filterDTO)
+                                            .FilterByExpenseName(filterDTO)
+                                            .FilterByDescription(filterDTO)
+                                            .FilterByPaymentMethod(requestedPaymentMethodName)
+                                            .FilterByExpenseCategory(requestedExpenseCategoryName)
+                                            .FilterByAmountRange(filterDTO)
+                                            .FilterByIrregularPayment(filterDTO)
+                                            .FilterByRegularPayment(filterDTO).ToList();
 
             return filteredExpenses;
         }

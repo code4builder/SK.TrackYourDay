@@ -208,21 +208,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
 
             if (ModelState.IsValid)
             {
-                //var filterDTO = _mapper.Map<FilterDTO>(filterVM);
-
-                var filterDTO = new FilterDTO()
-                {
-                    ExpenseName = filterVM.ExpenseName,
-                    Description = filterVM.Description,
-                    ExpenseCategory = filterVM.ExpenseCategory,
-                    PaymentMethod = filterVM.PaymentMethod,
-                    DateFrom = filterVM.DateFrom,
-                    DateTo = filterVM.DateTo,
-                    IrregularPayment = filterVM.IrregularPayment,
-                    RegularPayment = filterVM.RegularPayment,
-                    AmountFrom = filterVM.AmountFrom,
-                    AmountTo = filterVM.AmountTo
-                };
+                var filterDTO = _mapper.Map<FilterDTO>(filterVM);
 
                 var filteredExpensesDTO = await _expensesService.FilterExpenses(_userId, _role, filterDTO);
 
