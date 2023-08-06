@@ -4,6 +4,15 @@
     ViewData["Title"] = "Index";
 }
 
+<style>
+    .current-page {
+        font-weight: bold;
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+</style>
+
 <div class="container p-3">
     <div class="row pt-4">
         <div class="col-6">
@@ -100,12 +109,47 @@
     }
 
     <a asp-action="Index" asp-route-pageNumber="@(Model.PageIndex - 1)" class="btn btn-default @prevDisabled">Previous</a>
+
     <!-- Render page number buttons -->
-    @for (int pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+    @{
+        int maxPageButtons = 3;
+
+        int? startPage = Model.PageIndex - maxPageButtons / 2;
+        if (startPage < 1)
+        {
+            startPage = 1;
+        }
+
+        int? endPage = startPage + maxPageButtons - 1;
+        if (endPage > Model.TotalPages)
+        {
+            endPage = Model.TotalPages;
+            startPage = endPage - maxPageButtons + 1;
+            if (startPage < 1)
+            {
+                startPage = 1;
+            }
+        }
+    }
+
+    @if (startPage > 1)
+    {
+        <a asp-action="Index" asp-route-pageNumber="1" class="btn btn-default">1</a>
+        <span class="btn btn-default disabled">...</span>
+    }
+
+    @for (int? pageNumber = startPage; pageNumber <= endPage; pageNumber++)
     {
         string activeClass = pageNumber == Model.PageIndex ? "active" : "";
-        <a asp-action="Index" asp-route-pageNumber="@pageNumber" class="btn btn-default @activeClass">@pageNumber</a>
+        <a asp-action="Index" asp-route-pageNumber="@pageNumber" class="btn btn-default @activeClass @((pageNumber == Model.PageIndex) ? "current-page" : "")">@pageNumber</a>
     }
+
+    @if (endPage < Model.TotalPages)
+    {
+        <span class="btn btn-default disabled">...</span>
+        <a asp-action="Index" asp-route-pageNumber="@Model.TotalPages" class="btn btn-default">@Model.TotalPages</a>
+    }
+
     <a asp-action="Index" asp-route-pageNumber="@(Model.PageIndex + 1)" class="btn btn-default @nextDisabled">Next</a>
 
 </div>
