@@ -63,6 +63,14 @@
                         <select asp-for="PaymentMethod" asp-items="@ViewBag.PaymentMethodsDropDown" class="form-control"></select>
                     </div>
                 </div>
+                <div class="form-group margin-b-1">
+                    <div class="col-12">
+                        <label asp-for="UserName">Created By (readonly field)</label>
+                    </div>
+                    <div class="col-12">
+                        <input asp-for="UserName" class="form-control" readonly/>
+                    </div>
+                </div>
                 <div class="form-group row margin-b-1">
                     <div class="col-3">
                         <label asp-for="IrregularPayment"></label>
