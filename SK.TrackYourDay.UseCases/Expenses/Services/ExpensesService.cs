@@ -1,15 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Infrastructure.DataAccess;
 using SK.TrackYourDay.UseCases.Abstractions.Expenses.Services;
 using SK.TrackYourDay.UseCases.DTOs;
-using SK.TrackYourDay.UseCases.Expenses.Paging;
-using System;
-using System.Security.Claims;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Policy;
 
 namespace SK.TrackYourDay.UseCases.Expenses.Services
 {
@@ -69,10 +62,6 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             }
             else
                 expensesDTO = expensesDTO.OrderByDescending(e => e.Date).ThenBy(e => e.ExpenseName).ToList();
-
-            // Paging
-            int? pageSizeCorr = pageSize == 0 ? 10 : pageSize;
-            expensesDTO = PaginatedList<ExpenseDTO>.Create(expensesDTO.AsQueryable(), pageNumber ?? 1, pageSizeCorr ?? 10);
 
             return expensesDTO;
         }
@@ -338,39 +327,26 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             return friends;
         }
 
-        public async Task<List<ExpenseDTO>> FilterExpenses(string userId, string role, FilterDTO filterDTO)
+        public async Task<IEnumerable<ExpenseDTO>> FilterExpenses(string userId, string role, FilterDTO filterDTO)
         {
+            string requestedPaymentMethodName = _context.PaymentMethods.FirstOrDefault(x => x.Id.ToString() == filterDTO.PaymentMethod)?.Name;
+            string requestedExpenseCategoryName = _context.ExpenseCategories.FirstOrDefault(x => x.Id.ToString() == filterDTO.ExpenseCategory)?.Name;
+
             var expenses = await GetAllExpensesDTOAsync(userId, role, null, null, 0, 10);
 
-            var filteredExpenses = expenses.Where(x => x.Date >= filterDTO.DateFrom && x.Date <= filterDTO.DateTo);
+            List<ExpenseDTO> filteredExpenses = new List<ExpenseDTO>();
 
-            if (!string.IsNullOrEmpty(filterDTO.ExpenseName))
-                filteredExpenses = filteredExpenses.Where(x => x.ExpenseName.ToLower().Contains(filterDTO.ExpenseName.ToLower()));
+            if (expenses != null)
+                filteredExpenses = expenses.FilterByDateRange(filterDTO)
+                                            .FilterByExpenseName(filterDTO)
+                                            .FilterByDescription(filterDTO)
+                                            .FilterByPaymentMethod(requestedPaymentMethodName)
+                                            .FilterByExpenseCategory(requestedExpenseCategoryName)
+                                            .FilterByAmountRange(filterDTO)
+                                            .FilterByIrregularPayment(filterDTO)
+                                            .FilterByRegularPayment(filterDTO).ToList();
 
-            if (!string.IsNullOrEmpty(filterDTO.Description))
-                filteredExpenses = filteredExpenses.Where(x => x.Description.ToLower().Contains(filterDTO.Description.ToLower())).ToList();
-
-            string requestedPaymentMethodName = _context.PaymentMethods.FirstOrDefault(x => x.Id.ToString() == filterDTO.PaymentMethod)?.Name;
-            if (filterDTO.PaymentMethod != null && requestedPaymentMethodName != null)
-                filteredExpenses = filteredExpenses.Where(x => x.PaymentMethod.ToString() == requestedPaymentMethodName).ToList();
-
-            string requestedExpenseCategoryName = _context.ExpenseCategories.FirstOrDefault(x => x.Id.ToString() == filterDTO.ExpenseCategory)?.Name;
-            if (filterDTO.ExpenseCategory != null && requestedExpenseCategoryName != null)
-                filteredExpenses = filteredExpenses.Where(x => x.ExpenseCategory.ToString() == requestedExpenseCategoryName).ToList();
-
-            if (filterDTO.AmountFrom != 0)
-                filteredExpenses = filteredExpenses.Where(x => x.Amount >= filterDTO.AmountFrom).ToList();
-
-            if (filterDTO.AmountTo != 0)
-                filteredExpenses = filteredExpenses.Where(x => x.Amount <= filterDTO.AmountTo).ToList();
-
-            if (filterDTO.IrregularPayment == false)
-                filteredExpenses = filteredExpenses.Where(x => x.IrregularPayment == false).ToList();
-
-            if (filterDTO.RegularPayment == false)
-                filteredExpenses = filteredExpenses.Where(x => x.IrregularPayment == true).ToList();
-
-            return filteredExpenses.ToList();
+            return filteredExpenses;
         }
     }
 }

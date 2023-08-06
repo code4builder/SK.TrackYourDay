@@ -1,14 +1,13 @@
-﻿@model IEnumerable<SK.TrackYourDay.Expenses.Models.ViewModels.ExpenseVM>
+﻿@using SK.TrackYourDay.Expenses.Data.Paging;
+@model PaginatedList<SK.TrackYourDay.Expenses.Models.ViewModels.ExpenseVM>
 @{
     ViewData["Title"] = "Index";
 }
 
-
-<h1>Expenses Tracker</h1>
 <div class="container p-3">
     <div class="row pt-4">
         <div class="col-6">
-            <h2 class="text-primary">All Expenses List</h2>
+            <h3 class="text-primary">Expenses List</h3>
         </div>
         <div class="col-6 text-right">
             <a asp-controller="Expenses" asp-action="Create" class="btn btn-primary">Create new expense</a>
@@ -16,8 +15,8 @@
     </div>
     <br />
 
-    <div class="accordion" id="accordionExample">
-        <div class="card">
+    <div class="accordion margin-b-1" id="accordionExample">
+        <div class="card w-100">
             <div class="card-header" id="headingOne">
                 <h4 class="mb-0">
                     <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
@@ -79,10 +78,10 @@
                         <td width="4%" scope="col" class="d-none d-sm-table-cell text-center align-middle">@expense.PaymentMethod</td>
                         <td width="4%" scope="col" class="d-none d-sm-table-cell text-center align-middle">@expense.UserName</td>
                         <td width="4%" scope="col" class="d-none d-sm-table-cell text-center align-middle"><input asp-for="@expense.IrregularPayment" disabled /></td>
-                        <td width="23%">
+                        <td width="15%">
                             <div class="w-100 btn-group" role="group">
-                                <a asp-controller="Expenses" asp-action="Update" asp-route-Id="@expense.Id" class="btn btn-primary mx-1">Update</a>
-                                <a asp-controller="Expenses" asp-action="Delete" asp-route-Id="@expense.Id" class="btn btn-danger mx-1">Delete</a>
+                                <a asp-controller="Expenses" asp-action="Update" asp-route-Id="@expense.Id" class="btn-sm btn-primary mx-1">Update</a>
+                                <a asp-controller="Expenses" asp-action="Delete" asp-route-Id="@expense.Id" class="btn-sm btn-danger mx-1">Delete</a>
                             </div>
                         </td>
                     </tr>
@@ -94,4 +93,19 @@
     {
         <p>No expenses</p>
     }
+
+    @{
+        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+        var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+    }
+
+    <a asp-action="Index" asp-route-pageNumber="@(Model.PageIndex - 1)" class="btn btn-default @prevDisabled">Previous</a>
+    <!-- Render page number buttons -->
+    @for (int pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+    {
+        string activeClass = pageNumber == Model.PageIndex ? "active" : "";
+        <a asp-action="Index" asp-route-pageNumber="@pageNumber" class="btn btn-default @activeClass">@pageNumber</a>
+    }
+    <a asp-action="Index" asp-route-pageNumber="@(Model.PageIndex + 1)" class="btn btn-default @nextDisabled">Next</a>
+
 </div>
