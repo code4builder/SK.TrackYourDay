@@ -15,8 +15,8 @@
     </div>
     <br />
 
-    <div class="accordion" id="accordionExample">
-        <div class="card">
+    <div class="accordion margin-b-1" id="accordionExample">
+        <div class="card w-100">
             <div class="card-header" id="headingOne">
                 <h4 class="mb-0">
                     <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
@@ -78,10 +78,10 @@
                         <td width="4%" scope="col" class="d-none d-sm-table-cell text-center align-middle">@expense.PaymentMethod</td>
                         <td width="4%" scope="col" class="d-none d-sm-table-cell text-center align-middle">@expense.UserName</td>
                         <td width="4%" scope="col" class="d-none d-sm-table-cell text-center align-middle"><input asp-for="@expense.IrregularPayment" disabled /></td>
-                        <td width="23%">
+                        <td width="15%">
                             <div class="w-100 btn-group" role="group">
-                                <a asp-controller="Expenses" asp-action="Update" asp-route-Id="@expense.Id" class="btn btn-primary mx-1">Update</a>
-                                <a asp-controller="Expenses" asp-action="Delete" asp-route-Id="@expense.Id" class="btn btn-danger mx-1">Delete</a>
+                                <a asp-controller="Expenses" asp-action="Update" asp-route-Id="@expense.Id" class="btn-sm btn-primary mx-1">Update</a>
+                                <a asp-controller="Expenses" asp-action="Delete" asp-route-Id="@expense.Id" class="btn-sm btn-danger mx-1">Delete</a>
                             </div>
                         </td>
                     </tr>
