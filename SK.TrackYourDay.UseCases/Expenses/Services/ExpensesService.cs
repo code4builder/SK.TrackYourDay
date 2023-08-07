@@ -10,7 +10,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
     public class ExpensesService : IExpensesService
     {
         private ApplicationDbContext _context;
-        private readonly IMemoryCache _memoryCache;
+        private IMemoryCache _memoryCache;
 
         public ExpensesService(ApplicationDbContext context, IMemoryCache memoryCache)
         {
@@ -66,6 +66,19 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 expensesDTO = expensesDTO.OrderByDescending(e => e.Date).ThenBy(e => e.ExpenseName).ToList();
 
             return expensesDTO;
+        }
+
+        public async Task<IEnumerable<ExpenseDTO>> GetAllExpensesDTOCache(string userId, string role, string sortBy,
+                                                                    string searchString, int? pageNumber, int? pageSize)
+        {
+            List<ExpenseDTO> expensesDTO;
+
+            return _memoryCache.Get<List<ExpenseDTO>>("expenses");
+        }
+
+        public void SetAllExpensesDTOToCache(string key, IEnumerable<ExpenseDTO> expensesDTO)
+        {
+            _memoryCache.Set(key, expensesDTO, TimeSpan.FromMinutes(1));
         }
 
         public async Task<List<ExpenseDTO>> GetExpensesDTOByUserIdAsync(string userId)
@@ -242,7 +255,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 }
                 else
                 {
-                    var expenseCategoryService = new ExpenseCategoriesService(_context);
+                    var expenseCategoryService = new ExpenseCategoriesService(_context, _memoryCache);
                     var otherExpenseCategory = new ExpenseCategoryDTO() { Name = "Other", User = userId };
                     await expenseCategoryService.CreateExpenseCategoryAsync(otherExpenseCategory, userId);
                     var category = await _context.ExpenseCategories.FirstOrDefaultAsync(x => x.Name.ToLower() == "other");
@@ -271,7 +284,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 }
                 else
                 {
-                    var paymentMethodService = new PaymentMethodsService(_context);
+                    var paymentMethodService = new PaymentMethodsService(_context, _memoryCache);
                     var otherPaymentMethod = new PaymentMethodDTO() { Name = "Other", User = userId };
                     await paymentMethodService.CreatePaymentMethodAsync(otherPaymentMethod, userId);
                     var paymentMethod = await _context.PaymentMethods.FirstOrDefaultAsync(x => x.Name.ToLower() == "other");

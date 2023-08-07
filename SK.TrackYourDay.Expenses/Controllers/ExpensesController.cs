@@ -11,6 +11,7 @@ using SK.TrackYourDay.UseCases.DTOs;
 using System.Drawing.Printing;
 using System.Globalization;
 using SK.TrackYourDay.Expenses.Data.Paging;
+using System.Collections.Generic;
 
 namespace SK.TrackYourDay.Expenses.Controllers
 {
@@ -42,7 +43,13 @@ namespace SK.TrackYourDay.Expenses.Controllers
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var _role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
 
-            var expensesDTO = await _expensesService.GetAllExpensesDTOAsync(_userId, _role, sortBy, searchString, pageNumber, pageSize);
+            var expensesDTO = await _expensesService.GetAllExpensesDTOCache(_userId, _role, sortBy, searchString, pageNumber, pageSize);
+
+            if (expensesDTO is null)
+            {
+                expensesDTO = await _expensesService.GetAllExpensesDTOAsync(_userId, _role, sortBy, searchString, pageNumber, pageSize);
+                _expensesService.SetAllExpensesDTOToCache("expenses", expensesDTO);
+            }
 
             var expensesVM = _mapper.Map<IEnumerable<ExpenseVM>>(expensesDTO);
 

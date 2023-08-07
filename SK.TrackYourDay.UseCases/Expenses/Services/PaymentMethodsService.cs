@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Infrastructure.DataAccess;
 using SK.TrackYourDay.UseCases.Abstractions.Expenses.Services;
@@ -9,10 +10,12 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
     public class PaymentMethodsService : IPaymentMethodsService
     {
         private ApplicationDbContext _context;
+        private IMemoryCache _memoryCache;
 
-        public PaymentMethodsService(ApplicationDbContext context)
+        public PaymentMethodsService(ApplicationDbContext context, IMemoryCache memoryCache)
         {
             _context = context;
+            _memoryCache = memoryCache;
         }
 
         public async Task<List<PaymentMethodDTO>> GetAllPaymentMethodsDTOAsync(string userId) 
@@ -91,7 +94,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
         public async Task<List<PaymentMethodDTO>> GetFriendsPaymentMethodsAsync(string userId)
         {
-            var expenseService = new ExpensesService(_context);
+            var expenseService = new ExpensesService(_context, _memoryCache);
             var friends = expenseService.GetFriendsListAsync(userId).Result;
 
             var friendsPaymentMethodsDTO = new List<PaymentMethodDTO>();
@@ -105,7 +108,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
         public PaymentMethodDTO ConvertPaymentMethodToDTO(PaymentMethod paymentMethod, string userId)
         {
-            var expenseService = new ExpensesService(_context);
+            var expenseService = new ExpensesService(_context, _memoryCache);
             try
             {
                 var paymentMethodDTO = new PaymentMethodDTO()
