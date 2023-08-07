@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Infrastructure.DataAccess;
 using SK.TrackYourDay.UseCases.Abstractions.Expenses.Services;
@@ -9,11 +10,12 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
     public class ExpensesService : IExpensesService
     {
         private ApplicationDbContext _context;
+        private IMemoryCache _memoryCache;
 
-        public ExpensesService(ApplicationDbContext context
-         )
+        public ExpensesService(ApplicationDbContext context, IMemoryCache memoryCache)
         {
             _context = context;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -33,8 +35,8 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
             if (role == RoleDTO.User)
             {
-                expensesDTO = await GetExpensesDTOByUserId(userId);
-                var friendsExpensesDTO = await GetFriendsExpenses(userId);
+                expensesDTO = await GetExpensesDTOByUserIdAsync(userId);
+                var friendsExpensesDTO = await GetFriendsExpensesAsync(userId);
                 expensesDTO.AddRange(friendsExpensesDTO);
             }
             else
@@ -66,7 +68,20 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             return expensesDTO;
         }
 
-        public async Task<List<ExpenseDTO>> GetExpensesDTOByUserId(string userId)
+        public async Task<IEnumerable<ExpenseDTO>> GetAllExpensesDTOCache(string userId, string role, string sortBy,
+                                                                    string searchString, int? pageNumber, int? pageSize)
+        {
+            List<ExpenseDTO> expensesDTO;
+
+            return _memoryCache.Get<List<ExpenseDTO>>("expenses");
+        }
+
+        public void SetAllExpensesDTOToCache(string key, IEnumerable<ExpenseDTO> expensesDTO)
+        {
+            _memoryCache.Set(key, expensesDTO, TimeSpan.FromMinutes(1));
+        }
+
+        public async Task<List<ExpenseDTO>> GetExpensesDTOByUserIdAsync(string userId)
         {
             if (_context.Expenses.Any())
             {
@@ -93,10 +108,10 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         public async Task AddExpenseAsync(ExpenseDTO expenseDTO, string userId)
         {
             // Checking if category was selected
-            var hasExpenseCategorySelected = await CheckExpenseCategorySelected(expenseDTO, userId);
+            var hasExpenseCategorySelected = await CheckExpenseCategorySelectedAsync(expenseDTO, userId);
 
             // Checking if payment method was selected
-            var hasPaymentMethodSelected = await CheckPaymentMethodSelected(expenseDTO, userId);
+            var hasPaymentMethodSelected = await CheckPaymentMethodSelectedAsync(expenseDTO, userId);
 
             Expense expense;
             try
@@ -126,13 +141,13 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Expense> UpdateExpenseById(int id, ExpenseDTO expenseDTO, string userId)
+        public async Task<Expense> UpdateExpenseByIdAsync(int id, ExpenseDTO expenseDTO, string userId)
         {
             // Checking if category was selected
-            var hasExpenseCategorySelected = await CheckExpenseCategorySelected(expenseDTO, userId);
+            var hasExpenseCategorySelected = await CheckExpenseCategorySelectedAsync(expenseDTO, userId);
 
             // Checking if payment method was selected
-            var hasPaymentMethodSelected = await CheckPaymentMethodSelected(expenseDTO, userId);
+            var hasPaymentMethodSelected = await CheckPaymentMethodSelectedAsync(expenseDTO, userId);
 
             var _expense = await _context.Expenses.FirstOrDefaultAsync(expense => expense.Id == id);
             if (_expense != null)
@@ -228,7 +243,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         /// Checking if expense category was not selected in the form correctly
         /// </summary>
         /// <param name="expenseDTO">Expense</param>
-        public async Task<bool> CheckExpenseCategorySelected(ExpenseDTO expenseDTO, string userId)
+        public async Task<bool> CheckExpenseCategorySelectedAsync(ExpenseDTO expenseDTO, string userId)
         {
             if (!int.TryParse(expenseDTO.ExpenseCategory, out int result))
             {
@@ -240,7 +255,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 }
                 else
                 {
-                    var expenseCategoryService = new ExpenseCategoriesService(_context);
+                    var expenseCategoryService = new ExpenseCategoriesService(_context, _memoryCache);
                     var otherExpenseCategory = new ExpenseCategoryDTO() { Name = "Other", User = userId };
                     await expenseCategoryService.CreateExpenseCategoryAsync(otherExpenseCategory, userId);
                     var category = await _context.ExpenseCategories.FirstOrDefaultAsync(x => x.Name.ToLower() == "other");
@@ -257,7 +272,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         /// Checking if payment method was not selected in the form correctly
         /// </summary>
         /// <param name="expenseDTO">Expense</param>
-        public async Task<bool> CheckPaymentMethodSelected(ExpenseDTO expenseDTO, string userId)
+        public async Task<bool> CheckPaymentMethodSelectedAsync(ExpenseDTO expenseDTO, string userId)
         {
             if (!int.TryParse(expenseDTO.PaymentMethod, out int result))
             {
@@ -269,7 +284,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 }
                 else
                 {
-                    var paymentMethodService = new PaymentMethodsService(_context);
+                    var paymentMethodService = new PaymentMethodsService(_context, _memoryCache);
                     var otherPaymentMethod = new PaymentMethodDTO() { Name = "Other", User = userId };
                     await paymentMethodService.CreatePaymentMethodAsync(otherPaymentMethod, userId);
                     var paymentMethod = await _context.PaymentMethods.FirstOrDefaultAsync(x => x.Name.ToLower() == "other");
@@ -305,20 +320,20 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             }
         }
 
-        public async Task<List<ExpenseDTO>> GetFriendsExpenses(string userId)
+        public async Task<List<ExpenseDTO>> GetFriendsExpensesAsync(string userId)
         {
-            var friends = await GetFriendsList(userId);
+            var friends = await GetFriendsListAsync(userId);
 
             var friendsExpensesDTO = new List<ExpenseDTO>();
             foreach (var friend in friends)
             {
-                var expensesDTO = await GetExpensesDTOByUserId(friend.Id);
+                var expensesDTO = await GetExpensesDTOByUserIdAsync(friend.Id);
                 friendsExpensesDTO.AddRange(expensesDTO);
             }
             return friendsExpensesDTO;
         }
 
-        public async Task<List<ApplicationUser>> GetFriendsList(string userId)
+        public async Task<List<ApplicationUser>> GetFriendsListAsync(string userId)
         {
             var friends = await _context.User_Relations.Include(x => x.User2).Where(x => x.User1Id == userId).Select(x => x.User2).ToListAsync();
             var friendsRightColumn = await _context.User_Relations.Include(x => x.User1).Where(x => x.User2Id == userId).Select(x => x.User1).ToListAsync();
@@ -327,7 +342,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             return friends;
         }
 
-        public async Task<IEnumerable<ExpenseDTO>> FilterExpenses(string userId, string role, FilterDTO filterDTO)
+        public async Task<IEnumerable<ExpenseDTO>> FilterExpensesAsync(string userId, string role, FilterDTO filterDTO)
         {
             string requestedPaymentMethodName = _context.PaymentMethods.FirstOrDefault(x => x.Id.ToString() == filterDTO.PaymentMethod)?.Name;
             string requestedExpenseCategoryName = _context.ExpenseCategories.FirstOrDefault(x => x.Id.ToString() == filterDTO.ExpenseCategory)?.Name;

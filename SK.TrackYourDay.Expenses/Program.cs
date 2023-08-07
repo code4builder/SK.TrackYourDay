@@ -50,6 +50,7 @@ namespace SK.TrackYourDay.Expenses
                 builder.Services.AddTransient<PaymentMethodsService>();
                 builder.Services.AddScoped<IDbInitializer, DbInitializer.DbInitializer>();
                 builder.Services.AddHttpContextAccessor();
+                builder.Services.AddMemoryCache();
 
                 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 

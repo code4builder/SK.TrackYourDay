@@ -11,6 +11,7 @@ using SK.TrackYourDay.UseCases.DTOs;
 using System.Drawing.Printing;
 using System.Globalization;
 using SK.TrackYourDay.Expenses.Data.Paging;
+using System.Collections.Generic;
 
 namespace SK.TrackYourDay.Expenses.Controllers
 {
@@ -42,7 +43,13 @@ namespace SK.TrackYourDay.Expenses.Controllers
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var _role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
 
-            var expensesDTO = await _expensesService.GetAllExpensesDTOAsync(_userId, _role, sortBy, searchString, pageNumber, pageSize);
+            var expensesDTO = await _expensesService.GetAllExpensesDTOCache(_userId, _role, sortBy, searchString, pageNumber, pageSize);
+
+            if (expensesDTO is null)
+            {
+                expensesDTO = await _expensesService.GetAllExpensesDTOAsync(_userId, _role, sortBy, searchString, pageNumber, pageSize);
+                _expensesService.SetAllExpensesDTOToCache("expenses", expensesDTO);
+            }
 
             var expensesVM = _mapper.Map<IEnumerable<ExpenseVM>>(expensesDTO);
 
@@ -164,7 +171,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             if (ModelState.IsValid)
             {
                 var expenseDTO = _mapper.Map<ExpenseDTO>(expenseVM);
-                await _expensesService.UpdateExpenseById(expenseVM.Id, expenseDTO, _userId);
+                await _expensesService.UpdateExpenseByIdAsync(expenseVM.Id, expenseDTO, _userId);
                 _logger.LogInformation($"The expense with {expenseVM.Id} was updated");
 
                 return RedirectToAction("Index");
@@ -210,7 +217,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             {
                 var filterDTO = _mapper.Map<FilterDTO>(filterVM);
 
-                var filteredExpensesDTO = await _expensesService.FilterExpenses(_userId, _role, filterDTO);
+                var filteredExpensesDTO = await _expensesService.FilterExpensesAsync(_userId, _role, filterDTO);
 
                 filteredExpensesVM = _mapper.Map<List<ExpenseVM>>(filteredExpensesDTO);
 
