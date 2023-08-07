@@ -164,7 +164,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             if (ModelState.IsValid)
             {
                 var expenseDTO = _mapper.Map<ExpenseDTO>(expenseVM);
-                await _expensesService.UpdateExpenseById(expenseVM.Id, expenseDTO, _userId);
+                await _expensesService.UpdateExpenseByIdAsync(expenseVM.Id, expenseDTO, _userId);
                 _logger.LogInformation($"The expense with {expenseVM.Id} was updated");
 
                 return RedirectToAction("Index");
@@ -210,7 +210,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             {
                 var filterDTO = _mapper.Map<FilterDTO>(filterVM);
 
-                var filteredExpensesDTO = await _expensesService.FilterExpenses(_userId, _role, filterDTO);
+                var filteredExpensesDTO = await _expensesService.FilterExpensesAsync(_userId, _role, filterDTO);
 
                 filteredExpensesVM = _mapper.Map<List<ExpenseVM>>(filteredExpensesDTO);
 

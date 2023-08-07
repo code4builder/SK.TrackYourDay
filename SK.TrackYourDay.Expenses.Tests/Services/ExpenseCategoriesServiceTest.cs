@@ -66,7 +66,7 @@ namespace SK.TrackYourDay.Expenses.Tests.Services
             var userId = "UserId3";
 
             // Act
-            var result = await _expenseCategoriesService.GetExpenseCategoriesDTOByUserId(userId);
+            var result = await _expenseCategoriesService.GetExpenseCategoriesDTOByUserIdAsync(userId);
 
             // Assert
             result.Should().BeEmpty();
@@ -79,7 +79,7 @@ namespace SK.TrackYourDay.Expenses.Tests.Services
             var userId = "UserId1";
 
             // Act
-            var result = await _expenseCategoriesService.GetExpenseCategoriesDTOByUserId(userId);
+            var result = await _expenseCategoriesService.GetExpenseCategoriesDTOByUserIdAsync(userId);
 
             // Assert
             result.Should().HaveCount(3);

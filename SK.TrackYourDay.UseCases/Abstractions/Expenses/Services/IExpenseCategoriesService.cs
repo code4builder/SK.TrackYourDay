@@ -6,7 +6,7 @@ namespace SK.TrackYourDay.UseCases.Abstractions.Expenses.Services
     public interface IExpenseCategoriesService
     {
         Task<List<ExpenseCategoryDTO>> GetAllExpenseCategoriesDTOAsync(string userId);
-        Task<List<ExpenseCategoryDTO>> GetExpenseCategoriesDTOByUserId(string userId);
+        Task<List<ExpenseCategoryDTO>> GetExpenseCategoriesDTOByUserIdAsync(string userId);
         Task<ExpenseCategory> GetExpenseCategoryByIdAsync(int id);
         Task<ExpenseCategoryDTO> GetExpenseCategoryDTOByIdAsync(int id);
         Task CreateExpenseCategoryAsync(ExpenseCategoryDTO expenseCategoryDTO, string userId);

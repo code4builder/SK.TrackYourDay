@@ -19,8 +19,8 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         {
             if (_context.PaymentMethods.Any())
             {
-                var paymentMethods = await GetPaymentMethodsDTOByUserId(userId);
-                var friendsPaymentMethods = await GetFriendsPaymentMethods(userId);
+                var paymentMethods = await GetPaymentMethodsDTOByUserIdAsync(userId);
+                var friendsPaymentMethods = await GetFriendsPaymentMethodsAsync(userId);
                 paymentMethods.AddRange(friendsPaymentMethods);
 
                 return paymentMethods.OrderBy(ec => ec.Name).ToList();
@@ -29,7 +29,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 return new List<PaymentMethodDTO>();
         }
 
-        public async Task<List<PaymentMethodDTO>> GetPaymentMethodsDTOByUserId(string userId)
+        public async Task<List<PaymentMethodDTO>> GetPaymentMethodsDTOByUserIdAsync(string userId)
         {
             if (_context.PaymentMethods.Any())
             {
@@ -89,15 +89,15 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             return _paymentMethod;
         }
 
-        public async Task<List<PaymentMethodDTO>> GetFriendsPaymentMethods(string userId)
+        public async Task<List<PaymentMethodDTO>> GetFriendsPaymentMethodsAsync(string userId)
         {
             var expenseService = new ExpensesService(_context);
-            var friends = expenseService.GetFriendsList(userId).Result;
+            var friends = expenseService.GetFriendsListAsync(userId).Result;
 
             var friendsPaymentMethodsDTO = new List<PaymentMethodDTO>();
             foreach (var friend in friends)
             {
-                var paymentMethodsDTO = await GetPaymentMethodsDTOByUserId(friend.Id);
+                var paymentMethodsDTO = await GetPaymentMethodsDTOByUserIdAsync(friend.Id);
                 friendsPaymentMethodsDTO.AddRange(paymentMethodsDTO);
             }
             return friendsPaymentMethodsDTO;
