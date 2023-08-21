@@ -363,6 +363,8 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
             return filteredExpenses;
         }
+
+        public decimal GetTotalAmount(IEnumerable<ExpenseDTO> expensesDTO) => expensesDTO?.Sum(x => x.Amount) ?? 0;
     }
 }
 
