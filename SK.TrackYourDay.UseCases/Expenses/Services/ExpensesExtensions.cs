@@ -12,7 +12,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         internal static IEnumerable<ExpenseDTO> FilterByExpenseName(this IEnumerable<ExpenseDTO> expenses, FilterDTO filterDTO)
         {
             if (!string.IsNullOrEmpty(filterDTO.ExpenseName))
-                return expenses.Where(x => x.ExpenseName.ToLower().Contains(filterDTO.ExpenseName.ToLower()));
+                return expenses.Where(x => (x.ExpenseName?.ToLower() ?? "").Contains(filterDTO.ExpenseName.ToLower()));
 
             return expenses;
         }
@@ -20,7 +20,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         internal static IEnumerable<ExpenseDTO> FilterByDescription(this IEnumerable<ExpenseDTO> expenses, FilterDTO filterDTO)
         {
             if (!string.IsNullOrEmpty(filterDTO.Description))
-                return expenses.Where(x => x.Description.ToLower().Contains(filterDTO.Description.ToLower()));
+                return expenses.Where(x => (x.Description?.ToLower() ?? "").Contains(filterDTO.Description.ToLower()));
 
             return expenses;
         }
