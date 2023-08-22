@@ -6,7 +6,12 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
     {
         internal static IEnumerable<ExpenseDTO> FilterByDateRange(this IEnumerable<ExpenseDTO> expenses, FilterDTO filterDTO)
         {
-            return expenses.Where(x => x.Date >= filterDTO.DateFrom && x.Date <= filterDTO.DateTo);
+            DateTime? DateTimeIncludesLastDay = filterDTO.DateTo;
+
+            if (filterDTO.DateTo.Value.Hour == 0 && filterDTO.DateTo.Value.Minute == 0 && filterDTO.DateTo.Value.Second == 0)
+                DateTimeIncludesLastDay = filterDTO.DateTo?.AddHours(23).AddMinutes(59).AddSeconds(59);
+
+            return expenses.Where(x => x.Date >= filterDTO.DateFrom && x.Date <= DateTimeIncludesLastDay);
         }
 
         internal static IEnumerable<ExpenseDTO> FilterByExpenseName(this IEnumerable<ExpenseDTO> expenses, FilterDTO filterDTO)
