@@ -20,17 +20,17 @@ namespace SK.TrackYourDay.Expenses.Controllers
         IHttpContextAccessor _httpContextAccessor;
         private ExpensesService _expensesService;
         private ExpensesHandler _expensesHandler;
-        private PaymentMethodsService _paymentMethodsService;
+        private ExpenseCategoriesService _expenseCategoriesService;
         private readonly IMapper _mapper;
         private readonly ILogger<AccountController> _logger;
 
-        public ExpensesController(ExpensesService expensesService, PaymentMethodsService paymentMethodsService,
+        public ExpensesController(ExpensesService expensesService, ExpenseCategoriesService expenseCategoriesService,
             IHttpContextAccessor httpContextAccessor, ExpensesHandler expensesHandler, IMapper mapper, ILogger<AccountController> logger)
         {
             _httpContextAccessor = httpContextAccessor;
             _expensesService = expensesService;
             _expensesHandler = expensesHandler;
-            _paymentMethodsService = paymentMethodsService;
+            _expenseCategoriesService = expenseCategoriesService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -237,6 +237,23 @@ namespace SK.TrackYourDay.Expenses.Controllers
             ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
 
             return View("Index", paginatedExpensesVM);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Totals()
+        {
+            _logger.LogInformation("Totals triggered");
+
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var expensesDTO = await _expensesService.GetAllExpensesDTOAsync(_userId, "User", null, null, null, null);
+            var categoriesDTO = await _expenseCategoriesService.GetAllExpenseCategoriesDTOAsync(_userId);
+
+            TotalsDTO totalsDTO = await _expensesService.GetExpensesTotals(_userId, expensesDTO.ToList(), categoriesDTO);
+
+            TotalsVM totalsVM = _mapper.Map<TotalsVM>(totalsDTO);
+
+            return View(totalsVM);
         }
     }
 }
