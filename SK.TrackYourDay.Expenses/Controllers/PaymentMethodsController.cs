@@ -54,6 +54,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 var paymentMethodDTO = _mapper.Map<PaymentMethodDTO>(paymentMethodVM);
                 await _paymentMethodsService.CreatePaymentMethodAsync(paymentMethodDTO, _userId);
                 _logger.LogInformation($"The new payment method {paymentMethodVM.Name} was created");
+                TempData["success"] = "Payment method created successfully";
 
                 return RedirectToAction("Index");
             }
@@ -94,6 +95,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             {
                 await _paymentMethodsService.DeletePaymentMethodByIdAsync((int)id);
                 _logger.LogInformation($"The payment method with {id} was deleted");
+                TempData["success"] = "Payment method deleted successfully";
             }
 
             return RedirectToAction("Index");
@@ -135,6 +137,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 var paymentMethodDTO = _mapper.Map<PaymentMethodDTO>(paymentMethodVM);
                 await _paymentMethodsService.UpdatePaymentMethodByIdAsync(paymentMethodDTO.Id, paymentMethodDTO);
                 _logger.LogInformation($"The payment method with {paymentMethodVM.Name} was updated");
+                TempData["success"] = "Payment method updated successfully";
 
                 return RedirectToAction("Index");
             }
