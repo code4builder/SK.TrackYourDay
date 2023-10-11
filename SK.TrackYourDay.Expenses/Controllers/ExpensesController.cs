@@ -20,17 +20,17 @@ namespace SK.TrackYourDay.Expenses.Controllers
         IHttpContextAccessor _httpContextAccessor;
         private ExpensesService _expensesService;
         private ExpensesHandler _expensesHandler;
-        private PaymentMethodsService _paymentMethodsService;
+        private ExpenseCategoriesService _expenseCategoriesService;
         private readonly IMapper _mapper;
         private readonly ILogger<AccountController> _logger;
 
-        public ExpensesController(ExpensesService expensesService, PaymentMethodsService paymentMethodsService,
+        public ExpensesController(ExpensesService expensesService, ExpenseCategoriesService expenseCategoriesService,
             IHttpContextAccessor httpContextAccessor, ExpensesHandler expensesHandler, IMapper mapper, ILogger<AccountController> logger)
         {
             _httpContextAccessor = httpContextAccessor;
             _expensesService = expensesService;
             _expensesHandler = expensesHandler;
-            _paymentMethodsService = paymentMethodsService;
+            _expenseCategoriesService = expenseCategoriesService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -204,7 +204,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> FilterExpenses(FilterVM filterVM, int? pageNumber = 1, int pageSize = 5)
+        public async Task<IActionResult> FilterExpenses(FilterVM filterVM, int? pageNumber = 1, int pageSize = 10)
         {
             _logger.LogInformation("FilterExpenses triggered");
 
@@ -212,6 +212,8 @@ namespace SK.TrackYourDay.Expenses.Controllers
 
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var _role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
+
+            decimal totalAmount = 0;
 
             if (ModelState.IsValid)
             {
@@ -222,9 +224,12 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 filteredExpensesVM = _mapper.Map<List<ExpenseVM>>(filteredExpensesDTO);
 
                 _logger.LogInformation("FilterExpenses list received");
+
+                totalAmount = _expensesService.GetTotalAmount(filteredExpensesDTO);
             }
 
             var paginatedExpensesVM = PaginatedList<ExpenseVM>.Create(filteredExpensesVM.AsQueryable(), pageNumber, pageSize);
+            ViewBag.TotalAmount = totalAmount;
 
             var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown(_userId);
             ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
@@ -232,6 +237,23 @@ namespace SK.TrackYourDay.Expenses.Controllers
             ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
 
             return View("Index", paginatedExpensesVM);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Totals()
+        {
+            _logger.LogInformation("Totals triggered");
+
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var expensesDTO = await _expensesService.GetAllExpensesDTOAsync(_userId, "User", null, null, null, null);
+            var categoriesDTO = await _expenseCategoriesService.GetAllExpenseCategoriesDTOAsync(_userId);
+
+            TotalsDTO totalsDTO = await _expensesService.GetExpensesTotals(_userId, expensesDTO.ToList(), categoriesDTO);
+
+            TotalsVM totalsVM = _mapper.Map<TotalsVM>(totalsDTO);
+
+            return View(totalsVM);
         }
     }
 }

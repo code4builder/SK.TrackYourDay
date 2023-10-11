@@ -34,7 +34,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 {
                     _logger.LogInformation("Login succeded");
 
-                    return RedirectToAction("Index", "Expenses");
+                    return RedirectToAction("Index");
                 }
                 ModelState.AddModelError("", "Invalid login attempt");
             }

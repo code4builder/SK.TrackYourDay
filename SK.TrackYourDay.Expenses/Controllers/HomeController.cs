@@ -21,7 +21,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             if (_user == null)
                 return RedirectToAction("Login", "Account");
             else 
-                return RedirectToAction("Index", "Expenses");
+                return View();
         }
 
         public IActionResult Privacy()

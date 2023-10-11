@@ -363,6 +363,18 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
             return filteredExpenses;
         }
+
+        public decimal GetTotalAmount(IEnumerable<ExpenseDTO> expensesDTO) => expensesDTO?.Sum(x => x.Amount) ?? 0;
+
+        public async Task<TotalsDTO> GetExpensesTotals(string userId, List<ExpenseDTO> expenses, List<ExpenseCategoryDTO> categories)
+        {
+            List<ExpenseDTO> expensesDTO = await GetExpensesDTOByUserIdAsync(userId);
+            var friendsExpensesDTO = await GetFriendsExpensesAsync(userId);
+            expensesDTO.AddRange(friendsExpensesDTO);
+
+            var totalsDTO = new TotalsDTO(expenses, categories);
+            return totalsDTO;
+        }
     }
 }
 
