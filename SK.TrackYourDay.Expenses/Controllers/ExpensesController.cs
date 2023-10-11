@@ -12,6 +12,7 @@ using System.Drawing.Printing;
 using System.Globalization;
 using SK.TrackYourDay.Expenses.Data.Paging;
 using System.Collections.Generic;
+using Azure;
 
 namespace SK.TrackYourDay.Expenses.Controllers
 {
@@ -93,11 +94,13 @@ namespace SK.TrackYourDay.Expenses.Controllers
                     var expenseDTO = _mapper.Map<ExpenseDTO>(expenseVM);
                     await _expensesService.AddExpenseAsync(expenseDTO, _userId);
                     _logger.LogInformation($"The new expense {expenseVM.ExpenseName} was created");
+                    TempData["success"] = "Expense created successfully";
                     return RedirectToAction("Index");
                 }
             }
             catch (Exception ex)
             {
+                TempData["error"] = ex?.Message;
                 throw new Exception($"{ex}. Can't create new expense by user: {User.Identity.Name}");
                 //return BadRequest();
             }
@@ -126,6 +129,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             if (id != null)
                 await _expensesService.DeleteExpenseByIdAsync(id);
             _logger.LogInformation($"The expense with {id} was deleted");
+            TempData["success"] = "Expense deleted successfully";
 
             return RedirectToAction("Index");
         }
@@ -173,8 +177,13 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 var expenseDTO = _mapper.Map<ExpenseDTO>(expenseVM);
                 await _expensesService.UpdateExpenseByIdAsync(expenseVM.Id, expenseDTO, _userId);
                 _logger.LogInformation($"The expense with {expenseVM.Id} was updated");
+                TempData["success"] = "Expense updated successfully";
 
                 return RedirectToAction("Index");
+            }
+            else
+            {
+                TempData["error"] = "Something wrong. Update wasn't successful";
             }
 
             return View(expenseVM);
@@ -196,8 +205,13 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 var currentUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 await _expensesService.AddFriendAsync(currentUserId, friendVM.Email);
                 _logger.LogInformation($"The friend {friendVM.Email} was added");
+                TempData["success"] = "Friend added successfully";
 
                 return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                TempData["error"] = "Something wrong. Friend wasn't added";
             }
 
             return View();
