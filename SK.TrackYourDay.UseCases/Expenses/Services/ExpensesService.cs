@@ -1,9 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ExcelDataReader;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using OfficeOpenXml;
 using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Infrastructure.DataAccess;
 using SK.TrackYourDay.UseCases.Abstractions.Expenses.Services;
 using SK.TrackYourDay.UseCases.DTOs;
+using System.Linq;
 
 namespace SK.TrackYourDay.UseCases.Expenses.Services
 {
@@ -374,6 +378,67 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
             var totalsDTO = new TotalsDTO(expenses, categories);
             return totalsDTO;
+        }
+
+        /// <summary>
+        /// Load expenses from excel file
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="fileInput"></param>
+        /// <returns></returns>
+        public async Task LoadExpensesFromExcelAsync(string userId, IFormFile fileInput)
+        {
+            var expenses = new List<Expense>();
+            var expenseCategories = new List<ExpenseCategory>();
+            var paymentMethods = new List<PaymentMethod>();
+
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
+            using (var stream = new MemoryStream())
+            {
+                fileInput.CopyTo(stream);
+                stream.Position = 0;
+
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                {
+                    bool isFirstRow = true;
+
+                    while (reader.Read()) //Each row of the file
+                    {
+                        if (isFirstRow)
+                        {
+                            isFirstRow = false;
+                            continue; // Skip processing the first row
+                        }
+
+                        // Add functionality for automatic creating of expense categories and payment methods if needed
+                        //string expenseCategoryName = reader.GetValue(3).ToString();
+                        //if (!_context.ExpenseCategories.Any(ec => ec.Name == expenseCategoryName && ec.UserId == userId))
+                        //    _context.ExpenseCategories.Add(new ExpenseCategory { Name = expenseCategoryName, UserId = userId });
+
+                        //string paymentMethodName = reader.GetValue(4).ToString();
+                        //if (!_context.PaymentMethods.Any(pm => pm.Name == paymentMethodName && pm.UserId == userId))
+                        //    _context.PaymentMethods.Add(new PaymentMethod { Name = paymentMethodName, UserId = userId });
+
+                        var expenseCategory = _context.ExpenseCategories.FirstOrDefault(x => x.Name.ToLower() == reader.GetValue(3).ToString().ToLower() && x.UserId == userId);
+                        var paymentMethod = _context.PaymentMethods.FirstOrDefault(x => x.Name.ToLower() == reader.GetValue(4).ToString().ToLower() && x.UserId == userId);
+                        expenses.Add(new Expense
+                        {
+                            ExpenseName = reader.GetValue(0).ToString(),
+                            Description = reader.GetValue(1).ToString(),
+                            Amount = decimal.Parse(reader.GetValue(2).ToString()),
+                            ExpenseCategoryId = expenseCategory.Id,
+                            PaymentMethodId = paymentMethod.Id,
+                            Date = DateTime.Parse(reader.GetValue(5).ToString()),
+                            UserId = userId,
+                            IrregularPayment = bool.Parse(reader.GetValue(6).ToString())
+                        });
+                    }
+                }
+            }
+
+            await _context.Expenses.AddRangeAsync(expenses);
+            await _context.SaveChangesAsync();
         }
     }
 }

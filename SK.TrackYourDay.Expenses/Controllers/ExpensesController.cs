@@ -269,5 +269,34 @@ namespace SK.TrackYourDay.Expenses.Controllers
 
             return View(totalsVM);
         }
+
+        [HttpGet]
+        public IActionResult LoadExpensesFromExcel()
+        {
+            _logger.LogInformation("LoadExpenses view triggered");
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LoadExpensesFromExcel(IFormFile fileInput)
+        {
+            _logger.LogInformation("LoadExpenses triggered");
+
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            if (fileInput == null || fileInput.Length == 0)
+            {
+                TempData["error"] = "File is empty";
+                return View();
+            }
+
+            await _expensesService.LoadExpensesFromExcelAsync(_userId, fileInput);
+
+            TempData["success"] = "Expenses loaded successfully";
+
+            return RedirectToAction("Index");
+        }
     }
 }

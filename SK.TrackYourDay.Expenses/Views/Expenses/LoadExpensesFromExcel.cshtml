@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Load Expenses From Excel";
+}
+
+<h2>Load Expenses From Excel</h2>
+<p>
+    This page allows you to load expenses from an Excel file. The Excel file must be in the following format:
+</p>
+<img src="~/images/ExcelFormatForLoadingNewExpenses.PNG" alt="Excel Format" class="img-fluid" />
+<p>
+    The first row can contain the column names. <br />
+    The first row will be skipped. Reading is done from the second row. <br />
+    Expense Category and Method Method must exist. Please check it before uploading the file. <br />
+</p>
+<form method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="fileInput">Choose Excel File:</label>
+        <br />
+        <input type="file" name="fileInput" class="form-control" accept=".xls, .xlsx" required />
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Upload File</button>
+</form>
