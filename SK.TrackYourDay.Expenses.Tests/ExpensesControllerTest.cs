@@ -37,7 +37,7 @@ namespace SK.TrackYourDay.Expenses.Tests
 
             SeedDatabase();
 
-            _expensesService = new ExpensesService(_context);
+            _expensesService = new ExpensesService(_context, null);
             var logger = new NullLogger<AccountController>();
             var mapperConfiguration = new MapperConfiguration(cfg => cfg.AddProfile<AutoMapperProfile>());
             var mapper = new Mapper(mapperConfiguration);

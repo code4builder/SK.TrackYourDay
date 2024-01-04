@@ -34,7 +34,7 @@ namespace SK.TrackYourDay.Expenses.Tests
 
             SeedDatabase();
 
-            _expensesService = new ExpensesService(_context);
+            _expensesService = new ExpensesService(_context, null);
         }
 
         #endregion
