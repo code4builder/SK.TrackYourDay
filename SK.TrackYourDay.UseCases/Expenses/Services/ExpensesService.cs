@@ -386,7 +386,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         /// <param name="userId"></param>
         /// <param name="fileInput"></param>
         /// <returns></returns>
-        public async Task LoadExpensesFromExcelAsync(string userId, IFormFile fileInput)
+        public async Task<string> LoadExpensesFromExcelAsync(string userId, IFormFile fileInput)
         {
             var expenses = new List<Expense>();
             var expenseCategories = new List<ExpenseCategory>();
@@ -411,17 +411,23 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                             continue; // Skip processing the first row
                         }
 
+                        string expenseCategoryName = reader.GetValue(3).ToString();
                         // Add functionality for automatic creating of expense categories and payment methods if needed
-                        //string expenseCategoryName = reader.GetValue(3).ToString();
                         //if (!_context.ExpenseCategories.Any(ec => ec.Name == expenseCategoryName && ec.UserId == userId))
                         //    _context.ExpenseCategories.Add(new ExpenseCategory { Name = expenseCategoryName, UserId = userId });
 
-                        //string paymentMethodName = reader.GetValue(4).ToString();
+                        string paymentMethodName = reader.GetValue(4).ToString();
                         //if (!_context.PaymentMethods.Any(pm => pm.Name == paymentMethodName && pm.UserId == userId))
                         //    _context.PaymentMethods.Add(new PaymentMethod { Name = paymentMethodName, UserId = userId });
 
-                        var expenseCategory = _context.ExpenseCategories.FirstOrDefault(x => x.Name.ToLower() == reader.GetValue(3).ToString().ToLower() && x.UserId == userId);
-                        var paymentMethod = _context.PaymentMethods.FirstOrDefault(x => x.Name.ToLower() == reader.GetValue(4).ToString().ToLower() && x.UserId == userId);
+                        var expenseCategory = _context.ExpenseCategories.FirstOrDefault(x => x.Name.ToLower() == expenseCategoryName.ToLower() && x.UserId == userId);
+                        if(expenseCategory is null)
+                            return $"Expense category '{expenseCategoryName}' does not exist. Create this category firstly";
+
+                        var paymentMethod = _context.PaymentMethods.FirstOrDefault(x => x.Name.ToLower() == paymentMethodName.ToLower() && x.UserId == userId);
+                        if (paymentMethod is null)
+                            return $"Payment method '{paymentMethodName}' does not exist. Create this Payment method firstly";
+
                         expenses.Add(new Expense
                         {
                             ExpenseName = reader.GetValue(0).ToString(),
@@ -439,6 +445,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
             await _context.Expenses.AddRangeAsync(expenses);
             await _context.SaveChangesAsync();
+            return "Ok";
         }
     }
 }

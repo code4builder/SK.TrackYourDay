@@ -292,9 +292,11 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 return View();
             }
 
-            await _expensesService.LoadExpensesFromExcelAsync(_userId, fileInput);
-
-            TempData["success"] = "Expenses loaded successfully";
+            string message = await _expensesService.LoadExpensesFromExcelAsync(_userId, fileInput);
+            if (message == "Ok")
+                TempData["success"] = "Expenses loaded successfully";
+            else
+                TempData["error"] = message;
 
             return RedirectToAction("Index");
         }
