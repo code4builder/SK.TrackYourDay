@@ -428,17 +428,28 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                         if (paymentMethod is null)
                             return $"Payment method '{paymentMethodName}' does not exist. Create this Payment method firstly";
 
+                        if (reader.GetValue(0)?.ToString() is null)
+                            return $"Expense Name (the first column of excel file) must not be empty";
+
+                        if (decimal.TryParse(reader.GetValue(2)?.ToString(), out _) == false)
+                            return $"Expense Amount should be valid number";
+
+                        if (DateTime.TryParse(reader.GetValue(5)?.ToString(), out _) == false)
+                            return $"Expense Date should be valid date format";
+
+                        bool _isValidIrregular = bool.TryParse(reader.GetValue(6)?.ToString(), out bool _isIrregular);
+
                         expenses.Add(new Expense
                         {
                             ExpenseName = reader.GetValue(0).ToString(),
-                            Description = reader.GetValue(1).ToString(),
+                            Description = reader.GetValue(1)?.ToString() ?? string.Empty,
                             Amount = decimal.Parse(reader.GetValue(2).ToString()),
                             ExpenseCategoryId = expenseCategory.Id,
                             PaymentMethodId = paymentMethod.Id,
                             Date = DateTime.Parse(reader.GetValue(5).ToString()),
                             UserId = userId,
-                            IrregularPayment = bool.Parse(reader.GetValue(6).ToString())
-                        });
+                            IrregularPayment = _isValidIrregular ? _isIrregular : false
+                    });
                     }
                 }
             }
