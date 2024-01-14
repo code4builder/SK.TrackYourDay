@@ -1,6 +1,7 @@
 # SK.TrackYourDay
 Web application for tracking family expenses
 ![Screenshot1](/../master/Screenshots/TrackYourExpensesScreenshot.png)
+
 ## Project Structure
 ![Screenshot1](/../master/Screenshots/project_structure.jpg)
 
