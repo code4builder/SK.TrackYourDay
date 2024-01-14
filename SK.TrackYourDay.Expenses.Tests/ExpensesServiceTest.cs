@@ -34,7 +34,7 @@ namespace SK.TrackYourDay.Expenses.Tests
 
             SeedDatabase();
 
-            _expensesService = new ExpensesService(_context);
+            _expensesService = new ExpensesService(_context, null);
         }
 
         #endregion
@@ -102,7 +102,7 @@ namespace SK.TrackYourDay.Expenses.Tests
         [Test, Order(6)]
         public void GetExpensesByUserId_Test()
         {
-            var expenses = _expensesService.GetExpensesDTOByUserId("UserId2").Result;
+            var expenses = _expensesService.GetExpensesDTOByUserIdAsync("UserId2").Result;
 
             expenses.Count().Should().Be(3);
         }
@@ -164,7 +164,7 @@ namespace SK.TrackYourDay.Expenses.Tests
                 UserName = "John SmithUser"
             };
 
-            var updateResult = _expensesService.UpdateExpenseById(4, expenseDTO, "UserId2").Result;
+            var updateResult = _expensesService.UpdateExpenseByIdAsync(4, expenseDTO, "UserId2").Result;
 
             using (new AssertionScope())
             {

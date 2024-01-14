@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Infrastructure.DataAccess;
 using SK.TrackYourDay.UseCases.Abstractions.Expenses.Services;
@@ -9,18 +10,20 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
     public class PaymentMethodsService : IPaymentMethodsService
     {
         private ApplicationDbContext _context;
+        private IMemoryCache _memoryCache;
 
-        public PaymentMethodsService(ApplicationDbContext context)
+        public PaymentMethodsService(ApplicationDbContext context, IMemoryCache memoryCache)
         {
             _context = context;
+            _memoryCache = memoryCache;
         }
 
         public async Task<List<PaymentMethodDTO>> GetAllPaymentMethodsDTOAsync(string userId) 
         {
             if (_context.PaymentMethods.Any())
             {
-                var paymentMethods = await GetPaymentMethodsDTOByUserId(userId);
-                var friendsPaymentMethods = await GetFriendsPaymentMethods(userId);
+                var paymentMethods = await GetPaymentMethodsDTOByUserIdAsync(userId);
+                var friendsPaymentMethods = await GetFriendsPaymentMethodsAsync(userId);
                 paymentMethods.AddRange(friendsPaymentMethods);
 
                 return paymentMethods.OrderBy(ec => ec.Name).ToList();
@@ -29,7 +32,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
                 return new List<PaymentMethodDTO>();
         }
 
-        public async Task<List<PaymentMethodDTO>> GetPaymentMethodsDTOByUserId(string userId)
+        public async Task<List<PaymentMethodDTO>> GetPaymentMethodsDTOByUserIdAsync(string userId)
         {
             if (_context.PaymentMethods.Any())
             {
@@ -89,15 +92,15 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             return _paymentMethod;
         }
 
-        public async Task<List<PaymentMethodDTO>> GetFriendsPaymentMethods(string userId)
+        public async Task<List<PaymentMethodDTO>> GetFriendsPaymentMethodsAsync(string userId)
         {
-            var expenseService = new ExpensesService(_context);
-            var friends = expenseService.GetFriendsList(userId).Result;
+            var expenseService = new ExpensesService(_context, _memoryCache);
+            var friends = expenseService.GetFriendsListAsync(userId).Result;
 
             var friendsPaymentMethodsDTO = new List<PaymentMethodDTO>();
             foreach (var friend in friends)
             {
-                var paymentMethodsDTO = await GetPaymentMethodsDTOByUserId(friend.Id);
+                var paymentMethodsDTO = await GetPaymentMethodsDTOByUserIdAsync(friend.Id);
                 friendsPaymentMethodsDTO.AddRange(paymentMethodsDTO);
             }
             return friendsPaymentMethodsDTO;
@@ -105,7 +108,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
         public PaymentMethodDTO ConvertPaymentMethodToDTO(PaymentMethod paymentMethod, string userId)
         {
-            var expenseService = new ExpensesService(_context);
+            var expenseService = new ExpensesService(_context, _memoryCache);
             try
             {
                 var paymentMethodDTO = new PaymentMethodDTO()

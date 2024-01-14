@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Infrastructure.DataAccess;
 using SK.TrackYourDay.UseCases.Abstractions.Expenses.Services;
@@ -9,10 +10,12 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
     public class ExpenseCategoriesService : IExpenseCategoriesService
     {
         private ApplicationDbContext _context;
+        private readonly IMemoryCache _memoryCache;
 
-        public ExpenseCategoriesService(ApplicationDbContext context)
+        public ExpenseCategoriesService(ApplicationDbContext context, IMemoryCache memoryCache)
         {
             _context = context;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -24,7 +27,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         {
             if (_context.ExpenseCategories.Any())
             {
-                var expenseCategories = await GetExpenseCategoriesDTOByUserId(userId);
+                var expenseCategories = await GetExpenseCategoriesDTOByUserIdAsync(userId);
                 var friendsExpenseCategories = await GetFriendsExpenseCategoriesAsync(userId);
                 expenseCategories.AddRange(friendsExpenseCategories);
 
@@ -39,7 +42,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>The list of <see cref="ExpenseCategoryDTO"/> only for current user</returns>
-        public async Task<List<ExpenseCategoryDTO>> GetExpenseCategoriesDTOByUserId(string userId)
+        public async Task<List<ExpenseCategoryDTO>> GetExpenseCategoriesDTOByUserIdAsync(string userId)
         {
             if (_context.ExpenseCategories.Any())
             {
@@ -128,13 +131,13 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         /// <returns>The list of <see cref="ExpenseCategoryDTO"/> only for current user's friends</returns>
         public async Task<List<ExpenseCategoryDTO>> GetFriendsExpenseCategoriesAsync(string userId)
         {
-            var expenseService = new ExpensesService(_context);
-            var friends = await expenseService.GetFriendsList(userId);
+            var expenseService = new ExpensesService(_context, _memoryCache);
+            var friends = await expenseService.GetFriendsListAsync(userId);
 
             var friendsExpenseCategoriesDTO = new List<ExpenseCategoryDTO>();
             foreach (var friend in friends)
             {
-                var expenseCategoriesDTO = await GetExpenseCategoriesDTOByUserId(friend.Id);
+                var expenseCategoriesDTO = await GetExpenseCategoriesDTOByUserIdAsync(friend.Id);
                 friendsExpenseCategoriesDTO.AddRange(expenseCategoriesDTO);
             }
             return friendsExpenseCategoriesDTO;
@@ -148,7 +151,7 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
         /// <returns>Converted <see cref="ExpenseCategoryDTO"/></returns>
         public ExpenseCategoryDTO ConvertExpenseCategoryToDTO(ExpenseCategory expenseCategory, string userId)
         {
-            var expenseService = new ExpensesService(_context);
+            var expenseService = new ExpensesService(_context, _memoryCache);
             try
             {
                 var expenseCategoryDTO = new ExpenseCategoryDTO()

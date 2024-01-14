@@ -10,6 +10,9 @@ using AutoMapper;
 using SK.TrackYourDay.UseCases.DTOs;
 using System.Drawing.Printing;
 using System.Globalization;
+using SK.TrackYourDay.Expenses.Data.Paging;
+using System.Collections.Generic;
+using Azure;
 
 namespace SK.TrackYourDay.Expenses.Controllers
 {
@@ -18,31 +21,36 @@ namespace SK.TrackYourDay.Expenses.Controllers
         IHttpContextAccessor _httpContextAccessor;
         private ExpensesService _expensesService;
         private ExpensesHandler _expensesHandler;
-        private PaymentMethodsService _paymentMethodsService;
+        private ExpenseCategoriesService _expenseCategoriesService;
         private readonly IMapper _mapper;
         private readonly ILogger<AccountController> _logger;
-        //private FilterVM _filterVM = new FilterVM();
 
-        public ExpensesController(ExpensesService expensesService, PaymentMethodsService paymentMethodsService,
+        public ExpensesController(ExpensesService expensesService, ExpenseCategoriesService expenseCategoriesService,
             IHttpContextAccessor httpContextAccessor, ExpensesHandler expensesHandler, IMapper mapper, ILogger<AccountController> logger)
         {
             _httpContextAccessor = httpContextAccessor;
             _expensesService = expensesService;
             _expensesHandler = expensesHandler;
-            _paymentMethodsService = paymentMethodsService;
+            _expenseCategoriesService = expenseCategoriesService;
             _mapper = mapper;
             _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string sortBy, string searchString, int pageNumber, int pageSize)
+        public async Task<IActionResult> Index(string sortBy, string searchString, int? pageNumber = 1, int pageSize = 10)
         {
             _logger.LogInformation("GetAllExpenses triggered");
 
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var _role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
 
-            var expensesDTO = await _expensesService.GetAllExpensesDTOAsync(_userId, _role, sortBy, searchString, pageNumber, pageSize);
+            var expensesDTO = await _expensesService.GetAllExpensesDTOCache(_userId, _role, sortBy, searchString, pageNumber, pageSize);
+
+            if (expensesDTO is null)
+            {
+                expensesDTO = await _expensesService.GetAllExpensesDTOAsync(_userId, _role, sortBy, searchString, pageNumber, pageSize);
+                _expensesService.SetAllExpensesDTOToCache("expenses", expensesDTO);
+            }
 
             var expensesVM = _mapper.Map<IEnumerable<ExpenseVM>>(expensesDTO);
 
@@ -51,7 +59,10 @@ namespace SK.TrackYourDay.Expenses.Controllers
             var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown(_userId);
             ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
 
-            return View(expensesVM);
+            // Pagination
+            var paginatedExpensesVM = PaginatedList<ExpenseVM>.Create(expensesVM.AsQueryable(), pageNumber, pageSize);
+
+            return View(paginatedExpensesVM);
         }
 
         //GET-Create - Creating View
@@ -83,11 +94,13 @@ namespace SK.TrackYourDay.Expenses.Controllers
                     var expenseDTO = _mapper.Map<ExpenseDTO>(expenseVM);
                     await _expensesService.AddExpenseAsync(expenseDTO, _userId);
                     _logger.LogInformation($"The new expense {expenseVM.ExpenseName} was created");
+                    TempData["success"] = "Expense created successfully";
                     return RedirectToAction("Index");
                 }
             }
             catch (Exception ex)
             {
+                TempData["error"] = ex?.Message;
                 throw new Exception($"{ex}. Can't create new expense by user: {User.Identity.Name}");
                 //return BadRequest();
             }
@@ -116,6 +129,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             if (id != null)
                 await _expensesService.DeleteExpenseByIdAsync(id);
             _logger.LogInformation($"The expense with {id} was deleted");
+            TempData["success"] = "Expense deleted successfully";
 
             return RedirectToAction("Index");
         }
@@ -161,10 +175,15 @@ namespace SK.TrackYourDay.Expenses.Controllers
             if (ModelState.IsValid)
             {
                 var expenseDTO = _mapper.Map<ExpenseDTO>(expenseVM);
-                await _expensesService.UpdateExpenseById(expenseVM.Id, expenseDTO, _userId);
+                await _expensesService.UpdateExpenseByIdAsync(expenseVM.Id, expenseDTO, _userId);
                 _logger.LogInformation($"The expense with {expenseVM.Id} was updated");
+                TempData["success"] = "Expense updated successfully";
 
                 return RedirectToAction("Index");
+            }
+            else
+            {
+                TempData["error"] = "Something wrong. Update wasn't successful";
             }
 
             return View(expenseVM);
@@ -186,15 +205,20 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 var currentUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 await _expensesService.AddFriendAsync(currentUserId, friendVM.Email);
                 _logger.LogInformation($"The friend {friendVM.Email} was added");
+                TempData["success"] = "Friend added successfully";
 
                 return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                TempData["error"] = "Something wrong. Friend wasn't added";
             }
 
             return View();
         }
 
         [HttpGet]
-        public async Task<IActionResult> FilterExpenses(FilterVM filterVM)
+        public async Task<IActionResult> FilterExpenses(FilterVM filterVM, int? pageNumber = 1, int pageSize = 10)
         {
             _logger.LogInformation("FilterExpenses triggered");
 
@@ -203,23 +227,78 @@ namespace SK.TrackYourDay.Expenses.Controllers
             var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var _role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
 
+            decimal totalAmount = 0;
+
             if (ModelState.IsValid)
             {
                 var filterDTO = _mapper.Map<FilterDTO>(filterVM);
 
-                var filteredExpensesDTO = await _expensesService.FilterExpenses(_userId, _role, filterDTO);
+                var filteredExpensesDTO = await _expensesService.FilterExpensesAsync(_userId, _role, filterDTO);
 
                 filteredExpensesVM = _mapper.Map<List<ExpenseVM>>(filteredExpensesDTO);
 
                 _logger.LogInformation("FilterExpenses list received");
+
+                totalAmount = _expensesService.GetTotalAmount(filteredExpensesDTO);
             }
+
+            var paginatedExpensesVM = PaginatedList<ExpenseVM>.Create(filteredExpensesVM.AsQueryable(), pageNumber, pageSize);
+            ViewBag.TotalAmount = totalAmount;
 
             var ExpenseCategoriesDropDown = _expensesHandler.GetExpenseCategoriesDropDown(_userId);
             ViewBag.ExpenseCategoriesDropDown = ExpenseCategoriesDropDown;
             var PaymentMethodsDropDown = _expensesHandler.GetPaymentMethodsDropDown(_userId);
             ViewBag.PaymentMethodsDropDown = PaymentMethodsDropDown;
 
-            return View("Index", filteredExpensesVM);
+            return View("Index", paginatedExpensesVM);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Totals()
+        {
+            _logger.LogInformation("Totals triggered");
+
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var expensesDTO = await _expensesService.GetAllExpensesDTOAsync(_userId, "User", null, null, null, null);
+            var categoriesDTO = await _expenseCategoriesService.GetAllExpenseCategoriesDTOAsync(_userId);
+
+            TotalsDTO totalsDTO = await _expensesService.GetExpensesTotals(_userId, expensesDTO.ToList(), categoriesDTO);
+
+            TotalsVM totalsVM = _mapper.Map<TotalsVM>(totalsDTO);
+
+            return View(totalsVM);
+        }
+
+        [HttpGet]
+        public IActionResult LoadExpensesFromExcel()
+        {
+            _logger.LogInformation("LoadExpenses view triggered");
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LoadExpensesFromExcel(IFormFile fileInput)
+        {
+            _logger.LogInformation("LoadExpenses triggered");
+
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            if (fileInput == null || fileInput.Length == 0)
+            {
+                TempData["error"] = "File is empty";
+                return View();
+            }
+
+            string message = await _expensesService.LoadExpensesFromExcelAsync(_userId, fileInput);
+            if (message == "Ok")
+                TempData["success"] = "Expenses loaded successfully";
+            else
+                TempData["error"] = message;
+
+            return RedirectToAction("Index");
         }
     }
 }

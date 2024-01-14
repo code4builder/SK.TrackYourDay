@@ -32,7 +32,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 var result = await _accountService.LoginAsync(model);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("Login succeded");
+                    _logger.LogInformation("Login succeeded");
 
                     return RedirectToAction("Index", "Expenses");
                 }

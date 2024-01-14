@@ -54,6 +54,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 var expenseCategoryDTO = _mapper.Map<ExpenseCategoryDTO>(expenseCategoryVM);
                 await _expenseCategoriesService.CreateExpenseCategoryAsync(expenseCategoryDTO, _userId);
                 _logger.LogInformation($"The new expense category {expenseCategoryVM.Name} was created");
+                TempData["success"] = "Category created successfully";
 
                 return RedirectToAction("Index");
             }
@@ -89,6 +90,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
             {
                 await _expenseCategoriesService.DeleteExpenseCategoryByIdAsync((int)id);
                 _logger.LogInformation($"The expense category with {id} was deleted");
+                TempData["success"] = "Category deleted successfully";
             }
 
             return RedirectToAction("Index");
@@ -127,6 +129,7 @@ namespace SK.TrackYourDay.Expenses.Controllers
                 var expenseCategoryDTO = _mapper.Map<ExpenseCategoryDTO>(expenseCategoryVM);
                 await _expenseCategoriesService.UpdateExpenseCategoryByIdAsync(expenseCategoryDTO.Id, expenseCategoryDTO);
                 _logger.LogInformation($"The expense category with {expenseCategoryVM.Id} was updated");
+                TempData["success"] = "Category updated successfully";
 
                 return RedirectToAction("Index");
             }

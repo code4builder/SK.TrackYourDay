@@ -11,13 +11,13 @@ namespace SK.TrackYourDay.UseCases.Abstractions.Expenses.Services
     public interface IPaymentMethodsService
     {
         Task<List<PaymentMethodDTO>> GetAllPaymentMethodsDTOAsync(string userId);
-        Task<List<PaymentMethodDTO>> GetPaymentMethodsDTOByUserId(string userId);
+        Task<List<PaymentMethodDTO>> GetPaymentMethodsDTOByUserIdAsync(string userId);
         Task<PaymentMethod> GetPaymentMethodByIdAsync(int id);
         Task<PaymentMethodDTO> GetPaymentMethodDTOByIdAsync(int id);
         Task CreatePaymentMethodAsync(PaymentMethodDTO paymentMethodDTO, string userId);
         Task DeletePaymentMethodByIdAsync(int id);
         Task<PaymentMethod> UpdatePaymentMethodByIdAsync(int id, PaymentMethodDTO paymentMethodDTO);
-        Task<List<PaymentMethodDTO>> GetFriendsPaymentMethods(string userId);
+        Task<List<PaymentMethodDTO>> GetFriendsPaymentMethodsAsync(string userId);
         PaymentMethodDTO ConvertPaymentMethodToDTO(PaymentMethod paymentMethod, string userId);
 
     }
