@@ -57,20 +57,18 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
             return expenses;
         }
 
-        internal static IEnumerable<ExpenseDTO> FilterByIrregularPayment(this IEnumerable<ExpenseDTO> expenses, FilterDTO filterDTO)
+        internal static IEnumerable<ExpenseDTO> FilterByPaymentRegularity(this IEnumerable<ExpenseDTO> expenses, FilterDTO filterDTO)
         {
-            if (!filterDTO.IrregularPayment)
-                return expenses.Where(x => !x.IrregularPayment);
-
-            return expenses;
-        }
-
-        internal static IEnumerable<ExpenseDTO> FilterByRegularPayment(this IEnumerable<ExpenseDTO> expenses, FilterDTO filterDTO)
-        {
-            if (!filterDTO.RegularPayment)
+            if (filterDTO.IrregularPayment is true && filterDTO.RegularPayment is true)
+                return expenses;
+            else if (filterDTO.IrregularPayment is true && filterDTO.RegularPayment is false)
                 return expenses.Where(x => x.IrregularPayment);
-
-            return expenses;
+            else if (filterDTO.IrregularPayment is false && filterDTO.RegularPayment is true)
+                return expenses.Where(x => x.IrregularPayment is false);
+            
+            return new List<ExpenseDTO>();
         }
+
+
     }
 }
