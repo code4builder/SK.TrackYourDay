@@ -21,6 +21,9 @@ namespace SK.TrackYourDay.Expenses.Data
             CreateMap<FilterDTO, FilterVM>();
             CreateMap<FilterVM, FilterDTO>();
 
+            CreateMap<FilterDTO, FilterToCsvVM>();
+            CreateMap<FilterToCsvVM, FilterDTO>();
+
             CreateMap<TotalsDTO, TotalsVM>();
             CreateMap<TotalsVM, TotalsDTO>();
         }
