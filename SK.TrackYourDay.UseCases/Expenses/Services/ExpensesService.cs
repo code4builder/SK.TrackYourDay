@@ -1,4 +1,5 @@
-﻿using ExcelDataReader;
+﻿using CsvHelper;
+using ExcelDataReader;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -7,6 +8,7 @@ using SK.TrackYourDay.Domain.Models;
 using SK.TrackYourDay.Infrastructure.DataAccess;
 using SK.TrackYourDay.UseCases.Abstractions.Expenses.Services;
 using SK.TrackYourDay.UseCases.DTOs;
+using System.Globalization;
 using System.Linq;
 
 namespace SK.TrackYourDay.UseCases.Expenses.Services
@@ -355,15 +357,14 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
             List<ExpenseDTO> filteredExpenses = new List<ExpenseDTO>();
 
-            if (expenses != null)
+            if (expenses is not null && filterDTO is not null)
                 filteredExpenses = expenses.FilterByDateRange(filterDTO)
                                             .FilterByExpenseName(filterDTO)
                                             .FilterByDescription(filterDTO)
                                             .FilterByPaymentMethod(requestedPaymentMethodName)
                                             .FilterByExpenseCategory(requestedExpenseCategoryName)
                                             .FilterByAmountRange(filterDTO)
-                                            .FilterByIrregularPayment(filterDTO)
-                                            .FilterByRegularPayment(filterDTO).ToList();
+                                            .FilterByPaymentRegularity(filterDTO).ToList();
 
             return filteredExpenses;
         }
@@ -456,6 +457,22 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
             await _context.Expenses.AddRangeAsync(expenses);
             await _context.SaveChangesAsync();
+            return "Ok";
+        }
+
+        public async Task<string> ExportExpensesToCSVAsync(string filePath, IEnumerable<ExpenseDTO> expenses)
+        {
+            filePath = Path.Combine(filePath, $"expenses{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.csv");
+            // Create a file to write to:
+            File.Create(filePath).Dispose();
+
+            using (var writer = new StreamWriter(filePath))
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                csv.Context.RegisterClassMap<ExpenseDtoMap>();
+                csv.WriteRecords(expenses);
+            }
+
             return "Ok";
         }
     }

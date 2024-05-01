@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using CsvHelper.Configuration;
 
 namespace SK.TrackYourDay.UseCases.DTOs
 {
@@ -23,5 +24,21 @@ namespace SK.TrackYourDay.UseCases.DTOs
         public string UserName { get; set; } = "Unknown";
 
         public bool IrregularPayment { get; set; }
+    }
+
+    public class ExpenseDtoMap : ClassMap<ExpenseDTO>
+    {
+        public ExpenseDtoMap()
+        {
+            Map(m => m.ExpenseName);
+            Map(m => m.Description);
+            Map(m => m.Amount);
+            Map(m => m.ExpenseCategory);
+            Map(m => m.PaymentMethod);
+            Map(m => m.Date);
+            Map(m => m.IrregularPayment);
+            Map(m => m.UserName);
+            Map(m => m.Id);
+        }
     }
 }

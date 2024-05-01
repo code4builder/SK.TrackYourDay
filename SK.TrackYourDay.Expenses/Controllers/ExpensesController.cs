@@ -300,5 +300,51 @@ namespace SK.TrackYourDay.Expenses.Controllers
 
             return RedirectToAction("Index");
         }
+
+        [HttpGet]
+        public IActionResult ExportToCSV()
+        {
+            _logger.LogInformation("ExportToCSV view triggered");
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExportToCSV(FilterToCsvVM filterVM)
+        {
+            _logger.LogInformation("ExportToCSV triggered");
+
+            if (string.IsNullOrEmpty(filterVM.FilePath))
+            {
+                TempData["error"] = "Path to file is empty";
+                return View();
+            }
+
+            var filteredExpensesVM = new List<ExpenseVM>();
+
+            var _userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var _role = HttpContext.User.FindFirst(ClaimTypes.Role).Value;
+
+            if (ModelState.IsValid)
+            {
+                filterVM.DateFrom = filterVM.DateFrom ?? DateTime.MinValue;
+                filterVM.DateTo = filterVM.DateTo ?? DateTime.MaxValue;
+
+                var filterDTO = _mapper.Map<FilterDTO>(filterVM);
+
+                var filteredExpensesDTO = await _expensesService.FilterExpensesAsync(_userId, _role, filterDTO);
+
+                _logger.LogInformation("Filtered expenses list received");
+
+                string message = await _expensesService.ExportExpensesToCSVAsync(filterVM.FilePath, filteredExpensesDTO);
+                if (message == "Ok")
+                    TempData["success"] = "Expenses export to CSV file successfully";
+                else
+                    TempData["error"] = message;
+            }
+
+            return RedirectToAction("Index");
+        }
     }
 }
