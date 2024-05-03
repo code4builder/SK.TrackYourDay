@@ -402,56 +402,91 @@ namespace SK.TrackYourDay.UseCases.Expenses.Services
 
                 using (var reader = ExcelReaderFactory.CreateReader(stream))
                 {
-                    bool isFirstRow = true;
-
-                    while (reader.Read()) //Each row of the file
+                    if (reader is not null)
                     {
-                        if (isFirstRow)
+                        bool isFirstRow = true;
+
+                        while (reader.Read()) //Each row of the file
                         {
-                            isFirstRow = false;
-                            continue; // Skip processing the first row
+                            if (isFirstRow)
+                            {
+                                isFirstRow = false;
+                                continue; // Skip processing the first row
+                            }
+
+                            bool isEmptyRow = true;
+
+                            // Check if the row is empty
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                var cellValue = reader.GetValue(i);
+                                if (cellValue != null && cellValue != DBNull.Value)
+                                {
+                                    isEmptyRow = false;
+                                    break;
+                                }
+                            }
+                            if (isEmptyRow) break; // Stop processing further rows if an empty row is encountered
+
+                            var friends = await GetFriendsListAsync(userId);
+                            var friendsIds = friends.Select(x => x.Id).ToList();
+
+                            string expenseCategoryName = reader.GetValue(3)?.ToString();
+                            // Add functionality for automatic creating of expense categories and payment methods if needed
+                            //if (!_context.ExpenseCategories.Any(ec => ec.Name == expenseCategoryName && ec.UserId == userId))
+                            //    _context.ExpenseCategories.Add(new ExpenseCategory { Name = expenseCategoryName, UserId = userId });
+
+                            string paymentMethodName = reader.GetValue(4).ToString();
+                            //if (!_context.PaymentMethods.Any(pm => pm.Name == paymentMethodName && pm.UserId == userId))
+                            //    _context.PaymentMethods.Add(new PaymentMethod { Name = paymentMethodName, UserId = userId });
+
+                            ExpenseCategory expenseCategory;
+                            PaymentMethod paymentMethod;
+
+                            if (expenseCategoryName is not null)
+                            {
+                                expenseCategory = _context.ExpenseCategories.FirstOrDefault(x => x.Name.ToLower() == expenseCategoryName.ToLower()
+                                        && (x.UserId == userId || friendsIds.Any(friendId => friendId == x.UserId)));
+                                if (expenseCategory is null)
+                                    return $"Expense category '{expenseCategoryName}' does not exist. Create this category firstly";
+                            }
+                            else return "Reading Expense category was failed";
+
+                            if (paymentMethodName is not null)
+                            {
+                                paymentMethod = _context.PaymentMethods.FirstOrDefault(x => x.Name.ToLower() == paymentMethodName.ToLower()
+                                    && (x.UserId == userId || friendsIds.Any(friendId => friendId == x.UserId)));
+                                if (paymentMethod is null)
+                                    return $"Payment method '{paymentMethodName}' does not exist. Create this Payment method firstly";
+                            }
+                            else return "Reading Payment method was failed";
+
+                            if (reader.GetValue(0)?.ToString() is null)
+                                return $"Expense Name (the first column of excel file) must not be empty";
+
+                            if (decimal.TryParse(reader.GetValue(2)?.ToString(), out _) == false)
+                                return $"Expense Amount should be valid number";
+
+                            if (DateTime.TryParse(reader.GetValue(5)?.ToString(), out _) == false)
+                                return $"Expense Date should be valid date format";
+
+                            bool _isValidIrregular = bool.TryParse(reader.GetValue(6)?.ToString(), out bool _isIrregular);
+
+                            expenses.Add(new Expense
+                            {
+                                ExpenseName = reader.GetValue(0).ToString(),
+                                Description = reader.GetValue(1)?.ToString() ?? string.Empty,
+                                Amount = decimal.Parse(reader.GetValue(2).ToString()),
+                                ExpenseCategoryId = expenseCategory.Id,
+                                PaymentMethodId = paymentMethod.Id,
+                                Date = DateTime.Parse(reader.GetValue(5).ToString()),
+                                UserId = userId,
+                                IrregularPayment = _isValidIrregular ? _isIrregular : false
+                            });
                         }
-
-                        string expenseCategoryName = reader.GetValue(3).ToString();
-                        // Add functionality for automatic creating of expense categories and payment methods if needed
-                        //if (!_context.ExpenseCategories.Any(ec => ec.Name == expenseCategoryName && ec.UserId == userId))
-                        //    _context.ExpenseCategories.Add(new ExpenseCategory { Name = expenseCategoryName, UserId = userId });
-
-                        string paymentMethodName = reader.GetValue(4).ToString();
-                        //if (!_context.PaymentMethods.Any(pm => pm.Name == paymentMethodName && pm.UserId == userId))
-                        //    _context.PaymentMethods.Add(new PaymentMethod { Name = paymentMethodName, UserId = userId });
-
-                        var expenseCategory = _context.ExpenseCategories.FirstOrDefault(x => x.Name.ToLower() == expenseCategoryName.ToLower() && x.UserId == userId);
-                        if(expenseCategory is null)
-                            return $"Expense category '{expenseCategoryName}' does not exist. Create this category firstly";
-
-                        var paymentMethod = _context.PaymentMethods.FirstOrDefault(x => x.Name.ToLower() == paymentMethodName.ToLower() && x.UserId == userId);
-                        if (paymentMethod is null)
-                            return $"Payment method '{paymentMethodName}' does not exist. Create this Payment method firstly";
-
-                        if (reader.GetValue(0)?.ToString() is null)
-                            return $"Expense Name (the first column of excel file) must not be empty";
-
-                        if (decimal.TryParse(reader.GetValue(2)?.ToString(), out _) == false)
-                            return $"Expense Amount should be valid number";
-
-                        if (DateTime.TryParse(reader.GetValue(5)?.ToString(), out _) == false)
-                            return $"Expense Date should be valid date format";
-
-                        bool _isValidIrregular = bool.TryParse(reader.GetValue(6)?.ToString(), out bool _isIrregular);
-
-                        expenses.Add(new Expense
-                        {
-                            ExpenseName = reader.GetValue(0).ToString(),
-                            Description = reader.GetValue(1)?.ToString() ?? string.Empty,
-                            Amount = decimal.Parse(reader.GetValue(2).ToString()),
-                            ExpenseCategoryId = expenseCategory.Id,
-                            PaymentMethodId = paymentMethod.Id,
-                            Date = DateTime.Parse(reader.GetValue(5).ToString()),
-                            UserId = userId,
-                            IrregularPayment = _isValidIrregular ? _isIrregular : false
-                    });
                     }
+                    else
+                        return "Reading of this file was failed";
                 }
             }
 
