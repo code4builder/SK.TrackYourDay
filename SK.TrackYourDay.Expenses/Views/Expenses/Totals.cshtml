@@ -2,437 +2,291 @@
 
 <div class="container p-3">
 
-    <div class="accordion margin-b-1" id="accordionExample">
-        <div class="card w-100">
-            <div class="card-header" id="headingOne">
-                <h4 class="mb-0">
-                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                        <h4>Expenses @DateTime.Now.Year</h4>
-                    </button>
-                </h4>
-            </div>
-            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
-                <div class="card-body">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Description</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @if (@Model.ExpensesMonth01CurrentYear != 0)
-                            {
-                                <tr>
-                                    <td>January @DateTime.Now.Year</td>
-                                    <td>@Model.ExpensesMonth01CurrentYear</td>
-                                </tr>
-                            }
-                            @if (@Model.ExpensesMonth02CurrentYear != 0)
-                            {
-                                <tr>
-                                    <td>February @DateTime.Now.Year</td>
-                                    <td>@Model.ExpensesMonth02CurrentYear</td>
-                                </tr>
-                            }
-                            @if (@Model.ExpensesMonth03CurrentYear != 0)
-                            {
-                                <tr>
-                                    <td>March @DateTime.Now.Year</td>
-                                    <td>@Model.ExpensesMonth03CurrentYear</td>
-                                </tr>
-                            }
-                            @if (@Model.ExpensesMonth04CurrentYear != 0)
-                            {
-                                <tr>
-                                    <td>April @DateTime.Now.Year</td>
-                                    <td>@Model.ExpensesMonth04CurrentYear</td>
-                                </tr>
-                            }
-                            @if (@Model.ExpensesMonth05CurrentYear != 0)
-                            {
-                                <tr>
-                                    <td>May @DateTime.Now.Year</td>
-                                    <td>@Model.ExpensesMonth05CurrentYear</td>
-                                </tr>
-                            }
-                            @if (@Model.ExpensesMonth06CurrentYear != 0)
-                            {
-                                <tr>
-                                    <td>June @DateTime.Now.Year</td>
-                                    <td>@Model.ExpensesMonth06CurrentYear</td>
-                                </tr>
-                            }
-                            @if (@Model.ExpensesMonth07CurrentYear != 0)
-                            {
-                                <tr>
-                                    <td>July @DateTime.Now.Year</td>
-                                    <td>@Model.ExpensesMonth07CurrentYear</td>
-                                </tr>
-                            }
-                            @if (@Model.ExpensesMonth08CurrentYear != 0)
-                            {
-                                <tr>
-                                    <td>August @DateTime.Now.Year</td>
-                                    <td>@Model.ExpensesMonth08CurrentYear</td>
-                                </tr>
-                            }
-                            @if (@Model.ExpensesMonth09CurrentYear != 0)
-                            {
-                                <tr>
-                                    <td>September @DateTime.Now.Year</td>
-                                    <td>@Model.ExpensesMonth09CurrentYear</td>
-                                </tr>
-                            }
-                            @if (@Model.ExpensesMonth10CurrentYear != 0)
-                            {
-                                <tr>
-                                    <td>October @DateTime.Now.Year</td>
-                                    <td>@Model.ExpensesMonth10CurrentYear</td>
-                                </tr>
-                            }
-                            @if (@Model.ExpensesMonth11CurrentYear != 0)
-                            {
-                                <tr>
-                                    <td>Novmber @DateTime.Now.Year</td>
-                                    <td>@Model.ExpensesMonth11CurrentYear</td>
-                                </tr>
-                            }
-                            @if (@Model.ExpensesMonth12CurrentYear != 0)
-                            {
-                                <tr>
-                                    <td>December @DateTime.Now.Year</td>
-                                    <td>@Model.ExpensesMonth12CurrentYear</td>
-                                </tr>
-                            }
-                            <tr>
-                                <td>All Expenses @DateTime.Now.Year</td>
-                                <td>@Model.ExpensesCurrentYear</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @if (Model.ExpensesPreviousYear > 0)
+    @foreach (var year in Model.YearExpenses)
     {
         <div class="accordion margin-b-1" id="accordionExample">
             <div class="card w-100">
                 <div class="card-header" id="headingOne">
                     <h4 class="mb-0">
-                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                            <h4>Expenses @(DateTime.Now.Year - 1)</h4>
+                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            <h4>Expenses @year.Year</h4>
                         </button>
                     </h4>
                 </div>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
                     <div class="card-body">
-                        <table class="table">
+                        <table class="table table-striped">
                             <thead>
                                 <tr>
                                     <th>Description</th>
-                                    <th>Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (@Model.ExpensesMonth01PreviousYear != 0)
-                                {
-                                    <tr>
-                                        <td>January @DateTime.Now.Year</td>
-                                        <td>@Model.ExpensesMonth01PreviousYear</td>
-                                    </tr>
-                                }
-                                @if (@Model.ExpensesMonth02PreviousYear != 0)
-                                {
-                                    <tr>
-                                        <td>February @DateTime.Now.Year</td>
-                                        <td>@Model.ExpensesMonth02PreviousYear</td>
-                                    </tr>
-                                }
-                                @if (@Model.ExpensesMonth03PreviousYear != 0)
-                                {
-                                    <tr>
-                                        <td>March @DateTime.Now.Year</td>
-                                        <td>@Model.ExpensesMonth03PreviousYear</td>
-                                    </tr>
-                                }
-                                @if (@Model.ExpensesMonth04PreviousYear != 0)
-                                {
-                                    <tr>
-                                        <td>April @DateTime.Now.Year</td>
-                                        <td>@Model.ExpensesMonth04PreviousYear</td>
-                                    </tr>
-                                }
-                                @if (@Model.ExpensesMonth05PreviousYear != 0)
-                                {
-                                    <tr>
-                                        <td>May @DateTime.Now.Year</td>
-                                        <td>@Model.ExpensesMonth05PreviousYear</td>
-                                    </tr>
-                                }
-                                @if (@Model.ExpensesMonth06PreviousYear != 0)
-                                {
-                                    <tr>
-                                        <td>June @DateTime.Now.Year</td>
-                                        <td>@Model.ExpensesMonth06PreviousYear</td>
-                                    </tr>
-                                }
-                                @if (@Model.ExpensesMonth07PreviousYear != 0)
-                                {
-                                    <tr>
-                                        <td>July @DateTime.Now.Year</td>
-                                        <td>@Model.ExpensesMonth07PreviousYear</td>
-                                    </tr>
-                                }
-                                @if (@Model.ExpensesMonth08PreviousYear != 0)
-                                {
-                                    <tr>
-                                        <td>August @DateTime.Now.Year</td>
-                                        <td>@Model.ExpensesMonth08PreviousYear</td>
-                                    </tr>
-                                }
-                                @if (@Model.ExpensesMonth09PreviousYear != 0)
-                                {
-                                    <tr>
-                                        <td>September @DateTime.Now.Year</td>
-                                        <td>@Model.ExpensesMonth09PreviousYear</td>
-                                    </tr>
-                                }
-                                @if (@Model.ExpensesMonth10PreviousYear != 0)
-                                {
-                                    <tr>
-                                        <td>October @DateTime.Now.Year</td>
-                                        <td>@Model.ExpensesMonth10PreviousYear</td>
-                                    </tr>
-                                }
-                                @if (@Model.ExpensesMonth11PreviousYear != 0)
-                                {
-                                    <tr>
-                                        <td>Novmber @DateTime.Now.Year</td>
-                                        <td>@Model.ExpensesMonth11PreviousYear</td>
-                                    </tr>
-                                }
-                                @if (@Model.ExpensesMonth12PreviousYear != 0)
-                                {
-                                    <tr>
-                                        <td>December @DateTime.Now.Year</td>
-                                        <td>@Model.ExpensesMonth12PreviousYear</td>
-                                    </tr>
-                                }
-                                <tr>
-                                    <td>All Expenses @(DateTime.Now.Year - 1)</td>
-                                    <td>@Model.ExpensesPreviousYear</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion margin-b-1" id="accordionExample">
-            <div class="card w-100">
-                <div class="card-header" id="headingOne">
-                    <h4 class="mb-0">
-                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                            <h4>Expenses by category @DateTime.Now.Year</h4>
-                        </button>
-                    </h4>
-                </div>
-                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
-                    <div class="card-body">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Expense Category</th>
-                                    <th>Amount</th>
+                                    <th>Total</th>
+                                    <th>Regular</th>
+                                    <th>Irregular</th>
                                 </tr>
                             </thead>
 
                             <tbody>
-                                @if (@Model.Category00Expenses != 0)
+                                @if (@Model.YearExpenses.Any())
                                 {
+                                    @foreach (var month in year.monthExpensesYear)
+                                    {
+                                        if (month is not null)
+                                        {
+                                            <tr>
+                                                <td>@month.MonthName</td>
+                                                <td>@month.MonthTotal</td>
+                                                <td>@(month.MonthTotal - month.IrregularAmount)</td>
+                                                <td>@month.IrregularAmount</td>
+                                            </tr>
+                                        }
+                                    }
                                     <tr>
-                                        <td>@Model.Category00Name</td>
-                                        <td>@Model.Category00Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category01Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category01Name</td>
-                                        <td>@Model.Category01Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category02Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category02Name</td>
-                                        <td>@Model.Category02Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category03Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category03Name</td>
-                                        <td>@Model.Category03Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category04Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category04Name</td>
-                                        <td>@Model.Category04Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category05Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category05Name</td>
-                                        <td>@Model.Category05Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category06Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category06Name</td>
-                                        <td>@Model.Category06Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category07Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category07Name</td>
-                                        <td>@Model.Category07Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category08Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category08Name</td>
-                                        <td>@Model.Category08Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category09Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category09Name</td>
-                                        <td>@Model.Category09Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category10Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category10Name</td>
-                                        <td>@Model.Category10Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category11Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category11Name</td>
-                                        <td>@Model.Category11Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category12Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category12Name</td>
-                                        <td>@Model.Category12Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category13Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category13Name</td>
-                                        <td>@Model.Category13Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category14Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category14Name</td>
-                                        <td>@Model.Category14Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category15Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category15Name</td>
-                                        <td>@Model.Category15Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category16Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category16Name</td>
-                                        <td>@Model.Category16Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category17Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category17Name</td>
-                                        <td>@Model.Category17Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category18Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category18Name</td>
-                                        <td>@Model.Category18Expenses</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tbody>
-                                @if (@Model.Category19Expenses != 0)
-                                {
-                                    <tr>
-                                        <td>@Model.Category19Name</td>
-                                        <td>@Model.Category19Expenses</td>
+                                        <td><b>Totals @year.Year</b></td>
+                                        <td><b>@year.YearTotal</b></td>
+                                        <td><b>@year.RegularYearExpensesByCategory.Sum(x => x.Value)</b></td>
+                                        <td><b>@year.IrregularYearExpensesByCategory.Sum(x => x.Value)</b></td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
+
+                        <div class="accordion margin-b-1" id="accordionCategories">
+                            <div class="card w-100">
+                                <div class="card-header" id="headingOneCat">
+                                    <h4 class="mb-0">
+                                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseOneCategories" aria-expanded="false" aria-controls="collapseOneCategories">
+                                            <h4>All Expenses By Category @year.Year</h4>
+                                        </button>
+                                    </h4>
+                                </div>
+                                <div id="collapseOneCategories" class="collapse" aria-labelledby="headingOneCat" data-parent="#accordionCategories">
+                                    <div class="card-body">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Category</th>
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                @if (@Model.YearExpenses.Any())
+                                                {
+                                                    @foreach (var category in year.YearExpensesByCategory)
+                                                    {
+                                                        <tr>
+                                                            <td>@category.Key.Name</td>
+                                                            <td>@category.Value</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="card-header" id="headingTwoCat">
+                                    <h4 class="mb-0">
+                                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoCategories" aria-expanded="false" aria-controls="collapseTwoCategories">
+                                            <h4>Regular Expenses By Category @year.Year</h4>
+                                        </button>
+                                    </h4>
+                                </div>
+                                <div id="collapseTwoCategories" class="collapse" aria-labelledby="headingTwoCat" data-parent="#accordionCategories">
+                                    <div class="card-body">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Category</th>
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                @if (@Model.YearExpenses.Any())
+                                                {
+                                                    @foreach (var category in year.RegularYearExpensesByCategory)
+                                                    {
+                                                        <tr>
+                                                            <td>@category.Key.Name</td>
+                                                            <td>@category.Value</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="card-header" id="headingThreeCat">
+                                    <h4 class="mb-0">
+                                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeCategories" aria-expanded="false" aria-controls="collapseThreeCategories">
+                                            <h4>Irregular Expenses By Category @year.Year</h4>
+                                        </button>
+                                    </h4>
+                                </div>
+                                <div id="collapseThreeCategories" class="collapse" aria-labelledby="headingThreeCat" data-parent="#accordionCategories">
+                                    <div class="card-body">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Category</th>
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                @if (@Model.YearExpenses.Any())
+                                                {
+                                                    @foreach (var category in year.RegularYearExpensesByCategory)
+                                                    {
+                                                        <tr>
+                                                            <td>@category.Key.Name</td>
+                                                            <td>@category.Value</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="card-header" id="headingFourCat">
+                                    <h4 class="mb-0">
+                                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseFourCategories" aria-expanded="false" aria-controls="collapseFourCategories">
+                                            <h4>All Expenses By Month and Category @year.Year</h4>
+                                        </button>
+                                    </h4>
+                                </div>
+                                <div id="collapseFourCategories" class="collapse" aria-labelledby="headingFourCat" data-parent="#accordionCategories">
+                                    <div class="card-body">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Month</th>
+                                                    @foreach (var category in @year.monthExpensesYear[0].MonthExpensesByCategory.Keys)
+                                                    {
+                                                        <th>@category.Name</th>
+                                                    }
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                @if (@Model.YearExpenses.Any())
+                                                {
+                                                    @foreach (var month in year.monthExpensesYear)
+                                                    {
+                                                        if (month is not null)
+                                                        {
+                                                            <tr>
+                                                                <td>@month.MonthName</td>
+                                                                @foreach (var category in month.MonthExpensesByCategory)
+                                                                {
+                                                                    <td>@category.Value</td>
+                                                                }
+                                                                <td>@month.MonthTotal</td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="card-header" id="headingFiveCat">
+                                    <h4 class="mb-0">
+                                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseFiveCategories" aria-expanded="false" aria-controls="collapseFiveCategories">
+                                            <h4>Regular Expenses By Month and Category @year.Year</h4>
+                                        </button>
+                                    </h4>
+                                </div>
+                                <div id="collapseFiveCategories" class="collapse" aria-labelledby="headingFiveCat" data-parent="#accordionCategories">
+                                    <div class="card-body">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Month</th>
+                                                    @foreach (var category in @year.monthExpensesYear[0].RegularMonthExpensesByCategory.Keys)
+                                                    {
+                                                        <th>@category.Name</th>
+                                                    }
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                @if (@Model.YearExpenses.Any())
+                                                {
+                                                    @foreach (var month in year.monthExpensesYear)
+                                                    {
+                                                        if (month is not null)
+                                                        {
+                                                            <tr>
+                                                                <td>@month.MonthName</td>
+                                                                @foreach (var category in month.RegularMonthExpensesByCategory)
+                                                                {
+                                                                    <td>@category.Value</td>
+                                                                }
+                                                                <td>@(month.MonthTotal - month.IrregularAmount)</td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+
+                                <div class="card-header" id="headingSixCat">
+                                    <h4 class="mb-0">
+                                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseSixCategories" aria-expanded="false" aria-controls="collapseSixCategories">
+                                            <h4>Regular Expenses By Month and Category @year.Year</h4>
+                                        </button>
+                                    </h4>
+                                </div>
+                                <div id="collapseSixCategories" class="collapse" aria-labelledby="headingSixCat" data-parent="#accordionCategories">
+                                    <div class="card-body">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Month</th>
+                                                    @foreach (var category in @year.monthExpensesYear[0].IrregularMonthExpensesByCategory.Keys)
+                                                    {
+                                                        <th>@category.Name</th>
+                                                    }
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                @if (@Model.YearExpenses.Any())
+                                                {
+                                                    @foreach (var month in year.monthExpensesYear)
+                                                    {
+                                                        if (month is not null)
+                                                        {
+                                                            <tr>
+                                                                <td>@month.MonthName</td>
+                                                                @foreach (var category in month.IrregularMonthExpensesByCategory)
+                                                                {
+                                                                    <td>@category.Value</td>
+                                                                }
+                                                                <td>@month.IrregularAmount</td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
